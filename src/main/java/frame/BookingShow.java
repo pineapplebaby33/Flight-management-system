@@ -72,10 +72,6 @@ public class BookingShow {
             // System.out.println(flights[i].getFlightStatus());
         }
         BookingInfo_Table = new JTable(booking_ob, columnNames) {
-
-            /**
-             *
-             */
             private static final long serialVersionUID = 6755177410256977124L;
 
             public boolean isCellEditable(int row, int column) {

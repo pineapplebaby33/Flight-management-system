@@ -8,12 +8,10 @@ import java.sql.SQLException;
 public class DbSelect {
 	private DbConnect db = null;
 	private Connection cn = null;
-	private ResultSet ret = null;
-	private PreparedStatement pst = null;
+	private ResultSet ret = null;//接口，表示从数据库查询生成的结果集（类似于数据表）
+	private PreparedStatement pst = null;//接口，用于表示预编译的 SQL 语句对象
 
-	/*
-	 * Admin��¼��� ����Admin �� Null
-	 */
+	//查询并返回Admin
 	public Admin AdminSelect(String username) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -21,11 +19,11 @@ public class DbSelect {
 			this.pst = cn.prepareStatement("select * from admin where binary Username='" + username + "';",
 					ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
-			this.ret = pst.executeQuery();
+			this.ret = pst.executeQuery();//执行查询并将结果存储在 ret 中
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		//处理查询结果
 		try {
 			ret.last();
 			if (ret.getRow() > 0) {
@@ -33,7 +31,7 @@ public class DbSelect {
 
 				while (ret.next()) {
 					Admin ad = new Admin(ret.getInt(1), ret.getString(2),
-							ret.getString(3));
+							ret.getString(3));//ID,username,password
 					this.ret.close();
 					this.cn.close();
 					return ad;
@@ -43,16 +41,13 @@ public class DbSelect {
 				return null;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 
 	}
 
-	/*
-	 * Passenger�ĵ�¼��� ����Passenger��null
-	 */
+	//查询并返回Passenger
 	public Passenger PassengerSelect(String RealName, String pwd) {
 		pwd = Encode.MD5(pwd);
 		this.db = new DbConnect();
@@ -75,7 +70,7 @@ public class DbSelect {
 				while (ret.next()) {
 					Passenger ad = new Passenger(ret.getInt(1),
 							ret.getString(2), ret.getString(3),
-							ret.getString(4), ret.getString(5));
+							ret.getString(4), ret.getString(5));//Id,RealName,IdentityId,Password
 					this.ret.close();
 					this.cn.close();
 					return ad;
@@ -91,6 +86,7 @@ public class DbSelect {
 
 	}
 
+	//查询并返回Order
 	public Order OrderSelect(int pid, int fid) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -133,7 +129,6 @@ public class DbSelect {
 	}
 
 	public BookingInfo[] SelectFlightInfo(int Fid) {
-
 		Flight f = this.FlightSelect(Fid);
 		int[] pids = f.getPassengerId();
 		if (pids != null) {
@@ -180,7 +175,7 @@ public class DbSelect {
 				_sql = "select * from flight;";
 			}
 
-			this.pst = cn.prepareStatement(_sql);
+			this.pst = cn.prepareStatement(_sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 
 		} catch (Exception e) {
@@ -258,6 +253,7 @@ public class DbSelect {
 		return null;
 	}
 
+
 	public Order[] PassengerOrders(int pid) {
 
 		this.db = new DbConnect();
@@ -277,9 +273,6 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				Order[] ad = new Order[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
@@ -299,6 +292,7 @@ public class DbSelect {
 		return null;
 	}
 
+	//查询并返回Order订单
 	public Order OrderSelect(int pid, int fid, String mode) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -339,9 +333,6 @@ public class DbSelect {
 		return null;
 	}
 
-	/*
-	 * Select All ������ ���ض�������
-	 */
 	public Admin[] AdminSelect() {
 
 		this.db = new DbConnect();
@@ -359,9 +350,6 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				Admin[] ad = new Admin[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Admin x = new Admin(ret.getInt(1), ret.getString(2),
@@ -381,8 +369,8 @@ public class DbSelect {
 
 	}
 
+	//订单 ordershow
 	public Order[] OrderSelect() {
-
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
@@ -398,9 +386,6 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				Order[] ad = new Order[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
@@ -421,26 +406,21 @@ public class DbSelect {
 
 	}
 
+	//预定信息
 	public BookingInfo[] BookingInfoSelect() {
-
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
 			this.pst = cn.prepareStatement("select * from `order`;");
 			this.ret = pst.executeQuery();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		try {
 			ret.last();
 			if (ret.getRow() > 0) {
 				BookingInfo[] ad = new BookingInfo[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
@@ -513,6 +493,7 @@ public class DbSelect {
 		return null;
 	}
 
+
 	public Passenger[] PassengerSelect() {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -528,9 +509,6 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				Passenger[] ad = new Passenger[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Passenger x = new Passenger(ret.getInt(1),
@@ -593,6 +571,7 @@ public class DbSelect {
 		return null;
 	}
 
+	//查询并返回Flight[] 更新航班列表时使用
 	public Flight[] FlightSelectForPass() {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -634,6 +613,7 @@ public class DbSelect {
 		return null;
 	}
 
+	//查询并返回Flight by id
 	public Flight FlightSelect(int id) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -677,6 +657,9 @@ public class DbSelect {
 		return f;
 	}
 
+	//查询并返回Passenger by id
+	//1.查看订单信息
+	//2.查询航班信息
 	public Passenger PassengerSelect(int id) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -708,6 +691,7 @@ public class DbSelect {
 		return p;
 	}
 
+	//查询并返回Order by id 取消订单时使用
 	public Order OrderSelect(int id) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -742,13 +726,15 @@ public class DbSelect {
 
 	}
 
+	//查询并返回Order[] 乘客界面查询订单时使用
 	public Order[] OrderSelect(int pid, String s) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
 			this.pst = cn
 					.prepareStatement("select * from `order` where PassengerId="
-							+ pid + " and Status='PAID';");
+							+ pid + " and Status='PAID';",ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 
 		} catch (Exception e) {
@@ -782,6 +768,7 @@ public class DbSelect {
 		return null;
 	}
 
+	//查询并返回Admin by id 查询管理员姓名时使用
 	public Admin AdminSelect(int id) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();

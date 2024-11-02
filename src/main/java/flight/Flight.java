@@ -53,7 +53,6 @@ public class Flight {
 		String DepartureDate, float price, int CurrentPassengers,
 		int SeatCapacity, String FlightStatus, String PassengerId,
 		String FlightName) {
-
 		if (FlightStatus.equals(Flight_Status.TERMINATE.getStatus())) {
 			return 1;
 		}

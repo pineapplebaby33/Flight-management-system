@@ -23,12 +23,7 @@ public class Admin {
 		return pwd;
 	}
 
-	/**
-	 * @name ��¼��֤����
-	 * @param username
-	 * @param pwd
-	 * @return boolean
-	 */
+	//检查是否是管理员
 	public static boolean CheckAdmin(String username, String pwd) {
 		DbSelect _s = new DbSelect();
 		Admin _a = _s.AdminSelect(username);
@@ -43,16 +38,9 @@ public class Admin {
 
 	}
 
-	/**
-	 * @name ע�����Ա�û�
-	 * @param username
-	 * @param pwd
-	 * @param cid
-	 *            ����Բ²�������Ȩ��������ʲô
-	 * @return boolean
-	 */
+	//？
 	public static boolean CreateAdmin(String username, String pwd, String cid) {
-		if (Encode.MD5(cid).equals("b5223cc5cda3647409cede336d76aed8")) {
+		if (Encode.MD5(cid).equals("6829b4940c8c717af0b4e746055a492f")) {
 			DbInsert _i = new DbInsert();
 			if (_i.AdminInsert(username, pwd)) {
 				return true;

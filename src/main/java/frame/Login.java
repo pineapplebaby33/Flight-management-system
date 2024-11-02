@@ -44,13 +44,15 @@ public class Login {
         });
     }
 
-
+    //Login函数，用于调用实现初始化函数
     public Login() {
         initialize();
     }
 
 
-
+    //initialize函数，用于
+    //1.开启计时器，自动更新航班
+    //2.显示主窗口(登录/注册)
     private void initialize() {
         //开启计时器，自动更新航班
         TimeThread updateBegin = new TimeThread();
@@ -58,14 +60,14 @@ public class Login {
         t1.setPriority(Thread.MAX_PRIORITY);
         t1.start();
 
-        //主窗口
+        //主窗口-f
         frame = new JFrame();
         frame.setTitle("登录页面");
         frame.setBounds(100, 100, 607, 423);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
-        //用户名
+        //用户名-f
         JLabel label = new JLabel("用户名");
         label.setBounds(49, 117, 108, 29);
         frame.getContentPane().add(label);
@@ -75,7 +77,7 @@ public class Login {
         frame.getContentPane().add(RealName);
         RealName.setColumns(10);
 
-        //密码
+        //密码-f
         JLabel label_1 = new JLabel("密码");
         label_1.setBounds(49, 200, 108, 29);
         frame.getContentPane().add(label_1);
@@ -84,7 +86,7 @@ public class Login {
         passwordField.setBounds(194, 197, 273, 32);
         frame.getContentPane().add(passwordField);
 
-        //注册
+        //注册-f
         JButton button = new JButton("注册");
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -97,7 +99,7 @@ public class Login {
         button.setBounds(106, 273, 153, 37);
         frame.getContentPane().add(button);
 
-        //登录
+        //登录-f-j
         JButton button_1 = new JButton("登陆");
         button_1.addMouseListener(new MouseAdapter() {
             @Override
@@ -138,6 +140,7 @@ public class Login {
 
     }
 
+    //getFrame函数，用于返回登录页面
     public JFrame getFrame() {
         return frame;
     }

@@ -12,7 +12,6 @@ public class Passenger {
 	private int[] OrderList;
 
 	public Passenger(int id, String RealName, String IdentityId, String Password, String OrderList) {
-		// TODO Auto-generated constructor stub
 		this.id = id;
 		this.RealName = RealName;
 		this.IdentityId = IdentityId;
@@ -30,27 +29,28 @@ public class Passenger {
 		}
 	}
 
+	//检查密码
 	public static boolean CheckPwd(String RealName, String pwd) {
 		DbSelect _s = new DbSelect();
 		Passenger _a = _s.PassengerSelect(RealName, pwd);
 		if (_a != null) {
-
 			return true;
-
 		}
 		return false;
 
 	}
 
 
+	//预定航班
 	public static boolean ReserveFlight(int pid, int fid, String pwd) {
-
 		DbSelect select = new DbSelect();
 		Flight f = select.FlightSelect(fid);
+		//检查航班状态
 		if (f.getFlightStatus().equals("AVAILABLE")) {
 			Passenger p = select.PassengerSelect(pid);
+			// 验证密码
 			if (Passenger.CheckPwd(p.getRealName(), pwd)) {
-				// һ���˿����һ������ֻ����һ��Ʊ
+				// 检查乘客是否已预定该航班
 				if (select.OrderSelect(pid, fid,"") == null) {
 					DbInsert insert = new DbInsert();
 					// �������ڸ�ʽ

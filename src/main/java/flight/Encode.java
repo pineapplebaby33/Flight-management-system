@@ -6,6 +6,7 @@ public class Encode {
 	public static String MD5(String str) {
 		MessageDigest md5 = null;
 		try {
+			//获取 MD5 算法实例
 			md5 = MessageDigest.getInstance("MD5");
 		} catch (Exception e) {
 			System.out.println(e.toString());
