@@ -203,7 +203,7 @@ public class Research {
 						arrivalCity.getSelectedIndex()).toString();
 				String date1 = dateChooser.getText();
 				String date2 = dateChooser2.getText();
-				flight.Flight[] flights2 = new DbSelect().FlightSelect(date1, date2, s1, s2);
+				flight.Flight[] flights2 = new DbSelect().FlightSelect(date1, date2, s1, s2);//返回12列
 				if (flights2 != null) {
 					setTable(frame, flights2);
 				} else {
@@ -251,6 +251,9 @@ public class Research {
 
 	//创建表格_by frame 初始化/刷新
 	private void setTable(final JFrame frame) {
+		if (scrollPane != null) {
+			frame.getContentPane().remove(scrollPane); // 清除旧的表格
+		}
 		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定" };
 		Flight[] flights = new DbSelect().FlightSelectForPass();
 
@@ -268,9 +271,9 @@ public class Research {
 			flight_ob[i][6] = String.valueOf(flights[i].getPrice());
 			//检查当前登录的乘客是否已经预定该航班
 			if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())) {
-				flight_ob[i][7] = "已预定";
-			} else {
 				flight_ob[i][7] = "未预定";
+			} else {
+				flight_ob[i][7] = "已预定";
 			}
 		}
 
@@ -321,6 +324,9 @@ public class Research {
 
 	//创建表格_by frame 精准查询
 	private void setTable(final JFrame frame, Flight[] flights) {
+		if (scrollPane != null) {
+			frame.getContentPane().remove(scrollPane); // 清除旧的表格
+		}
 		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定" };
 		String[][] flight_ob = new String[flights.length][8];
 
@@ -345,13 +351,12 @@ public class Research {
 
 			public boolean isCellEditable(int row, int column) {
 				return false;
-			}// ��������༭
+			}
 		};
 		TableColumn column = null;
 		int colunms = Flight_Table.getColumnCount();
 		for (int i = 0; i < colunms; i++) {
 			column = Flight_Table.getColumnModel().getColumn(i);
-			/* ��ÿһ�е�Ĭ�Ͽ������Ϊ100 */
 			column.setPreferredWidth(100);
 		}
 		Flight_Table.getColumnModel().getColumn(0).setPreferredWidth(20);
@@ -367,7 +372,7 @@ public class Research {
 		scrollPane.setViewportView(Flight_Table);
 		Flight_Table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {// ������Σ�������˫���¼�
+				if (e.getClickCount() == 2) {
 					int row = Flight_Table.getSelectedRow();
 					String preId1 = Flight_Table.getValueAt(row, 0).toString();
 					frame.setVisible(false);

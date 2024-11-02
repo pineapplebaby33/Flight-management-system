@@ -53,28 +53,26 @@ public class Passenger {
 				// 检查乘客是否已预定该航班
 				if (select.OrderSelect(pid, fid,"") == null) {
 					DbInsert insert = new DbInsert();
-					// �������ڸ�ʽ
-					SimpleDateFormat df = new SimpleDateFormat(
-							"yyyy-MM-dd-HH-mm-ss");
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 					String CreateDate = df.format(new Date());
-
+					// 插入订单
 					boolean re = insert.OrderInsert(p.getId(), p.getId(),
 							f.getId(), CreateDate, "PAID");
-					// ����Flight��Passenger�б��CurrentPassengers������Passenger��OrderList
+					// 更新航班和乘客信息
 					re = re && Flight.ReserveFlight(pid, fid)
 							&& p.UpdateOrderList(fid);
 					if (re) {
 						return true;
 					}
 				} else {
-					System.err.println("�����Ѵ��ڣ��޷��ظ���Ʊ");
+					System.err.println("该乘客已预订该航班，无法重复预订");
 				}
 			} else {
-				System.err.println("�˿��������");
+				System.err.println("密码错误");
 				return false;
 			}
 		} else {
-			System.err.println("����״̬�쳣������Ԥ��");
+			System.err.println("航班状态异常，无法预订");
 			return false;
 		}
 		return false;
@@ -194,7 +192,6 @@ public class Passenger {
 		return OrderList;
 	}
 
-	// ����Id��ԃ���w��Ϣ���@��Passenger�Č���
 	public Passenger GetPassengerById(int id) {
 		DbSelect select = new DbSelect();
 		return select.PassengerSelect(id);

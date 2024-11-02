@@ -27,13 +27,7 @@ public class EditFlight {
 	private JTextField Capp;
 	private JTextField PriceText;
 
-	/**
-	 * Launch the application.
-	 */
 
-	/**
-	 * Create the application.
-	 */
 	public EditFlight() {
 		initialize();
 	}
@@ -42,12 +36,10 @@ public class EditFlight {
 		return this.frame;
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	@SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 	private void initialize() {
 
+		//// 从数据库中获取航班信息
 		Flight f = new DbSelect().FlightSelect(Login.FlightId);
 		frame = new JFrame();
 		frame.setResizable(false);
@@ -55,6 +47,7 @@ public class EditFlight {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
+		// 创建并设置各个标签
 		JLabel FlightId = new JLabel("航班号");
 		FlightId.setBounds(20, 22, 60, 29);
 		frame.getContentPane().add(FlightId);
@@ -193,6 +186,7 @@ public class EditFlight {
 				String price = PriceText.getText();
 				String FS = FlightStateCombox.getItemAt(
 						FlightStateCombox.getSelectedIndex()).toString();
+				// 更新航班信息
 				boolean x = new DbUpdate().FlightUpdate(Login.FlightId, st, at,
 						sc, ac, st, Float.parseFloat(price),
 						f.getCurrentPassengers(), Integer.parseInt(ca), FS,
@@ -201,12 +195,13 @@ public class EditFlight {
 					frame.setVisible(false);
 					AdminFunction window = new AdminFunction();
 					window.getAdminFrame().setVisible(true);
-					AllDialog.Dialog(window.getAdminFrame(), "�޸ĳɹ�");
+					AllDialog.Dialog(window.getAdminFrame(), "修改成功");
 				} else {
-					AllDialog.Dialog(frame, "�޸�ʧ��");
+					AllDialog.Dialog(frame, "修改失败");
 				}
 			}
 		});
+		// 检查航班状态是否为 TERMINATE
 		if (f.getFlightStatus().equals("TERMINATE")) {
 			IdtextField.disable();
 			STtextField.disable();
@@ -219,12 +214,13 @@ public class EditFlight {
 			FlightStateCombox.disable();
 			Warning.setText("�������������޷�����");
 		}
+		// 设置各个输入框的初始值
 		IdtextField.setText(f.getFlightName());
 		STtextField.setText(DateTime.GetDateTimeStr(f.getStartTime()));
 		ATtextField_1.setText(DateTime.GetDateTimeStr(f.getArrivalTime()));
 		Capp.setText(Integer.toString(f.getSeatCapacity()));
 		PriceText.setText(Float.toString(f.getPrice()));
-
+		// 返回按钮
 		JButton button = new JButton("返回");
 		button.addMouseListener(new MouseAdapter() {
 			@Override
@@ -236,30 +232,29 @@ public class EditFlight {
 		});
 		button.setBounds(394, 428, 115, 37);
 		frame.getContentPane().add(button);
-		
+		// 删除航班按钮
 		JButton del = new JButton("删除航班");
 		del.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				Flight f=new DbSelect().FlightSelect(Login.FlightId);
-				//System.out.println(Login.FlightId);
-				if(f.getFlightStatus().equals("UNPUBLISHED"))
+				if(f.getFlightStatus().equals("UNPUBLISHED")) // 检查状态
 				{
-				boolean x=new DbDelete().FlightDelete(Login.FlightId);
-				if(x)
+				boolean x=new DbDelete().FlightDelete(Login.FlightId);// 删除航班
+				if(x)// 删除成功
 				{
 					frame.setVisible(false);
 					AdminFunction window=new AdminFunction();
 					window.getAdminFrame().setVisible(true);
-					AllDialog.Dialog(window.getAdminFrame(), "ɾ���ɹ�");
+					AllDialog.Dialog(window.getAdminFrame(), "删除成功");
 					
 				}
 				else {
-					AllDialog.Dialog(frame, "ɾ��ʧ��");
+					AllDialog.Dialog(frame, "删除失败");
 				}
 				}
 				else{
-					AllDialog.Dialog(frame, "�����ѷ���������ɾ��");
+					AllDialog.Dialog(frame, "航班已发布，无法删除");
 				}
 			}
 		});

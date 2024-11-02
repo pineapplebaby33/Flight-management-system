@@ -93,7 +93,8 @@ public class DbSelect {
 		try {
 			String _sql = "select * from `order` where PassengerId=" + pid
 					+ " and FlightId=" + fid + ";";
-			this.pst = cn.prepareStatement(_sql);
+			this.pst = cn.prepareStatement(_sql,ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 
 		} catch (Exception e) {
@@ -146,8 +147,7 @@ public class DbSelect {
 		return null;
 	}
 
-	public Flight[] FlightSelect(String StartTime, String ArrivalTime,
-			String StartCity, String ArrivalCity) {
+	public Flight[] FlightSelect(String StartTime, String ArrivalTime, String StartCity, String ArrivalCity) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
@@ -186,9 +186,6 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				Flight[] ad = new Flight[ret.getRow()];
 				ret.beforeFirst();
-				/*
-				 * ע�⣺getRow()���������ǻ�����������ǻ��ret��ǰָ��λ ������Ҫ��ret�����������󣬻�ȡrow����������
-				 */
 				int _i = 0;
 				while (ret.next()) {
 					Flight x = new Flight(ret.getInt(1), ret.getString(2),
@@ -205,7 +202,6 @@ public class DbSelect {
 				return ad;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -374,7 +370,7 @@ public class DbSelect {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
-			this.pst = cn.prepareStatement("select * from `order`;");
+			this.pst = cn.prepareStatement("select * from `order`;",ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 
 		} catch (Exception e) {
@@ -411,7 +407,7 @@ public class DbSelect {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
-			this.pst = cn.prepareStatement("select * from `order`;");
+			this.pst = cn.prepareStatement("select * from `order`;",ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -576,7 +572,7 @@ public class DbSelect {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
-			this.pst = cn.prepareStatement("select * from flight where FlightStatus='TERMINATE' or FlightStatus='FULL';",
+			this.pst = cn.prepareStatement("select * from flight where FlightStatus='AVAILABLE' or FlightStatus='FULL';",
 							ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			this.ret = pst.executeQuery();
 

@@ -191,7 +191,7 @@ public class Flight {
 											.GetPassengerString(flights[i].PassengerId),
 									flights[i].FlightName);
 					if (!re) {
-						System.err.println("����״̬�Զ����³���");
+						System.err.println("航班状态更新失败");
 					}
 				}
 			}
@@ -270,7 +270,6 @@ public class Flight {
 		return s;
 	}
 
-	// ����һ����׼DateTime����
 	public static DateTime GetTime(String time) {
 		DateTime x = new DateTime(time);
 		return x;

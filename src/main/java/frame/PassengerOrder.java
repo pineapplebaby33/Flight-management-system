@@ -25,9 +25,6 @@ public class PassengerOrder {
 	private JTable table;
 	private JScrollPane scrollPane;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -41,20 +38,14 @@ public class PassengerOrder {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public PassengerOrder() {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("我的订单");
-		frame.setBounds(250, 50, 950, 600);
+		frame.setBounds(250, 40, 950, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
@@ -98,7 +89,7 @@ public class PassengerOrder {
 		String[][] o_ob2 =null;
 		if(order!=null)
 		{
-			o_ob2 = new String[order.length][7];
+			o_ob2 = new String[order.length][8];
 			if (order != null) {
 				for (int i = 0; i < order.length; i++) {
 					o_ob2[i][0] = Integer.toString(order[i].getId());
@@ -110,17 +101,15 @@ public class PassengerOrder {
 					o_ob2[i][5] = DateTime.GetDateTimeStr(order[i].getFlightId()
 							.getArrivalTime());
 					o_ob2[i][6] = DateTime.GetDateTimeStr(order[i].getCreateDate());
+					o_ob2[i][7] = "已预定";
 				}
 
 			}
 		}else{
-			o_ob2 = new String[1][7];
-			label.setText("出现错误!");
+			o_ob2 = new String[1][8];
+			label.setText("当前无订单!");
 		}
 		table = new JTable(o_ob2, columnNames) {
-			/**
-			 *
-			 */
 			private static final long serialVersionUID = -7902867902078729470L;
 
 			public boolean isCellEditable(int row, int column) {
@@ -130,8 +119,8 @@ public class PassengerOrder {
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
-				if (e.getClickCount() == 2) {// ������Σ�������˫���¼�
-					// ��ת��ȡ������ҳ��
+				if (e.getClickCount() == 2) {// 检测双击事件
+					// 获取选中的行
 					int row = table.getSelectedRow();
 					String preId1 = table.getValueAt(row, 0).toString();
 					// System.out.println(preId1);

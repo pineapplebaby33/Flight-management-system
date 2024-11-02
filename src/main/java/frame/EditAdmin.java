@@ -1,7 +1,6 @@
 package frame;
 
-import java.awt.EventQueue;
-import java.awt.Window;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,6 +14,8 @@ import flight.DbUpdate;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class EditAdmin {
 
@@ -81,6 +82,18 @@ public class EditAdmin {
 		frame.getContentPane().add(newuser);
 		newuser.setColumns(10);
 
+
+		JLabel label_2 = new JLabel("旧用户名");
+		label_2.setBounds(168, 65, 54, 15);
+		frame.getContentPane().add(label_2);
+
+		olduser = new JTextField();
+		olduser.setBounds(324, 62, 126, 35);
+		frame.getContentPane().add(olduser);
+		olduser.setColumns(10);
+		Admin nowadmin = new DbSelect().AdminSelect(Login.AdminId);
+		olduser.setText(nowadmin.getUsername());
+
 		JButton button = new JButton("确定");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -97,8 +110,7 @@ public class EditAdmin {
 					passnew += p2[i];
 				}
 				if (Admin.CheckAdmin(userold, passold)) {
-					boolean x = new DbUpdate().AdminUpdate(Login.AdminId,
-							usernew, passnew);
+					boolean x = new DbUpdate().AdminUpdate(Login.AdminId, usernew, passnew);
 					if (x) {
 						frame.setVisible(false);
 						AdminFunction window = new AdminFunction();
@@ -113,16 +125,19 @@ public class EditAdmin {
 		button.setBounds(297, 412, 153, 37);
 		frame.getContentPane().add(button);
 
-		JLabel label_2 = new JLabel("旧用户名");
-		label_2.setBounds(168, 65, 54, 15);
-		frame.getContentPane().add(label_2);
+		JButton button_2 = new JButton("返回");
+		button_2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.setVisible(false);
+				AdminFunction n_adminFunction = new AdminFunction();
+				n_adminFunction.getFrame().setVisible(true);
+			}
+		});
+		//button_2.setFont(new Font("宋体", Font.PLAIN, 20));
+		button_2.setBounds(297, 462, 153, 37);
+		frame.getContentPane().add(button_2);
 
-		olduser = new JTextField();
-		olduser.setBounds(324, 62, 126, 35);
-		frame.getContentPane().add(olduser);
-		olduser.setColumns(10);
-		Admin nowadmin = new DbSelect().AdminSelect(Login.AdminId);
-		olduser.setText(nowadmin.getUsername());
 	}
 
 	public Window getFrame() {

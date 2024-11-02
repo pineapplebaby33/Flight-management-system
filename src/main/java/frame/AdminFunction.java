@@ -32,9 +32,6 @@ public class AdminFunction {
     private JTable Flight_Table;
     private JScrollPane scrollPane;
 
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -48,9 +45,6 @@ public class AdminFunction {
         });
     }
 
-    /**
-     * Create the application.
-     */
     public AdminFunction() {
         initialize();
     }
@@ -59,9 +53,6 @@ public class AdminFunction {
         return this.AdminFrame;
     }
 
-    /**
-     * Initialize the contents of the AdminFrame.
-     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void initialize() {
         AdminFrame = new JFrame();
@@ -82,13 +73,13 @@ public class AdminFunction {
         });
         addAdmin.setBounds(271, 0, 153, 37);
         AdminFrame.getContentPane().add(addAdmin);
-
+        /*
         final JRadioButton CheckDateRadio = new JRadioButton(
                 "不选择日期搜索");
         CheckDateRadio.setSelected(true);
         CheckDateRadio.setBounds(691, 63, 121, 23);
         AdminFrame.getContentPane().add(CheckDateRadio);
-
+        */
         JButton ModifyP = new JButton("修改个人信息");
         ModifyP.addMouseListener(new MouseAdapter() {
             @Override
@@ -182,7 +173,7 @@ public class AdminFunction {
         ArrLabel.setBounds(571, 67, 54, 29);
         AdminFrame.getContentPane().add(ArrLabel);
 
-        String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定"};
+        String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "航班状态"};
         flight.Flight[] flights = new DbSelect().FlightSelect();
         String[][] flight_ob = new String[flights.length][8];
         for (int i = 0; i < flights.length; i++) {
@@ -249,18 +240,16 @@ public class AdminFunction {
         newFlight.setBounds(183, 541, 190, 50);
         AdminFrame.getContentPane().add(newFlight);
 
-        // �������
         final DateChooser dateChooser = new DateChooser(
                 AdminFrame.getContentPane());
         dateChooser.setBounds(364, 96, 153, 37);
         AdminFrame.getContentPane().add(dateChooser);
-        // ��������
+
         final DateChooser dateChooser2 = new DateChooser(
                 AdminFrame.getContentPane());
         dateChooser2.setBounds(534, 96, 153, 37);
         AdminFrame.getContentPane().add(dateChooser2);
 
-        // Flight_Table������
         scrollPane = new JScrollPane();
         scrollPane.setBounds(12, 143, 800, 363);
 
@@ -277,30 +266,15 @@ public class AdminFunction {
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
-
-                String s1 = startCity.getItemAt(startCity.getSelectedIndex())
-                        .toString();
-                String s2 = arrivalCity.getItemAt(
-                        arrivalCity.getSelectedIndex()).toString();
+                String s1 = startCity.getItemAt(startCity.getSelectedIndex()).toString();
+                String s2 = arrivalCity.getItemAt(arrivalCity.getSelectedIndex()).toString();
                 String date1 = dateChooser.getText();
                 String date2 = dateChooser2.getText();
-                if (CheckDateRadio.isSelected()) {
                     if (s1.equals(" ") && s2.equals(" ")) {
-                        // show_table(AdminFrame,new DbSelect().FlightSelect());
-                        AllDialog.Dialog(AdminFrame, "你好管理员");
+                        show_table(AdminFrame,new DbSelect().FlightSelect());
+                        //AllDialog.Dialog(AdminFrame, "你好管理员");
                     } else {
-                        show_table(AdminFrame,
-                                new DbSelect().FlightSelect("", "", s1, s2));
-                    }
-                } else {
-                    if (s1.equals(" ") && s2.equals(" ")) {
-                        show_table(AdminFrame, new DbSelect().FlightSelect(
-                                date1, date2, "", ""));
-
-                    } else {
-                        show_table(AdminFrame, new DbSelect().FlightSelect(
-                                date1, date2, s1, s2));
-                    }
+                        show_table(AdminFrame, new DbSelect().FlightSelect(date1, date2, s1, s2));
                 }
             }
         });
@@ -352,7 +326,7 @@ public class AdminFunction {
 
     public void show_table(final JFrame AdminFrame,
                            flight.Flight[] flights) {
-        String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定" };
+        String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "航班状态" };
         // com.flight.java.Flight[] flights = new DbSelect().FlightSelect();
         if (flights != null) {
             String[][] flight_ob = new String[flights.length][8];
@@ -367,12 +341,9 @@ public class AdminFunction {
                         .getArrivalTime());
                 flight_ob[i][6] = String.valueOf(flights[i].getPrice());
                 flight_ob[i][7] = flights[i].getFlightStatus();
-                // System.out.println(flights[i].getFlightStatus());
+
             }
             Flight_Table = new JTable(flight_ob, columnNames) {
-                /**
-                 *
-                 */
                 private static final long serialVersionUID = 176942350943898960L;
 
                 public boolean isCellEditable(int row, int column) {
@@ -383,7 +354,6 @@ public class AdminFunction {
             int colunms = Flight_Table.getColumnCount();
             for (int i = 0; i < colunms; i++) {
                 column = Flight_Table.getColumnModel().getColumn(i);
-                /* ��ÿһ�е�Ĭ�Ͽ������Ϊ100 */
                 column.setPreferredWidth(100);
             }
             Flight_Table.getColumnModel().getColumn(0).setPreferredWidth(20);
@@ -394,12 +364,9 @@ public class AdminFunction {
             Flight_Table.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
 
-                    if (e.getClickCount() == 2) {// ������Σ�������˫���¼�
-                        // ��ת���޸ĺ���
+                    if (e.getClickCount() == 2) {
                         int row = Flight_Table.getSelectedRow();
-                        String preId1 = Flight_Table.getValueAt(row, 0)
-                                .toString();
-                        // System.out.println(preId1);
+                        String preId1 = Flight_Table.getValueAt(row, 0).toString();
                         AdminFrame.setVisible(false);
                         Login.FlightId = Integer.parseInt(preId1);
                         EditFlight window = new EditFlight();
@@ -412,5 +379,8 @@ public class AdminFunction {
         } else {
             AllDialog.Dialog(AdminFrame, "没有当前航班数据");
         }
+    }
+    public JFrame getFrame() {
+        return this.AdminFrame;
     }
 }
