@@ -4,12 +4,12 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import flight.DateTime;
 import flight.DbSelect;
 import flight.Flight;
 
@@ -121,12 +121,12 @@ public class ReserveFlight {
 		Seat.setBounds(558, 43, 123, 15);
 		frame.getContentPane().add(Seat);
 
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		FlightName.setText(f.getFlightName());
 		StartCity.setText(f.getStartCity());
 		ArrCity.setText(f.getArrivalCity());
-		StartTime.setText(DateTime.GetDateTimeStr(f.getStartTime()));
-		ArrTime.setText(DateTime.GetDateTimeStr(f.getArrivalTime()));
+		StartTime.setText(f.getStartTime().format(formatter));
+		ArrTime.setText(f.getArrivalTime().format(formatter));
 		Price.setText(Float.toString(f.getPrice()) + "￥");
 		Seat.setText(Integer.toString(f.getSeatCapacity()));
 

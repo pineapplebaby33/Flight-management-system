@@ -1,3 +1,4 @@
+/*
 package flight;
 
 import java.lang.reflect.InvocationTargetException;
@@ -7,6 +8,7 @@ public class TestObject {
 	/*
 	 * Test���� ���ڱ���ĳһ���������private���ԣ� ������Щ����Ϊ���飬 �޷�ֱ�Ӳ鿴����
 	 */
+/*
 	public static void print(BookingInfo m) {
 
 		Class<?> c;
@@ -192,3 +194,4 @@ public class TestObject {
 
 	}
 }
+*/

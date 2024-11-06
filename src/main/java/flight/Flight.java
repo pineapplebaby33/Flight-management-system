@@ -1,4 +1,7 @@
 package flight;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 enum Flight_Status {
 	UNPUBLISHED("UNPUBLISHED"), AVAILABLE("AVAILABLE"), FULL("FULL"), TERMINATE(
@@ -17,8 +20,8 @@ enum Flight_Status {
 
 public class Flight {
 	private int id = 0;
-	private DateTime StartTime = null;
-	private DateTime ArrivalTime = null;
+	private LocalDateTime StartTime = null;
+	private LocalDateTime ArrivalTime = null;
 	private String StartCity = "";
 	private String ArrivalCity = "";
 	private String DepartureDate = "";
@@ -33,9 +36,11 @@ public class Flight {
 			String StartCity, String ArrivalCity, String DepartureDate,
 			float price, int CurrentPassengers, int SeatCapacity,
 			String FlightStatus, String PassengerId, String FlightName) {
+		// 根据时间字符串的格式创建 DateTimeFormatter
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		this.id = id;
-		this.StartTime = DateTime.GetDateTimeOb(StartTime);
-		this.ArrivalTime = DateTime.GetDateTimeOb(ArrivalTime);
+		this.StartTime = LocalDateTime.parse(StartTime, formatter);
+		this.ArrivalTime = LocalDateTime.parse(ArrivalTime, formatter);
 		this.StartCity = StartCity;
 		this.ArrivalCity = ArrivalCity;
 		this.DepartureDate = DepartureDate;
@@ -71,12 +76,12 @@ public class Flight {
 		String StartCity, String ArrivalCity, String DepartureDate,
 		float price, int CurrentPassengers, int SeatCapacity,
 		String FlightStatus, String PassengerId, String FlightName) {
-		DateTime starTime = new DateTime(StartTime);
-		DateTime arrivalTime = new DateTime(ArrivalTime);
-		if (!DateTime.CompareDate(arrivalTime, starTime)) {
-			return false;
-		}//出发时间应早于到达时间
-		if (!DateTime.GetSub(arrivalTime, starTime)) {
+		// 定义日期时间格式
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		// 使用 LocalDateTime.parse() 方法将字符串解析为 LocalDateTime 对象
+		LocalDateTime startTime = LocalDateTime.parse(StartTime, formatter);
+		LocalDateTime arrivalTime = LocalDateTime.parse(ArrivalTime, formatter);
+		if (!startTime.isBefore(arrivalTime)) {
 			return false;
 		}
 		if (StartCity.equals(ArrivalCity)) {
@@ -117,10 +122,11 @@ public class Flight {
 				passengerIdString += pids[i] + ";";
 			}
 		}//更新乘客的 ID 列表
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		passengerIdString += pid + ";";
 		boolean r = update.FlightUpdate(xFlight.getId(),
-				DateTime.GetDateTimeStr(xFlight.getStartTime()),
-				DateTime.GetDateTimeStr(xFlight.getArrivalTime()),
+				xFlight.getStartTime().format(formatter),
+				xFlight.getArrivalTime().format(formatter),
 				xFlight.getStartCity(), xFlight.getArrivalCity(),
 				xFlight.getDepartureDate(), xFlight.getPrice(),
 				(xFlight.getCurrentPassengers() + 1),
@@ -150,10 +156,10 @@ public class Flight {
 				}
 			}
 		}
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		boolean r = update.FlightUpdate(xFlight.getId(),
-				DateTime.GetDateTimeStr(xFlight.getStartTime()),
-				DateTime.GetDateTimeStr(xFlight.getArrivalTime()),
+				xFlight.getStartTime().format(formatter),
+				xFlight.getArrivalTime().format(formatter),
 				xFlight.getStartCity(), xFlight.getArrivalCity(),
 				xFlight.getDepartureDate(), xFlight.getPrice(),
 				(xFlight.getCurrentPassengers() - 1),
@@ -167,19 +173,23 @@ public class Flight {
 	}
 
 	//自动更新航班状态
-	public static void AutoUpdateStatus(DateTime NowDate) {
+	public static void AutoUpdateStatus(LocalDateTime NowDate) {
 		DbSelect sel = new DbSelect();
 		Flight[] flights = sel.FlightSelect();
 		DbUpdate up = new DbUpdate();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		for (int i = 0; i < flights.length; i++) {
 			if (flights[i].getFlightStatus().equals(Flight_Status.AVAILABLE.getStatus())
 					|| flights[i].getFlightStatus().equals(Flight_Status.FULL.getStatus())) {
-				if (NowDate.UpdateStatus(flights[i].getStartTime())) {
-					boolean re = up
-							.FlightUpdate(
+				// 计算当前时间与航班出发时间的分钟差
+				LocalDateTime startTime = flights[i].getStartTime();
+				long minutesDifference = Duration.between(NowDate, startTime).toMinutes();
+				// 如果出发时间在当前时间之后且不超过120分钟，则更新航班状态
+				if (minutesDifference >= 0 && minutesDifference <= 120){
+					boolean re = up.FlightUpdate(
 									flights[i].id,
-									DateTime.GetDateTimeStr(flights[i].StartTime),
-									DateTime.GetDateTimeStr(flights[i].ArrivalTime),
+									flights[i].getStartTime().format(formatter),
+									flights[i].getArrivalTime().format(formatter),
 									flights[i].StartCity,
 									flights[i].ArrivalCity,
 									flights[i].DepartureDate,
@@ -202,11 +212,11 @@ public class Flight {
 		return id;
 	}
 
-	public DateTime getStartTime() {
+	public LocalDateTime getStartTime() {
 		return StartTime;
 	}
 
-	public DateTime getArrivalTime() {
+	public LocalDateTime getArrivalTime() {
 		return ArrivalTime;
 	}
 
@@ -270,16 +280,43 @@ public class Flight {
 		return s;
 	}
 
+	/*
 	public static DateTime GetTime(String time) {
 		DateTime x = new DateTime(time);
 		return x;
+	}*/
+	@Override
+	public String toString() {
+		return "Flight ID: " + id +
+				", Start Time: " + StartTime +
+				", Arrival Time: " + ArrivalTime +
+				", Start City: " + StartCity +
+				", Arrival City: " + ArrivalCity +
+				", Departure Date: " + DepartureDate +
+				", Price: " + price +
+				", Current Passengers: " + CurrentPassengers +
+				", Seat Capacity: " + SeatCapacity +
+				", Flight Status: " + FlightStatus +
+				", Passenger ID: " + PassengerId +
+				", Flight Name: " + FlightName;
 	}
 
+
 	public static void main(String[] args) {
-		/*
-		 * BookingInfo[] r=Flight.SelectFlightInfo(1);
-		 * 
-		 * for (int i = 0; i < r.length; i++) { TestObject.print(r[i]); }
-		 */
+		Flight[] flights = {
+				new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "On Time", "0", "Flight A"),
+				new Flight(2, "2024-11-30-09-00-00", "2024-11-30-11-30-00",  "上海", "广州", "2024-11-30", 400.0f, 100, 150, "On Time","0", "Flight C"),
+				new Flight(3, "2024-11-30-12-00-00", "2024-11-30-14-00-00",  "广州", "深圳", "2024-11-30", 300.0f, 100, 150, "On Time", "0", "Flight D"),
+				new Flight(4, "2024-11-30-21-30-00", "2024-12-01-00-30-00",  "北京", "杭州", "2024-11-30", 450.0f, 100, 150, "On Time", "0", "Flight B"),
+				new Flight(5, "2024-12-01-09-30-00", "2024-12-01-12-00-00",  "杭州", "深圳", "2024-12-01", 350.0f, 100, 150, "On Time", "0", "Flight E"),
+				new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "On Time", "0", "Flight F"),
+				new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "On Time","0", "Flight G")
+		};
+
+		for (Flight flight : flights) {
+			System.out.println(flight);
+		}
+
 	}
+
 }

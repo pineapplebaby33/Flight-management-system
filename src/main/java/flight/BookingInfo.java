@@ -1,5 +1,7 @@
 package flight;
 
+import java.time.LocalDateTime;
+
 public class BookingInfo {
 
 	private int fid;
@@ -10,11 +12,11 @@ public class BookingInfo {
 	private String pident;
 	private int oid;
 	private int seat;
-	private DateTime oCreateDate;
+	private LocalDateTime oCreateDate;
 	private String oStatus;
 
 	BookingInfo(int fid, int pid, String pname, String pident, int oid,
-			int seat, DateTime oCreateDate, String oStatus) {
+			int seat, LocalDateTime oCreateDate, String oStatus) {
 		this.fid = fid;
 		this.pid = pid;
 		this.pname = pname;
@@ -26,7 +28,7 @@ public class BookingInfo {
 	}
 
 	BookingInfo(Flight f, Passenger p, String pname, String pident, int oid,
-			int seat, DateTime oCreateDate, String oStatus) {
+			int seat, LocalDateTime oCreateDate, String oStatus) {
 		this.f = f;
 		this.p = p;
 		this.pname = pname;
@@ -61,7 +63,7 @@ public class BookingInfo {
 		return seat;
 	}
 
-	public DateTime getoCreateDate() {
+	public LocalDateTime getoCreateDate() {
 		return oCreateDate;
 	}
 

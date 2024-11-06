@@ -15,6 +15,7 @@ import flight.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JPasswordField;
 
 public class CancelOrder {
@@ -89,9 +90,11 @@ public class CancelOrder {
                 }
                 Order o = new DbSelect().OrderSelect(Login.OrderId);
 
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
                 boolean x = new DbUpdate().OrderUpdate(Login.OrderId, o
                                 .getPassengerId().getId(), o.getSeat(), o.getFlightId()
-                                .getId(), DateTime.GetDateTimeStr(o.getCreateDate()),
+                                .getId(),
+                                o.getCreateDate().format(formatter),
                         "CANCEL") && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd);
                 if (x) {
                     frame.setVisible(false);

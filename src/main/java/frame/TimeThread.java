@@ -3,6 +3,8 @@
 package frame;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import flight.*;
@@ -15,12 +17,13 @@ public class TimeThread implements Runnable {
 
 	@Override
 	public void run() {
-		// 用于格式化和解析日期的一个类
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+		// 假设 df 是指定的日期时间格式
+		DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		while (ThreadFlag) {
-			//获取当前系统时间，并使用 df 格式化成字符串
-			DateTime NowDate = new DateTime(df.format(new Date()));
-			Flight.AutoUpdateStatus(NowDate);
+			LocalDateTime now = LocalDateTime.now();
+			// 使用 DateTimeFormatter 格式化成字符串
+			//String formattedNow = now.format(df);
+			Flight.AutoUpdateStatus(now);
 			// 1s*60*5=5min
 			int time = 1000 * 60 * 1;
 			try {

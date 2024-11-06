@@ -19,7 +19,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
-import flight.DateTime;
 import flight.DbSelect;
 import flight.Flight;
 import flight.Order;
@@ -27,6 +26,7 @@ import flight.Passenger;
 
 import java.awt.event.MouseEvent;
 import java.io.Serial;
+import java.time.format.DateTimeFormatter;
 
 public class Research {
 
@@ -86,8 +86,8 @@ public class Research {
 				window.getFrame().setVisible(true);
 			}
 		});
-		btnNewButton.setFont(new Font("Dialog", Font.PLAIN, 12));
-		btnNewButton.setBounds(842, 5, 92, 41);
+		//btnNewButton.setFont(new Font("宋体", Font.PLAIN, 12));
+		btnNewButton.setBounds(837, 7, 87, 42);
 		frame.getContentPane().add(btnNewButton);
 
 		//搜索按钮
@@ -141,9 +141,7 @@ public class Research {
 				window.getFrame().setVisible(true);
 			}
 		});
-		/*button_1.addMouseListener(new MouseAdapter() {
 
-		});*/
 		button_1.setFont(new Font("宋体", Font.PLAIN, 14));
 		button_1.setBounds(869, 1208, 173, 41);
 		frame.getContentPane().add(button_1);
@@ -165,7 +163,7 @@ public class Research {
 				"武汉", "南京", "成都", "贵阳",
 				"昆明", "南宁", "拉萨", "杭州",
 				"南昌", "广州", "福州", "台北",
-				"海口", "香港", "澳门" }));
+				"海口", "香港", "澳门","深圳" }));
 		startCity.setToolTipText("");
 		startCity.setBounds(41, 62, 127, 37);
 		frame.getContentPane().add(startCity);
@@ -182,7 +180,7 @@ public class Research {
 				"武汉", "南京", "成都", "贵阳",
 				"昆明", "南宁", "拉萨", "杭州",
 				"南昌", "广州", "福州", "台北",
-				"海口", "香港", "澳门" }));
+				"海口", "香港", "澳门","深圳"}));
 		arrivalCity.setToolTipText("");
 		arrivalCity.setBounds(208, 62, 127, 37);
 		frame.getContentPane().add(arrivalCity);
@@ -203,7 +201,7 @@ public class Research {
 						arrivalCity.getSelectedIndex()).toString();
 				String date1 = dateChooser.getText();
 				String date2 = dateChooser2.getText();
-				flight.Flight[] flights2 = new DbSelect().FlightSelect(date1, date2, s1, s2);//返回12列
+				flight.Flight[] flights2 = new DbSelect().FlightSelect(date1,  s1, s2);//返回12列
 				if (flights2 != null) {
 					setTable(frame, flights2);
 				} else {
@@ -254,20 +252,18 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定" };
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
 		Flight[] flights = new DbSelect().FlightSelectForPass();
-
-		String[][] flight_ob = new String[flights.length][8];
+		String[][] flight_ob = new String[flights.length][9];
 		//遍历 flights 数组，将每个航班的信息存入 flight_ob 二维数组，准备显示在表格中。
 		for (int i = 0; i < flights.length; i++) {
 			flight_ob[i][0] = Integer.toString(flights[i].getId());
 			flight_ob[i][1] = flights[i].getFlightName();
 			flight_ob[i][2] = flights[i].getStartCity();
 			flight_ob[i][3] = flights[i].getArrivalCity();
-			flight_ob[i][4] = DateTime
-					.GetDateTimeStr(flights[i].getStartTime());
-			flight_ob[i][5] = DateTime.GetDateTimeStr(flights[i]
-					.getArrivalTime());
+			flight_ob[i][4] = flights[i].getStartTime().format(formatter);
+			flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
 			flight_ob[i][6] = String.valueOf(flights[i].getPrice());
 			//检查当前登录的乘客是否已经预定该航班
 			if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())) {
@@ -275,6 +271,7 @@ public class Research {
 			} else {
 				flight_ob[i][7] = "已预定";
 			}
+			flight_ob[i][8] = "直飞";
 		}
 
 		//创建 JTable 表格，显示航班数据，并设置表格不可编辑。
@@ -327,24 +324,23 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定" };
-		String[][] flight_ob = new String[flights.length][8];
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
+		String[][] flight_ob = new String[flights.length][9];
 		for (int i = 0; i < flights.length; i++) {
 			flight_ob[i][0] = Integer.toString(flights[i].getId());
 			flight_ob[i][1] = flights[i].getFlightName();
 			flight_ob[i][2] = flights[i].getStartCity();
 			flight_ob[i][3] = flights[i].getArrivalCity();
-			flight_ob[i][4] = DateTime
-					.GetDateTimeStr(flights[i].getStartTime());
-			flight_ob[i][5] = DateTime.GetDateTimeStr(flights[i]
-					.getArrivalTime());
+			flight_ob[i][4] = flights[i].getStartTime().format(formatter);
+			flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
 			flight_ob[i][6] = String.valueOf(flights[i].getPrice());
 			if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())) {
 				flight_ob[i][7] = "已预定";
 			} else {
 				flight_ob[i][7] = "未预定";
 			}
+			flight_ob[i][8] = "直飞";
 		}
 		Flight_Table = new JTable(flight_ob, columnNames) {
 			private static final long serialVersionUID = -5723427406160453043L;
@@ -384,3 +380,4 @@ public class Research {
 		});
 	}
 }
+

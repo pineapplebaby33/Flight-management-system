@@ -15,8 +15,8 @@ public class DateChooser extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1379027901492443365L;
-	private int width = 200; // ���ڿؼ��Ŀ��
-	private int height = 220; // ���ڿؼ��ĸ߶�
+	private int width = 200;
+	private int height = 220;
 
 	private GridBagLayout gridBagLayout1 = new GridBagLayout();
 	private JTextField dateField = new JTextField();

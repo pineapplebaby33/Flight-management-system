@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,7 +16,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
 import flight.BookingInfo;
-import flight.DateTime;
 import flight.DbSelect;
 
 public class BookingShow {
@@ -58,6 +58,7 @@ public class BookingShow {
         frame.setBounds(100, 100, 594, 517);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         String[] columnNames = {"乘客姓名", "身份证号", "座位号", "预定时间", "订单状态", "航班名称"};
         BookingInfo[] bookingInfos = new DbSelect().BookingInfoSelect();
         String[][] booking_ob = new String[bookingInfos.length][6];
@@ -65,8 +66,7 @@ public class BookingShow {
             booking_ob[i][0] = bookingInfos[i].getPname();
             booking_ob[i][1] = bookingInfos[i].getPident();
             booking_ob[i][2] = Integer.toString(bookingInfos[i].getSeat());
-            booking_ob[i][3] = DateTime.GetDateTimeStr(bookingInfos[i]
-                    .getoCreateDate());
+            booking_ob[i][3] = bookingInfos[i].getoCreateDate().format(formatter);
             booking_ob[i][4] = bookingInfos[i].getoStatus();
             booking_ob[i][5] = bookingInfos[i].getF().getFlightName();
             // System.out.println(flights[i].getFlightStatus());
@@ -147,15 +147,14 @@ public class BookingShow {
                         }
 
                     }
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
                     String[][] booking_ob = new String[bookingInfos.length][6];
                     for (int i = 0; i < bookingInfos.length; i++) {
                         booking_ob[i][0] = bookingInfos[i].getPname();
                         booking_ob[i][1] = bookingInfos[i].getPident();
                         booking_ob[i][2] = Integer.toString(bookingInfos[i]
                                 .getSeat());
-                        booking_ob[i][3] = DateTime
-                                .GetDateTimeStr(bookingInfos[i]
-                                        .getoCreateDate());
+                        booking_ob[i][3] = bookingInfos[i].getoCreateDate().format(formatter);
                         booking_ob[i][4] = bookingInfos[i].getoStatus();
                         booking_ob[i][5] = bookingInfos[i].getF()
                                 .getFlightName();

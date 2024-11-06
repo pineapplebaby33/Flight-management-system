@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,7 +14,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
-import flight.DateTime;
 import flight.DbSelect;
 import flight.Order;
 
@@ -56,6 +56,7 @@ public class OrderShow {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = { "订单ID", "乘客", "剩余座位", "航班ID", "时间", "航班状态"};
 		Order[] orders = new DbSelect().OrderSelect();
 		String[][] order_ob = new String[orders.length][6];
@@ -64,7 +65,7 @@ public class OrderShow {
 			order_ob[i][1] = orders[i].getPassengerId().getRealName();
 			order_ob[i][2] = Integer.toString(orders[i].getSeat());
 			order_ob[i][3] = orders[i].getFlightId().getFlightName();
-			order_ob[i][4] = DateTime.GetDateTimeStr(orders[i].getCreateDate());
+			order_ob[i][4] = orders[i].getCreateDate().format(formatter);
 			order_ob[i][5] = orders[i].getStatus();
 			// System.out.println(flights[i].getFlightStatus());
 		}

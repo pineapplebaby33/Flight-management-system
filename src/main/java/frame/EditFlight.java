@@ -17,6 +17,7 @@ import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Font;
+import java.time.format.DateTimeFormatter;
 
 public class EditFlight {
 
@@ -215,9 +216,10 @@ public class EditFlight {
 			Warning.setText("�������������޷�����");
 		}
 		// 设置各个输入框的初始值
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		IdtextField.setText(f.getFlightName());
-		STtextField.setText(DateTime.GetDateTimeStr(f.getStartTime()));
-		ATtextField_1.setText(DateTime.GetDateTimeStr(f.getArrivalTime()));
+		STtextField.setText(f.getStartTime().format(formatter));
+		ATtextField_1.setText(f.getArrivalTime().format(formatter));
 		Capp.setText(Integer.toString(f.getSeatCapacity()));
 		PriceText.setText(Float.toString(f.getPrice()));
 		// 返回按钮

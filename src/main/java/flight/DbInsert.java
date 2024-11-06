@@ -2,6 +2,7 @@ package flight;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.time.format.DateTimeFormatter;
 
 public class DbInsert {
 	private DbConnect db = null;
@@ -23,9 +24,11 @@ public class DbInsert {
 	}
 
 	public boolean FlightInsert(Flight f) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		return new DbInsert().FlightInsert(
-				DateTime.GetDateTimeStr(f.getStartTime()),
-				DateTime.GetDateTimeStr(f.getArrivalTime()), f.getStartCity(),
+				f.getStartTime().format(formatter),
+				f.getArrivalTime().format(formatter),
+				f.getStartCity(),
 				f.getArrivalCity(), f.getDepartureDate(), f.getPrice(),
 				f.getCurrentPassengers(), f.getSeatCapacity(),
 				f.getFlightStatus(), f.GetPassengerString(f.getPassengerId()),
@@ -33,9 +36,11 @@ public class DbInsert {
 	}
 
 	public boolean OrderInsert(Order o) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		return new DbInsert().OrderInsert(o.getPassengerId().getId(),
 				o.getSeat(), o.getFlightId().getId(),
-				DateTime.GetDateTimeStr(o.getCreateDate()), o.getStatus());
+				o.getCreateDate().format(formatter),
+				o.getStatus());
 	}
 
 	/*

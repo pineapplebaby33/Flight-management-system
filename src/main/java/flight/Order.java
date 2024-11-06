@@ -2,12 +2,15 @@
 
 package flight;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Order {
 	private int id = 0;
 	private Passenger PassengerId = null;
 	private int Seat = 0;
 	private Flight FlightId = null;
-	private DateTime CreateDate;
+	private LocalDateTime CreateDate;
 	private String Status = "";
 
 
@@ -21,16 +24,14 @@ public class Order {
 		}
 		return re;
 	}
-	public Order(int id, int PassengerId, int Seat, int FlightId,
-			String CreateDate, String Status) {
+	public Order(int id, int PassengerId, int Seat, int FlightId, String CreateDate, String Status) {
 		DbSelect dbSelect = new DbSelect();
-
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		this.id = id;
 		this.PassengerId = dbSelect.PassengerSelect(PassengerId);
 		this.Seat = Seat;
 		this.FlightId = dbSelect.FlightSelect(FlightId);
-		DateTime d = new DateTime(CreateDate);
-		this.CreateDate = d;
+		this.CreateDate = LocalDateTime.parse(CreateDate, formatter);
 		this.Status = Status;
 	}
 
@@ -51,7 +52,7 @@ public class Order {
 		return FlightId;
 	}
 
-	public DateTime getCreateDate() {
+	public LocalDateTime getCreateDate() {
 		return CreateDate;
 	}
 

@@ -23,6 +23,7 @@ import flight.*;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
@@ -173,6 +174,7 @@ public class AdminFunction {
         ArrLabel.setBounds(571, 67, 54, 29);
         AdminFrame.getContentPane().add(ArrLabel);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "航班状态"};
         flight.Flight[] flights = new DbSelect().FlightSelect();
         String[][] flight_ob = new String[flights.length][8];
@@ -181,10 +183,8 @@ public class AdminFunction {
             flight_ob[i][1] = flights[i].getFlightName();
             flight_ob[i][2] = flights[i].getStartCity();
             flight_ob[i][3] = flights[i].getArrivalCity();
-            flight_ob[i][4] = DateTime
-                    .GetDateTimeStr(flights[i].getStartTime());
-            flight_ob[i][5] = DateTime.GetDateTimeStr(flights[i]
-                    .getArrivalTime());
+            flight_ob[i][4] = flights[i].getStartTime().format(formatter);
+            flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
             flight_ob[i][6] = String.valueOf(flights[i].getPrice());
             flight_ob[i][7] = flights[i].getFlightStatus();
             // System.out.println(flights[i].getFlightStatus());
@@ -274,7 +274,7 @@ public class AdminFunction {
                         show_table(AdminFrame,new DbSelect().FlightSelect());
                         //AllDialog.Dialog(AdminFrame, "你好管理员");
                     } else {
-                        show_table(AdminFrame, new DbSelect().FlightSelect(date1, date2, s1, s2));
+                        show_table(AdminFrame, new DbSelect().FlightSelect(date1, s1, s2));
                 }
             }
         });
@@ -328,6 +328,7 @@ public class AdminFunction {
                            flight.Flight[] flights) {
         String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "航班状态" };
         // com.flight.java.Flight[] flights = new DbSelect().FlightSelect();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         if (flights != null) {
             String[][] flight_ob = new String[flights.length][8];
             for (int i = 0; i < flights.length; i++) {
@@ -335,10 +336,8 @@ public class AdminFunction {
                 flight_ob[i][1] = flights[i].getFlightName();
                 flight_ob[i][2] = flights[i].getStartCity();
                 flight_ob[i][3] = flights[i].getArrivalCity();
-                flight_ob[i][4] = DateTime.GetDateTimeStr(flights[i]
-                        .getStartTime());
-                flight_ob[i][5] = DateTime.GetDateTimeStr(flights[i]
-                        .getArrivalTime());
+                flight_ob[i][4] = flights[i].getStartTime().format(formatter);
+                flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
                 flight_ob[i][6] = String.valueOf(flights[i].getPrice());
                 flight_ob[i][7] = flights[i].getFlightStatus();
 

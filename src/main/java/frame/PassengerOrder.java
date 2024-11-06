@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,7 +17,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 
-import flight.DateTime;
 import flight.DbSelect;
 
 public class PassengerOrder {
@@ -83,6 +83,7 @@ public class PassengerOrder {
 		label.setBounds(26, 401, 301, 15);
 		frame.getContentPane().add(label);
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定"};
 		flight.Order[] order = new DbSelect().OrderSelect(
 				Login.PassengerId, "");
@@ -96,11 +97,9 @@ public class PassengerOrder {
 					o_ob2[i][1] = Integer.toString(order[i].getSeat());
 					o_ob2[i][2] = order[i].getFlightId().getStartCity();
 					o_ob2[i][3] = order[i].getFlightId().getArrivalCity();
-					o_ob2[i][4] = DateTime.GetDateTimeStr(order[i].getFlightId()
-							.getStartTime());
-					o_ob2[i][5] = DateTime.GetDateTimeStr(order[i].getFlightId()
-							.getArrivalTime());
-					o_ob2[i][6] = DateTime.GetDateTimeStr(order[i].getCreateDate());
+					o_ob2[i][4] = order[i].getFlightId().getStartTime().format(formatter);
+					o_ob2[i][5] = order[i].getFlightId().getArrivalTime().format(formatter);
+					o_ob2[i][6] = order[i].getCreateDate().format(formatter);
 					o_ob2[i][7] = "已预定";
 				}
 

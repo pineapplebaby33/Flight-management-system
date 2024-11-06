@@ -147,7 +147,7 @@ public class DbSelect {
 		return null;
 	}
 
-	public Flight[] FlightSelect(String StartTime, String ArrivalTime, String StartCity, String ArrivalCity) {
+	public Flight[] FlightSelect(String StartTime, String StartCity, String ArrivalCity) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
@@ -164,14 +164,11 @@ public class DbSelect {
 				_sql += " ArrivalCity = '" + ArrivalCity + "'";
 				_sql += " and ";
 			}
-			if (ArrivalTime != null && ArrivalTime.length() > 0) {
-				_sql += " ArrivalTime like '" + ArrivalTime + "%'";
-				_sql += " and ";
-			}
+
 			_sql = _sql.substring(0, _sql.length() - 5);
 			_sql += ";";
 			if (StartTime.length() <= 0 && StartCity.length() <= 0
-					&& ArrivalCity.length() <= 0 && ArrivalTime.length() <= 0) {
+					&& ArrivalCity.length() <= 0 ) {
 				_sql = "select * from flight;";
 			}
 
