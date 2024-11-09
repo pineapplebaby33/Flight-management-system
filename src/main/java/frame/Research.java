@@ -26,7 +26,11 @@ import flight.Passenger;
 
 import java.awt.event.MouseEvent;
 import java.io.Serial;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 public class Research {
 
@@ -76,79 +80,12 @@ public class Research {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		setTable(frame);
-		//跳转订单界面
-		JButton btnNewButton = new JButton("我的订单");
-		btnNewButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.setVisible(false);
-				PassengerOrder window = new PassengerOrder();
-				window.getFrame().setVisible(true);
-			}
-		});
-		//btnNewButton.setFont(new Font("宋体", Font.PLAIN, 12));
-		btnNewButton.setBounds(837, 7, 87, 42);
-		frame.getContentPane().add(btnNewButton);
 
-		//搜索按钮
-		JButton button = new JButton("搜索");
-		button.setFont(new Font("宋体", Font.PLAIN, 14));
-		button.setBounds(1717, 83, 173, 41);
-		frame.getContentPane().add(button);
-
-		//标签价格
-		JLabel lblNewLabel_8 = new JLabel("价格");
-		lblNewLabel_8.setFont(new Font("宋体", Font.PLAIN, 14));
-		lblNewLabel_8.setBounds(1423, 205, 92, 44);
-		frame.getContentPane().add(lblNewLabel_8);
-
-		//标签航班状态
-		JLabel lblNewLabel_9 = new JLabel("航班状态");
-		lblNewLabel_9.setFont(new Font("宋体", Font.PLAIN, 14));
-		lblNewLabel_9.setBounds(1674, 205, 169, 44);
-		frame.getContentPane().add(lblNewLabel_9);
-
-		//标签_起飞时间
-		JLabel StartTimeLabel = new JLabel("起飞时间");
-		StartTimeLabel.setFont(new Font("宋体", Font.PLAIN, 14));
-		StartTimeLabel.setBounds(391, 14, 92, 42);
-		frame.getContentPane().add(StartTimeLabel);
-
-		//日期选择器
-		final DateChooser dateChooser = new DateChooser(frame.getContentPane(),
-				100);
-		dateChooser.setBounds(366, 66, 126, 42);
-		frame.getContentPane().add(dateChooser);
-
-		//标签_到达时间
-		JLabel EndTimeLabel = new JLabel("到达时间");
-		EndTimeLabel.setBounds(546, 28, 54, 15);
-		frame.getContentPane().add(EndTimeLabel);
-
-		//日期选择器
-		final DateChooser dateChooser2 = new DateChooser(
-				frame.getContentPane(), 100);
-		dateChooser2.setBounds(521, 66, 126, 42);
-		frame.getContentPane().add(dateChooser2);
-
-		//返回登录界面
-		JButton button_1 = new JButton("返回");
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.setVisible(false);
-
-				Login window = new Login();
-				window.getFrame().setVisible(true);
-			}
-		});
-
-		button_1.setFont(new Font("宋体", Font.PLAIN, 14));
-		button_1.setBounds(869, 1208, 173, 41);
-		frame.getContentPane().add(button_1);
 
 		//标签_起飞城市
 		JLabel label = new JLabel("起飞城市");
-		label.setBounds(79, 21, 60, 29);
+		//label.setBounds(79, 21, 60, 29);
+		label.setBounds(233, 21, 60, 29);
 		frame.getContentPane().add(label);
 
 		//出发城市下拉框
@@ -165,8 +102,14 @@ public class Research {
 				"南昌", "广州", "福州", "台北",
 				"海口", "香港", "澳门","深圳" }));
 		startCity.setToolTipText("");
-		startCity.setBounds(41, 62, 127, 37);
+		//startCity.setBounds(41, 62, 127, 37);
+		startCity.setBounds(208, 62, 127, 37);
 		frame.getContentPane().add(startCity);
+
+		//标签降落城市
+		JLabel label_1 = new JLabel("降落城市");
+		label_1.setBounds(391, 14, 92, 42);
+		frame.getContentPane().add(label_1);
 
 		//降落城市下拉框
 		final JComboBox arrivalCity = new JComboBox();
@@ -182,13 +125,51 @@ public class Research {
 				"南昌", "广州", "福州", "台北",
 				"海口", "香港", "澳门","深圳"}));
 		arrivalCity.setToolTipText("");
-		arrivalCity.setBounds(208, 62, 127, 37);
+		arrivalCity.setBounds(366, 62, 127, 38);
 		frame.getContentPane().add(arrivalCity);
 
-		//标签降落城市
-		JLabel label_1 = new JLabel("降落城市");
-		label_1.setBounds(233, 21, 60, 29);
-		frame.getContentPane().add(label_1);
+		//标签_起飞时间
+		JLabel StartTimeLabel = new JLabel("起飞时间");
+		//StartTimeLabel.setFont(new Font("宋体", Font.PLAIN, 14));
+		StartTimeLabel.setBounds(546, 28, 54, 15);
+		frame.getContentPane().add(StartTimeLabel);
+
+		//日期选择器
+		final DateChooser dateChooser = new DateChooser(frame.getContentPane(),
+				100);
+		dateChooser.setBounds(521, 66, 126, 42);
+		frame.getContentPane().add(dateChooser);
+
+		//我的订单界面
+		JButton btnNewButton = new JButton("我的订单");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.setVisible(false);
+				PassengerOrder window = new PassengerOrder();
+				window.getFrame().setVisible(true);
+			}
+		});
+		//btnNewButton.setFont(new Font("宋体", Font.PLAIN, 12));
+		btnNewButton.setBounds(837, 7, 87, 42);
+		frame.getContentPane().add(btnNewButton);
+
+
+		//返回登录界面
+		JButton button_1 = new JButton("返回");
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frame.setVisible(false);
+
+				Login window = new Login();
+				window.getFrame().setVisible(true);
+			}
+		});
+
+		button_1.setFont(new Font("宋体", Font.PLAIN, 14));
+		button_1.setBounds(869, 1208, 173, 41);
+		frame.getContentPane().add(button_1);
+
 
 		//查询按钮
 		JButton search = new JButton("查询");
@@ -199,11 +180,32 @@ public class Research {
 						.toString();
 				String s2 = arrivalCity.getItemAt(
 						arrivalCity.getSelectedIndex()).toString();
+				//用户选择的日期
 				String date1 = dateChooser.getText();
-				String date2 = dateChooser2.getText();
-				flight.Flight[] flights2 = new DbSelect().FlightSelect(date1,  s1, s2);//返回12列
-				if (flights2 != null) {
-					setTable(frame, flights2);
+				//String date2 = dateChooser2.getText();
+				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				// 将日期字符串转换为 LocalDate
+				LocalDate localDate = LocalDate.parse(date1, dateFormatter);
+				// 将 LocalDate 转换为 LocalDateTime 的当天开始时间
+				LocalDateTime startDate = LocalDateTime.of(localDate, LocalTime.MIN);  // 2024-11-30T00:00
+				// 创建 FlightProcessor 对象
+				FlightProcessor processor = new FlightProcessor();
+				// 处理航班数据，查找从 "北京" 到 "深圳" 的路径
+				Flight[] flights = new DbSelect().FlightSelectForPass();
+				// 处理航班数据，查找从 "北京" 到 "深圳" 的路径
+				Flight[] processedFlights = processor.processFlights(flights, s1, s2,startDate);
+				for (Flight flight : processedFlights) {
+					if (flight.getStartTime() == null && flight.getArrivalTime() == null) {
+						// 输出标签
+						System.out.println(flight.getFlightName());
+					} else {
+						// 输出具体航班信息
+						System.out.println(flight.toString());
+					}
+				}
+				//flight.Flight[] flights2 = new DbSelect().FlightSelect(date1,  s1, s2);//返回12列
+				if (processedFlights != null) {
+					setTable(frame, processedFlights,s1,s2);
 				} else {
 					AllDialog.Dialog(frame, "当前没有符合条件的航班");
 				}
@@ -212,6 +214,7 @@ public class Research {
 		search.setFont(new Font("宋体", Font.PLAIN, 16));
 		search.setBounds(700, 66, 69, 42);
 		frame.getContentPane().add(search);
+
 
 		//提示标签
 		JLabel label_2 = new JLabel(
@@ -320,7 +323,7 @@ public class Research {
 	}
 
 	//创建表格_by frame 精准查询
-	private void setTable(final JFrame frame, Flight[] flights) {
+	private void setTable(final JFrame frame, Flight[] flights,String startcity,String arrivalcity) {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
@@ -332,15 +335,30 @@ public class Research {
 			flight_ob[i][1] = flights[i].getFlightName();
 			flight_ob[i][2] = flights[i].getStartCity();
 			flight_ob[i][3] = flights[i].getArrivalCity();
-			flight_ob[i][4] = flights[i].getStartTime().format(formatter);
-			flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
-			flight_ob[i][6] = String.valueOf(flights[i].getPrice());
-			if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())) {
-				flight_ob[i][7] = "已预定";
-			} else {
-				flight_ob[i][7] = "未预定";
+			//flight_ob[i][4] = flights[i].getStartTime().format(formatter);
+			flight_ob[i][4] = (flights[i].getStartTime() != null) ?
+					flights[i].getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+					"";
+			flight_ob[i][5] = (flights[i].getArrivalTime() != null) ?
+					flights[i].getArrivalTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+					"";
+			flight_ob[i][6] = (flights[i].getPrice()==0.0f)?"":String.valueOf(flights[i].getPrice());
+			if(flights[i].getStartTime()==null){
+				flight_ob[i][7] = "";
 			}
-			flight_ob[i][8] = "直飞";
+			else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())&&flights[i].getStartCity()!=null) {
+				flight_ob[i][7] = "未预定";
+			}else{
+				flight_ob[i][7] = "已预定";
+			}
+			if(flights[i].getStartTime()==null){
+				flight_ob[i][8] = "";
+			}
+			else if(Objects.equals(flights[i].getStartCity(), startcity)&&Objects.equals(flights[i].getArrivalCity(), arrivalcity)){
+				flight_ob[i][8] = "直飞";
+			}
+			else
+				flight_ob[i][8] = "中转";
 		}
 		Flight_Table = new JTable(flight_ob, columnNames) {
 			private static final long serialVersionUID = -5723427406160453043L;

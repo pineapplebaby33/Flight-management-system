@@ -2,6 +2,7 @@ package flight;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 enum Flight_Status {
 	UNPUBLISHED("UNPUBLISHED"), AVAILABLE("AVAILABLE"), FULL("FULL"), TERMINATE(
@@ -38,6 +39,7 @@ public class Flight {
 			String FlightStatus, String PassengerId, String FlightName) {
 		// 根据时间字符串的格式创建 DateTimeFormatter
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		/*
 		this.id = id;
 		this.StartTime = LocalDateTime.parse(StartTime, formatter);
 		this.ArrivalTime = LocalDateTime.parse(ArrivalTime, formatter);
@@ -50,6 +52,23 @@ public class Flight {
 		this.FlightStatus = FlightStatus;
 		this.PassengerId = this.GetPassengerList(PassengerId);
 		this.FlightName = FlightName;
+		*/
+		this.id = id;
+		this.StartTime = (StartTime != null) ? LocalDateTime.parse(StartTime, formatter) : null;
+		this.ArrivalTime = (ArrivalTime != null) ? LocalDateTime.parse(ArrivalTime, formatter) : null;
+
+		// Debug输出
+		//System.out.println("Initializing Flight ID: " + id + ", StartTime: " + this.StartTime + ", ArrivalTime: " + this.ArrivalTime);
+
+		this.StartCity = (StartCity != null) ? StartCity : "";
+		this.ArrivalCity = (ArrivalCity != null) ? ArrivalCity : "";
+		this.DepartureDate = (DepartureDate != null) ? DepartureDate : "";
+		this.price = price;
+		this.CurrentPassengers = CurrentPassengers;
+		this.SeatCapacity = SeatCapacity;
+		this.FlightStatus = (FlightStatus != null) ? FlightStatus : "";
+		this.PassengerId = GetPassengerList(PassengerId != null ? PassengerId : "");
+		this.FlightName = (FlightName != null) ? FlightName : "";
 	}
 
 	//根据航班状态返回不同的整数值
@@ -287,9 +306,14 @@ public class Flight {
 	}*/
 	@Override
 	public String toString() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+
+		String formattedStartTime = (StartTime != null) ? StartTime.format(formatter) : "N/A";
+		String formattedArrivalTime = (ArrivalTime != null) ? ArrivalTime.format(formatter) : "N/A";
+
 		return "Flight ID: " + id +
-				", Start Time: " + StartTime +
-				", Arrival Time: " + ArrivalTime +
+				", Start Time: " + formattedStartTime +
+				", Arrival Time: " + formattedArrivalTime +
 				", Start City: " + StartCity +
 				", Arrival City: " + ArrivalCity +
 				", Departure Date: " + DepartureDate +
@@ -297,20 +321,22 @@ public class Flight {
 				", Current Passengers: " + CurrentPassengers +
 				", Seat Capacity: " + SeatCapacity +
 				", Flight Status: " + FlightStatus +
-				", Passenger ID: " + PassengerId +
+				", Passenger ID: " + Arrays.toString(PassengerId) +
 				", Flight Name: " + FlightName;
 	}
 
 
+
+
 	public static void main(String[] args) {
 		Flight[] flights = {
-				new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "On Time", "0", "Flight A"),
-				new Flight(2, "2024-11-30-09-00-00", "2024-11-30-11-30-00",  "上海", "广州", "2024-11-30", 400.0f, 100, 150, "On Time","0", "Flight C"),
-				new Flight(3, "2024-11-30-12-00-00", "2024-11-30-14-00-00",  "广州", "深圳", "2024-11-30", 300.0f, 100, 150, "On Time", "0", "Flight D"),
-				new Flight(4, "2024-11-30-21-30-00", "2024-12-01-00-30-00",  "北京", "杭州", "2024-11-30", 450.0f, 100, 150, "On Time", "0", "Flight B"),
-				new Flight(5, "2024-12-01-09-30-00", "2024-12-01-12-00-00",  "杭州", "深圳", "2024-12-01", 350.0f, 100, 150, "On Time", "0", "Flight E"),
-				new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "On Time", "0", "Flight F"),
-				new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "On Time","0", "Flight G")
+				new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "AVAILABLE", "0", "Flight A"),
+				new Flight(2, "2024-11-30-09-00-00", "2024-11-30-11-30-00",  "上海", "广州", "2024-11-30", 400.0f, 100, 150, "AVAILABLE","0", "Flight C"),
+				new Flight(3, "2024-11-30-12-00-00", "2024-11-30-14-00-00",  "广州", "深圳", "2024-11-30", 300.0f, 100, 150, "AVAILABLE", "0", "Flight D"),
+				new Flight(4, "2024-11-30-21-30-00", "2024-12-01-00-30-00",  "北京", "杭州", "2024-11-30", 450.0f, 100, 150, "AVAILABLE", "0", "Flight B"),
+				new Flight(5, "2024-12-01-09-30-00", "2024-12-01-12-00-00",  "杭州", "深圳", "2024-12-01", 350.0f, 100, 150, "AVAILABLE", "0", "Flight E"),
+				new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "AVAILABLE", "0", "Flight F"),
+				new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "AVAILABLE","0", "Flight G")
 		};
 
 		for (Flight flight : flights) {

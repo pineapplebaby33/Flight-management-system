@@ -16,6 +16,7 @@ class FlightGraph {
     private Map<String, List<Flight>> adjList = new HashMap<>();
 
     public void addFlight(Flight flight) {
+        //System.out.println("Adding flight from " + flight.getStartCity());
         adjList.computeIfAbsent(flight.getStartCity(), k -> new ArrayList<>()).add(flight);
     }
 
@@ -114,7 +115,7 @@ class FlightSearch {
     }
 }
 
-
+/*
 class FlightProcessor {
     public Flight[] processFlights(Flight[] flights, String startCity, String destinationCity, LocalDateTime startDate) {
         // 创建航班图
@@ -159,7 +160,67 @@ class FlightProcessor {
         // 返回构建好的 FlightInfo[] 数组
         return flightsList.toArray(new Flight[0]);
     }
+
 }
+ */
+class FlightProcessor {
+    public Flight[] processFlights(Flight[] flights, String startCity, String destinationCity, LocalDateTime startDate) {
+        // 创建航班图
+        FlightGraph flightGraph = new FlightGraph();
+
+        // 添加符合日期条件的航班信息到图中
+        for (Flight flight : flights) {
+            // 只判断 startTime 的日期部分是否等于 startDate 的日期部分
+            if (flight.getStartTime().toLocalDate().isEqual(startDate.toLocalDate())) {
+                flightGraph.addFlight(flight);
+            }
+        }
+
+        // 创建航班搜索对象
+        FlightSearch flightSearch = new FlightSearch(flightGraph);
+
+        // 查找最快和最便宜路径
+        FlightPathResult result = flightSearch.findPaths(startCity, destinationCity);
+
+        // 获取所有可能的路径
+        List<List<Flight>> allPaths = flightGraph.findAllPaths(startCity, destinationCity);
+
+        // 构建 FlightInfo[] flights 数组
+        List<Flight> flightsList = new ArrayList<>();
+
+        // 添加"最快路径"标签
+        flightsList.add(new Flight(-1, null, null, "", "", "", 0.0f, 0, 0, "", "0", "最快路径："));
+        flightsList.addAll(result.getFastestPath());
+
+        // 添加路径分隔符
+        flightsList.add(new Flight(-4, null, null, "", "", "", 0.0f, 0, 0, "", "0", "----"));
+
+        // 添加"最便宜路径"标签
+        flightsList.add(new Flight(-2, null, null, "", "", "", 0.0f, 0, 0, "", "0", "最便宜路径："));
+        flightsList.addAll(result.getCheapestPath());
+
+        // 添加路径分隔符
+        flightsList.add(new Flight(-4, null, null, "", "", "", 0.0f, 0, 0, "", "0", "----"));
+
+        // 添加剩余路径（排除最快和最便宜的路径）
+        flightsList.add(new Flight(-3, null, null, "", "", "", 0.0f, 0, 0, "", "0", "剩下的路径："));
+
+        for (List<Flight> path : allPaths) {
+            if (!path.equals(result.getFastestPath()) && !path.equals(result.getCheapestPath())) {
+                flightsList.addAll(path);
+
+                // 添加路径分隔符，每条完整路径之后
+                flightsList.add(new Flight(-4, null, null, "", "", "", 0.0f, 0, 0, "", "0", "----"));
+            }
+        }
+
+        // 返回构建好的 FlightInfo[] 数组
+        return flightsList.toArray(new Flight[0]);
+    }
+
+
+}
+
 
 
 class filter {
@@ -184,14 +245,15 @@ class filter {
         // 构建 FlightInfo[] flights 数组
 
         Flight[] flights = {
-                new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "On Time", "0", "Flight A"),
-                new Flight(2, "2024-11-30-09-00-00", "2024-11-30-11-30-00",  "上海", "广州", "2024-11-30", 400.0f, 100, 150, "On Time","0", "Flight C"),
-                new Flight(3, "2024-11-30-12-00-00", "2024-11-30-14-00-00",  "广州", "深圳", "2024-11-30", 300.0f, 100, 150, "On Time", "0", "Flight D"),
-                new Flight(4, "2024-11-30-21-30-00", "2024-12-01-00-30-00",  "北京", "杭州", "2024-11-30", 450.0f, 100, 150, "On Time", "0", "Flight B"),
-                new Flight(5, "2024-12-01-09-30-00", "2024-12-01-12-00-00",  "杭州", "深圳", "2024-12-01", 350.0f, 100, 150, "On Time", "0", "Flight E"),
-                new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "On Time", "0", "Flight F"),
-                new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "On Time","0", "Flight G")
+                new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "AVAILABLE", "0", "Flight A"),
+                new Flight(2, "2024-11-30-09-00-00", "2024-11-30-11-30-00",  "上海", "广州", "2024-11-30", 400.0f, 100, 150, "AVAILABLE","0", "Flight C"),
+                new Flight(3, "2024-11-30-12-00-00", "2024-11-30-14-00-00",  "广州", "深圳", "2024-11-30", 300.0f, 100, 150, "AVAILABLE", "0", "Flight D"),
+                new Flight(4, "2024-11-30-21-30-00", "2024-12-01-00-30-00",  "北京", "杭州", "2024-11-30", 450.0f, 100, 150, "AVAILABLE", "0", "Flight B"),
+                new Flight(5, "2024-12-01-09-30-00", "2024-12-01-12-00-00",  "杭州", "深圳", "2024-12-01", 350.0f, 100, 150, "AVAILABLE", "0", "Flight E"),
+                new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "AVAILABLE", "0", "Flight F"),
+                new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "AVAILABLE","0", "Flight G")
         };
+        /*
         for (Flight flight : flights) {
             System.out.println("ID: " + flight.getId());
             System.out.println("Start Time: " + flight.getStartTime());
@@ -203,18 +265,18 @@ class filter {
             System.out.println("Current Passengers: " + flight.getCurrentPassengers());
             System.out.println("Seat Capacity: " + flight.getSeatCapacity());
             System.out.println("Flight Status: " + flight.getFlightStatus());
-            System.out.println("Passenger ID: " + flight.getPassengerId());
+            System.out.println("Passenger ID: " + Arrays.toString(flight.getPassengerId()));
             System.out.println("Flight Name: " + flight.getFlightName());
             System.out.println("-------------------------------------------------");
         }
-
+        */
 
         // 创建 FlightProcessor 对象
         FlightProcessor processor = new FlightProcessor();
-        System.out.println("FlightProcessor对象创建成功 " );
+        //System.out.println("FlightProcessor对象创建成功 " );
         // 处理航班数据，查找从 "北京" 到 "深圳" 的路径
         Flight[] processedFlights = processor.processFlights(flights, "北京", "深圳",startDate);
-        System.out.println("processor.processFlights查找成功 " );
+        //System.out.println("processor.processFlights查找成功 " );
         // 输出结果
         for (Flight flight : processedFlights) {
             if (flight.getStartTime() == null && flight.getArrivalTime() == null) {
