@@ -93,8 +93,9 @@ public class Research {
 		label.setBounds(233, 21, 60, 29);
 		frame.getContentPane().add(label);
 
-		//出发城市下拉框
+		//下拉框-起飞城市
 		final JComboBox startCity = new JComboBox();
+		/*
 		startCity.setModel(new DefaultComboBoxModel(new String[] {
 				"北京", "上海", "天津", "重庆",
 				"哈尔滨", "长春", "沈阳",
@@ -107,20 +108,18 @@ public class Research {
 				"南昌", "广州", "福州", "台北",
 				"海口", "香港", "澳门","深圳" }));
 
-
+		 */
 		startCity.setToolTipText("");
 		startCity.setBounds(208, 62, 127, 37);
 		frame.getContentPane().add(startCity);
 
-		//标签降落城市
+		//标签-降落城市
 		JLabel label_1 = new JLabel("降落城市");
 		label_1.setBounds(391, 14, 92, 42);
 		frame.getContentPane().add(label_1);
 
-		//降落城市下拉框
-		// 初始化降落城市下拉框
+		//下拉框-降落城市
 		final JComboBox<String> arrivalCity = new JComboBox<>();
-		//updateArrivalCity(arrivalCity, isDomestic);
 		updateFlightCities(startCity, arrivalCity, isDomestic);
 		arrivalCity.setToolTipText("");
 		arrivalCity.setBounds(366, 62, 127, 38);
@@ -161,9 +160,17 @@ public class Research {
 			public void mouseClicked(MouseEvent arg0) {
 					String s1 = startCity.getItemAt(startCity.getSelectedIndex()).toString();
 					String s2 = arrivalCity.getItemAt(arrivalCity.getSelectedIndex()).toString();
+				if (isDomestic) {
+					// 国内航班：直接交换选中项
 					startCity.setSelectedItem(s2);
 					arrivalCity.setSelectedItem(s1);
+				} else {
+					// 国外航班：交换选项列表和选中值
+					String[] tempOptions = getCityOptions(arrivalCity);//临时列表获得到达城市的列表
+					updateComboBox(arrivalCity, getCityOptions(startCity), s1); // 设置 arrivalCity 为 startCity 的选项
+					updateComboBox(startCity, tempOptions, s2); // 设置 startCity 为 arrivalCity 的选项
 
+				}
 			}
 		});
 		Exchange.setFont(new Font("宋体", Font.PLAIN, 12));
@@ -363,7 +370,6 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
 		String[][] flight_ob = new String[flights.length][9];
 		for (int i = 0; i < flights.length; i++) {
@@ -371,7 +377,6 @@ public class Research {
 			flight_ob[i][1] = flights[i].getFlightName();
 			flight_ob[i][2] = flights[i].getStartCity();
 			flight_ob[i][3] = flights[i].getArrivalCity();
-			//flight_ob[i][4] = flights[i].getStartTime().format(formatter);
 			flight_ob[i][4] = (flights[i].getStartTime() != null) ?
 					flights[i].getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
 					"";
@@ -398,7 +403,6 @@ public class Research {
 		}
 		Flight_Table = new JTable(flight_ob, columnNames) {
 			private static final long serialVersionUID = -5723427406160453043L;
-
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
@@ -434,6 +438,24 @@ public class Research {
 		});
 	}
 
+	private String[] getCityOptions(JComboBox<String> comboBox) {
+		int itemCount = comboBox.getItemCount();
+		String[] options = new String[itemCount];
+		for (int i = 0; i < itemCount; i++) {
+			options[i] = comboBox.getItemAt(i);
+		}
+		return options;
+	}
+
+	private void updateComboBox(JComboBox<String> comboBox, String[] newOptions, String selectedValue) {
+		comboBox.setModel(new DefaultComboBoxModel<>(newOptions));
+		comboBox.setSelectedItem(selectedValue);
+		comboBox.revalidate();
+		comboBox.repaint();
+	}
+
+
+
 	private void updateFlightCities(JComboBox<String> startCity, JComboBox<String> arrivalCity, boolean isDomestic) {
 		String[] domesticCities = {
 				"北京", "上海", "天津", "重庆", "哈尔滨", "长春", "沈阳",
@@ -443,28 +465,31 @@ public class Research {
 				"南昌", "广州", "福州", "台北", "海口", "香港", "澳门", "深圳"
 		};
 
-		String[] internationalCities = {
+		String[] internationalCitiesStart = {
+				"北京", "上海", "天津", "重庆", "哈尔滨", "长春", "沈阳",
+				"呼和浩特", "石家庄", "乌鲁木齐", "兰州", "西宁", "西安",
+				"银川", "郑州", "济南", "太原", "合肥", "长沙", "武汉",
+				"南京", "成都", "贵阳", "昆明", "南宁", "拉萨", "杭州",
+				"南昌", "广州", "福州", "台北", "海口", "香港", "澳门", "深圳"
+		};
+
+		String[] internationalCitiesArrival = {
+
 				"纽约", "伦敦", "巴黎", "柏林", "阿姆斯特丹", "慕尼黑",
 				"罗马", "东京", "首尔", "曼谷", "悉尼", "奥克兰",
 				"温哥华", "莫斯科", "芝加哥", "洛杉矶", "新加坡", "旧金山"
 		};
 
-		// 设置下拉框的内容为国内或国际城市
-		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(domesticCities);
-		startCity.setModel(model);
-		arrivalCity.setModel(new DefaultComboBoxModel<>(isDomestic ? domesticCities : internationalCities));
-
-		// 将下拉框默认选择重置为第一个项
-		if (startCity.getItemCount() > 0) {
-			startCity.setSelectedIndex(0);
-		}
-		if (arrivalCity.getItemCount() > 0) {
-			arrivalCity.setSelectedIndex(0);
+		if (isDomestic) {
+			startCity.setModel(new DefaultComboBoxModel<>(domesticCities));
+			arrivalCity.setModel(new DefaultComboBoxModel<>(domesticCities));
+		} else {
+			startCity.setModel(new DefaultComboBoxModel<>(internationalCitiesStart));
+			arrivalCity.setModel(new DefaultComboBoxModel<>(internationalCitiesArrival));
 		}
 
-		// 刷新下拉框显示
-		startCity.revalidate();
-		arrivalCity.revalidate();
+		startCity.setSelectedIndex(0);
+		arrivalCity.setSelectedIndex(0);
 	}
 
 
