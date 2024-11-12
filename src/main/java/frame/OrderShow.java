@@ -58,7 +58,7 @@ public class OrderShow {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = { "订单ID", "乘客", "剩余座位", "航班ID", "时间", "航班状态"};
-		Order[] orders = new DbSelect().OrderSelect();
+		Order[] orders = new DbSelect().OrderSelect(AdminFunction.isDomestic);
 		String[][] order_ob = new String[orders.length][6];
 		for (int i = 0; i < orders.length; i++) {
 			order_ob[i][0] = Integer.toString(orders[i].getId());

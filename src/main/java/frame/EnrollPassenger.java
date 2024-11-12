@@ -63,31 +63,46 @@ public class EnrollPassenger {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
+		//标签_姓名
 		JLabel realName = new JLabel("姓        名");
 		realName.setFont(new Font("宋体", Font.PLAIN, 14));
 		realName.setBounds(123, 73, 175, 38);
 		frame.getContentPane().add(realName);
 
-		JLabel identityID = new JLabel("身份证号");
-		identityID.setFont(new Font("宋体", Font.PLAIN, 14));
-		identityID.setBounds(123, 134, 175, 53);
-		frame.getContentPane().add(identityID);
-
-		JLabel password = new JLabel("密        码");
-		password.setFont(new Font("宋体", Font.PLAIN, 14));
-		password.setBounds(123, 210, 175, 45);
-		frame.getContentPane().add(password);
-
+		//输入框_姓名
 		nameText = new JTextField();
 		nameText.setBounds(322, 77, 146, 38);
 		frame.getContentPane().add(nameText);
 		nameText.setColumns(10);
 
+
+		//标签_身份证号
+		JLabel identityID = new JLabel("身份证号");
+		identityID.setFont(new Font("宋体", Font.PLAIN, 14));
+		identityID.setBounds(123, 134, 175, 53);
+		frame.getContentPane().add(identityID);
+
+		//身份证号输入框
 		IdentityText = new JTextField();
 		IdentityText.setBounds(322, 145, 146, 38);
 		frame.getContentPane().add(IdentityText);
 		IdentityText.setColumns(10);
 
+		//标签_密码
+		JLabel password = new JLabel("密        码");
+		password.setFont(new Font("宋体", Font.PLAIN, 14));
+		password.setBounds(123, 210, 175, 45);
+		frame.getContentPane().add(password);
+
+
+		//密码输入框
+		passwordField = new JPasswordField();
+		passwordField.setBounds(322, 217, 146, 38);
+		frame.getContentPane().add(passwordField);
+		passwordField.setColumns(10);
+
+
+		//取消按钮
 		JButton btnNewButton = new JButton("取消");
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -98,18 +113,12 @@ public class EnrollPassenger {
 			}
 		});
 		btnNewButton.setFont(new Font("宋体", Font.PLAIN, 14));
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-
-			}
-		});
 		btnNewButton.setBounds(136, 304, 146, 41);
 		frame.getContentPane().add(btnNewButton);
 
-		passwordField = new JPasswordField();
-		passwordField.setBounds(322, 217, 146, 38);
-		frame.getContentPane().add(passwordField);
 
+
+		//注册按钮
 		JButton button = new JButton("注册");
 		button.addMouseListener(new MouseAdapter() {
 			@Override
@@ -124,8 +133,7 @@ public class EnrollPassenger {
 				if (realName.equals("") || iden.equals("") || pwd.equals("")) {
 					AllDialog.Dialog(frame, "请输入完整信息");
 				} else {
-					boolean x = new DbInsert().PassengerInsert(realName, iden,
-							pwd, "");
+					boolean x = new DbInsert().PassengerInsert(realName, iden, pwd, "","");
 					if (x) {
 						frame.setVisible(false);
 						Login window = new Login();

@@ -117,7 +117,7 @@ public class EditAdmin {
 						window.getAdminFrame().setVisible(true);
 					}
 				} else {
-					AllDialog.Dialog(frame, "���������");
+					AllDialog.Dialog(frame, "原账户名或密码错误！");
 				}
 
 			}

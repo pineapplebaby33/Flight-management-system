@@ -90,7 +90,7 @@ public class Flight {
 		return 0;
 	}
 
-	//验证航班信息的有效性
+	//A-验证航班信息的有效性(更新，插入航班)
 	public static boolean IsFlight(String StartTime, String ArrivalTime,
 		String StartCity, String ArrivalCity, String DepartureDate,
 		float price, int CurrentPassengers, int SeatCapacity,
@@ -109,14 +109,15 @@ public class Flight {
 		return true;
 	}
 
-	public static BookingInfo[] SelectFlightInfo(int id) {
+
+	public static BookingInfo[] SelectFlightInfo(int id,boolean isDometic) {
 		DbSelect sel = new DbSelect();
-		Flight f = sel.FlightSelect(id);
+		Flight f = sel.FlightSelect(id,isDometic);
 		int[] pids = f.getPassengerId();
 		BookingInfo[] re = new BookingInfo[pids.length];
 		for (int i = 0; i < pids.length; i++) {
 			Passenger p = sel.PassengerSelect(pids[i]);
-			Order o = sel.OrderSelect(p.getId(), f.getId());
+			Order o = sel.OrderSelect(p.getId(), f.getId(),isDometic);
 			BookingInfo b = new BookingInfo(f.getId(), p.getId(),
 					p.getRealName(), p.getIdentityId(), o.getId(), o.getSeat(),
 					o.getCreateDate(), o.getStatus());
@@ -126,11 +127,14 @@ public class Flight {
 		return re;
 	}
 
+
+
 	//预定航班
-	public static boolean ReserveFlight(int pid, int fid) {
+	//通过将特定乘客加入到某个航班的乘客名单中，并更新该航班的相关信息（如当前乘客数、航班状态等）√
+	public static boolean ReserveFlight(int pid, int fid,boolean isDmestic) {
 		DbUpdate update = new DbUpdate();
 		DbSelect select = new DbSelect();
-		Flight xFlight = select.FlightSelect(fid);
+		Flight xFlight = select.FlightSelect(fid,isDmestic);
 		String flightStatus = xFlight.getCurrentPassengers() + 1 == xFlight
 				.getSeatCapacity() ? Flight_Status.FULL.getStatus() : xFlight
 				.getFlightStatus();//是否满员
@@ -150,7 +154,7 @@ public class Flight {
 				xFlight.getDepartureDate(), xFlight.getPrice(),
 				(xFlight.getCurrentPassengers() + 1),
 				xFlight.getSeatCapacity(), flightStatus, passengerIdString,
-				xFlight.getFlightName());
+				xFlight.getFlightName(),isDmestic);
 		if (r) {
 			return true;
 		}
@@ -159,11 +163,11 @@ public class Flight {
 	}
 
 	//取消预定
-	public boolean UnreserveFlight(int pid, int fid) {
+	public boolean UnreserveFlight(int pid, int fid,boolean isDmestic) {
 		DbUpdate update = new DbUpdate();
 		DbSelect select = new DbSelect();
-		Flight xFlight = select.FlightSelect(fid);
-		String flightStatus = xFlight.getCurrentPassengers() - 1 < xFlight
+		Flight xFlight = select.FlightSelect(fid,isDmestic);
+		String flightStatus = xFlight.getCurrentPassengers() - 1 < xFlight//当前乘客人员减一后是否还有空位
 				.getSeatCapacity() ? Flight_Status.AVAILABLE.getStatus()
 				: xFlight.getFlightStatus();
 		int[] pids = xFlight.getPassengerId();
@@ -183,7 +187,7 @@ public class Flight {
 				xFlight.getDepartureDate(), xFlight.getPrice(),
 				(xFlight.getCurrentPassengers() - 1),
 				xFlight.getSeatCapacity(), flightStatus, passengerIdString,
-				xFlight.getFlightName());
+				xFlight.getFlightName(),isDmestic);
 		if (r) {
 			return true;
 		}
@@ -194,7 +198,7 @@ public class Flight {
 	//自动更新航班状态
 	public static void AutoUpdateStatus(LocalDateTime NowDate) {
 		DbSelect sel = new DbSelect();
-		Flight[] flights = sel.FlightSelect();
+		Flight[] flights = sel.FlightSelect(true);
 		DbUpdate up = new DbUpdate();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		for (int i = 0; i < flights.length; i++) {
@@ -218,7 +222,7 @@ public class Flight {
 									Flight_Status.TERMINATE.getStatus(),
 									flights[i]
 											.GetPassengerString(flights[i].PassengerId),
-									flights[i].FlightName);
+									flights[i].FlightName,true);
 					if (!re) {
 						System.err.println("航班状态更新失败");
 					}

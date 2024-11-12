@@ -55,10 +55,13 @@ public class CancelOrder {
      */
     private void initialize() {
         frame = new JFrame();
+        frame.setTitle("取消订单");
         frame.setBounds(100, 100, 450, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+
+        //取消订单提示
         JLabel label = new JLabel(
                 "你确认要取消订单吗？");
         label.setFont(new Font("宋体", Font.PLAIN, 18));
@@ -66,6 +69,7 @@ public class CancelOrder {
         label.setBounds(112, 38, 208, 63);
         frame.getContentPane().add(label);
 
+        //返回按钮
         JButton button = new JButton("返回");
         button.addMouseListener(new MouseAdapter() {
             @Override
@@ -78,6 +82,7 @@ public class CancelOrder {
         button.setBounds(48, 183, 93, 47);
         frame.getContentPane().add(button);
 
+        //取消按钮
         JButton button_1 = new JButton("确认取消");
         button_1.addMouseListener(new MouseAdapter() {
             @Override
@@ -88,14 +93,13 @@ public class CancelOrder {
                     pwd += pass[i];
 
                 }
-                Order o = new DbSelect().OrderSelect(Login.OrderId);
-
+                //查询订单
+                Order o = new DbSelect().OrderSelect(Login.OrderId,Research.isDomestic);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-                boolean x = new DbUpdate().OrderUpdate(Login.OrderId, o
-                                .getPassengerId().getId(), o.getSeat(), o.getFlightId()
-                                .getId(),
-                                o.getCreateDate().format(formatter),
-                        "CANCEL") && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd);
+                boolean x = new DbUpdate().OrderUpdate(Login.OrderId, o.getPassengerId().getId(), o.getSeat(),
+                                                        o.getFlightId().getId(),
+                                                        o.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
+                        && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
                 if (x) {
                     frame.setVisible(false);
                     PassengerOrder wMyOrder = new PassengerOrder();

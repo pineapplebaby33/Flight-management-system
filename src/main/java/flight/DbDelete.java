@@ -9,12 +9,14 @@ public class DbDelete {
 	private boolean re = false;
 	private PreparedStatement pst = null;
 
-	public boolean FlightDelete(int id) {
+	//A-删除未发布航班√
+	public boolean FlightDelete(int id,boolean isDomestic) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
-			//����ɾ��ֻ��ɾ��δ��������ֹ����
-			this.pst = cn.prepareStatement("DELETE FROM `flight` WHERE Id="+id+" and FlightStatus='UNPUBLISHED';");
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			this.pst = cn.prepareStatement("DELETE FROM"+tableName+"  WHERE Id="+id+" and FlightStatus='UNPUBLISHED';");
 			this.re = pst.executeUpdate() == 1;
 
 		} catch (Exception e) {

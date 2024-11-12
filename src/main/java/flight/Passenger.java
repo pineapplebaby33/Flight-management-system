@@ -1,6 +1,8 @@
 //乘客信息，取消航班预定，返回预定列表
 package flight;
 
+import frame.Research;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,16 +12,19 @@ public class Passenger {
 	private String IdentityId = "";
 	private String Password = "";
 	private int[] OrderList;
+	private int[] OrderList1;
 
-	public Passenger(int id, String RealName, String IdentityId, String Password, String OrderList) {
+	public Passenger(int id, String RealName, String IdentityId, String Password, String OrderList,String OrderList1) {
 		this.id = id;
 		this.RealName = RealName;
 		this.IdentityId = IdentityId;
 		this.Password = Password;
 		this.OrderList = this.GetOrderList(OrderList);
+		this.OrderList1 = this.GetOrderList(OrderList1);
 	}
 
 
+	/*
 	public Order[] SelectOrders(String pwd) {
 		if (Passenger.CheckPwd(this.getRealName(), pwd)) {
 			return new DbSelect().PassengerOrders(this.getId());
@@ -29,7 +34,9 @@ public class Passenger {
 		}
 	}
 
-	//检查密码
+
+	 */
+	//检查密码√
 	public static boolean CheckPwd(String RealName, String pwd) {
 		DbSelect _s = new DbSelect();
 		Passenger _a = _s.PassengerSelect(RealName, pwd);
@@ -41,26 +48,26 @@ public class Passenger {
 	}
 
 
-	//预定航班
-	public static boolean ReserveFlight(int pid, int fid, String pwd) {
+	//预定航班√
+	public static boolean ReserveFlight(int pid, int fid, String pwd,Boolean  isDomestic) {
 		DbSelect select = new DbSelect();
-		Flight f = select.FlightSelect(fid);
+		Flight f = select.FlightSelect(fid,isDomestic);
 		//检查航班状态
 		if (f.getFlightStatus().equals("AVAILABLE")) {
 			Passenger p = select.PassengerSelect(pid);
 			// 验证密码
 			if (Passenger.CheckPwd(p.getRealName(), pwd)) {
 				// 检查乘客是否已预定该航班
-				if (select.OrderSelect(pid, fid,"") == null) {
+				if (select.OrderSelect(pid, fid,"",isDomestic) == null) {
 					DbInsert insert = new DbInsert();
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 					String CreateDate = df.format(new Date());
 					// 插入订单
 					boolean re = insert.OrderInsert(p.getId(), p.getId(),
-							f.getId(), CreateDate, "PAID");
+							f.getId(), CreateDate, "PAID",isDomestic);
 					// 更新航班和乘客信息
-					re = re && Flight.ReserveFlight(pid, fid)
-							&& p.UpdateOrderList(fid);
+					re = re && Flight.ReserveFlight(pid, fid,isDomestic)
+							&& p.UpdateOrderList(fid,isDomestic);
 					if (re) {
 						return true;
 					}
@@ -78,6 +85,7 @@ public class Passenger {
 		return false;
 	}
 
+	/*
 	public static Order ReserveFlight(int pid, int fid, String pwd, int mode) {
 
 		DbSelect select = new DbSelect();
@@ -116,9 +124,11 @@ public class Passenger {
 		}
 		return null;
 	}
+*/
 
-	public boolean UpdateOrderList(int fid) {
-		int[] _o = this.getOrderList();
+	//订单表_添加P.OrderList
+	public boolean UpdateOrderList(int fid,boolean isDomestic) {
+		int[] _o = isDomestic ? this.getOrderList():this.getOrderList1();
 		String OrderList = "";
 		if (_o != null) {
 			for (int i = 0; i < _o.length; i++) {
@@ -126,11 +136,12 @@ public class Passenger {
 			}
 		}
 		OrderList += fid + ";";
-		return new DbUpdate().UpdateOrderList(this.getId(), OrderList);
+		return new DbUpdate().UpdateOrderList(this.getId(), OrderList,isDomestic);
 	}
 
-	public boolean UpdateOrderList2(int fid) {
-		int[] _o = this.getOrderList();
+	//订单表_移除p.OrderList
+	public boolean UpdateOrderList2(int fid,boolean isDomestic) {
+		int[] _o = isDomestic ? this.getOrderList():this.getOrderList1();
 		String OrderList = "";
 		if (_o != null) {
 			for (int i = 0; i < _o.length; i++) {
@@ -139,33 +150,32 @@ public class Passenger {
 				}
 			}
 		}
-		return new DbUpdate().UpdateOrderList(this.getId(), OrderList);
+		return new DbUpdate().UpdateOrderList(this.getId(), OrderList,isDomestic);
 	}
 
-	public static boolean UnsubscribeFlight(int pid, int fid, String pwd) {
+
+	//取消航班√
+	public static boolean UnsubscribeFlight(int pid, int fid, String pwd,boolean isDomestic) {
 		DbSelect select = new DbSelect();
-		Flight f = select.FlightSelect(fid);
-		// �������������������˶�
-		if (!f.getFlightStatus().equals("TERMINATE")) {
+		Flight f = select.FlightSelect(fid,isDomestic);//获取航班信息
+		if (!f.getFlightStatus().equals("TERMINATE")) {//检查状态，如果航班终止，无法取消订单
 			Passenger p = select.PassengerSelect(pid);
 			if (Passenger.CheckPwd(p.getRealName(), pwd)) {
-				// ����Ƿ���ڶ���
-				if (select.OrderSelect(pid, fid) != null) {
-					// ����Flight��Passenger�б��CurrentPassengers������Passenger��OrderList
-					boolean re = f.UnreserveFlight(pid, fid)
-							&& p.UpdateOrderList2(fid);
+				if (select.OrderSelect(pid, fid, isDomestic) != null) {
+					boolean re = f.UnreserveFlight(pid, fid,isDomestic)
+							&& p.UpdateOrderList2(fid,isDomestic);
 					if (re) {
 						return true;
 					}
 				} else {
-					System.err.println("���������ڣ��޷��˶�");
+					System.err.println("订单不存在，无法取消");
 				}
 			} else {
-				System.err.println("�˿��������");
+				System.err.println("密码不正确");
 				return false;
 			}
 		} else {
-			System.err.println("�����������������˶�");
+			System.err.println("航班已终止，无法取消");
 			return false;
 		}
 		return false;
@@ -190,6 +200,10 @@ public class Passenger {
 
 	public int[] getOrderList() {
 		return OrderList;
+	}
+
+	public int[] getOrderList1() {
+		return OrderList1;
 	}
 
 	public Passenger GetPassengerById(int id) {

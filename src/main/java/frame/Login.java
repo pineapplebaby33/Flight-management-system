@@ -55,6 +55,7 @@ public class Login {
     //2.显示主窗口(登录/注册)
     private void initialize() {
         //开启计时器，自动更新航班
+        int a=0;
         TimeThread updateBegin = new TimeThread();
         Thread t1 = new Thread(updateBegin);
         t1.setPriority(Thread.MAX_PRIORITY);

@@ -15,11 +15,12 @@ import flight.Flight;
 
 public class ReserveFlight {
 	private JFrame frame;
+	/*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					ReserveFlight window = new ReserveFlight();
+					ReserveFlight window = new ReserveFlight(isDmestic);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -28,12 +29,14 @@ public class ReserveFlight {
 		});
 	}
 
-	public ReserveFlight() {
-		initialize();
+	 */
+
+	public ReserveFlight(boolean isDmestic) {
+		initialize(isDmestic);
 	}
 
-	private void initialize() {
-		Flight f = new DbSelect().FlightSelect(Login.FlightId);
+	private void initialize(boolean isDmestic) {
+		Flight f = new DbSelect().FlightSelect(Login.FlightId, isDmestic);
 		frame = new JFrame();
 		frame.setBounds(100, 100, 738, 548);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -65,7 +68,7 @@ public class ReserveFlight {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				frame.setVisible(false);
-				Pay windowPay = new Pay();
+				Pay windowPay = new Pay(isDmestic);
 				windowPay.getFrame().setVisible(true);
 			}
 		});

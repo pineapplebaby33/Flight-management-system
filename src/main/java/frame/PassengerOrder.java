@@ -49,11 +49,12 @@ public class PassengerOrder {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
+		/*
+		//按钮_退出登录
 		JButton btnNewButton_1 = new JButton("退出登录");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.setVisible(false);
-
 				Login window = new Login();
 				window.getFrame().setVisible(true);
 			}
@@ -61,6 +62,7 @@ public class PassengerOrder {
 		btnNewButton_1.setFont(new Font("宋体", Font.PLAIN, 40));
 		btnNewButton_1.setBounds(1611, 0, 361, 49);
 		frame.getContentPane().add(btnNewButton_1);
+
 
 		JButton button = new JButton("搜索");
 		button.setFont(new Font("宋体", Font.PLAIN, 40));
@@ -77,16 +79,18 @@ public class PassengerOrder {
 		lblNewLabel_9.setBounds(1611, 205, 169, 44);
 		frame.getContentPane().add(lblNewLabel_9);
 
-		JLabel label = new JLabel(
-				"双击订单可以进入取消订单页面");
+		 */
+
+		//取消订单提示
+		JLabel label = new JLabel("双击订单可以进入取消订单页面");
 		label.setForeground(Color.RED);
 		label.setBounds(26, 401, 301, 15);
 		frame.getContentPane().add(label);
 
+		//查询所有订单
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定"};
-		flight.Order[] order = new DbSelect().OrderSelect(
-				Login.PassengerId, "");
+		flight.Order[] order = new DbSelect().OrderSelect(Login.PassengerId,Research.isDomestic,"yes");
 		String[][] o_ob2 =null;
 		if(order!=null)
 		{
@@ -99,7 +103,7 @@ public class PassengerOrder {
 					o_ob2[i][3] = order[i].getFlightId().getArrivalCity();
 					o_ob2[i][4] = order[i].getFlightId().getStartTime().format(formatter);
 					o_ob2[i][5] = order[i].getFlightId().getArrivalTime().format(formatter);
-					o_ob2[i][6] = order[i].getCreateDate().format(formatter);
+					o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
 					o_ob2[i][7] = "已预定";
 				}
 
@@ -113,7 +117,7 @@ public class PassengerOrder {
 
 			public boolean isCellEditable(int row, int column) {
 				return false;
-			}// ��������༭
+			}
 		};
 		table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -122,7 +126,6 @@ public class PassengerOrder {
 					// 获取选中的行
 					int row = table.getSelectedRow();
 					String preId1 = table.getValueAt(row, 0).toString();
-					// System.out.println(preId1);
 					frame.setVisible(false);
 					Login.OrderId = Integer.parseInt(preId1);
 					CancelOrder window = new CancelOrder();
@@ -136,7 +139,6 @@ public class PassengerOrder {
 		int colunms = table.getColumnCount();
 		for (int i = 0; i < colunms; i++) {
 			column = table.getColumnModel().getColumn(i);
-			/* ��ÿһ�е�Ĭ�Ͽ������Ϊ100 */
 			column.setPreferredWidth(100);
 		}
 		table.getColumnModel().getColumn(0).setPreferredWidth(20);
@@ -150,28 +152,6 @@ public class PassengerOrder {
 
 		frame.getContentPane().add(scrollPane);
 		scrollPane.setViewportView(table);
-		JLabel lblNewLabel_10 = new JLabel("退订");
-		lblNewLabel_10.setFont(new Font("宋体", Font.PLAIN, 40));
-		lblNewLabel_10.setBounds(1843, 205, 86, 44);
-		frame.getContentPane().add(lblNewLabel_10);
-
-		JButton button_1 = new JButton("返回");
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		button_1.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.setVisible(false);
-				Research window = new Research();
-				window.getFrame().setVisible(true);
-
-			}
-		});
-		button_1.setFont(new Font("宋体", Font.PLAIN, 40));
-		button_1.setBounds(905, 1246, 173, 41);
-		frame.getContentPane().add(button_1);
 
 		JButton button_2 = new JButton("返回");
 		button_2.addMouseListener(new MouseAdapter() {

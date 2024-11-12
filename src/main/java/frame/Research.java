@@ -37,6 +37,8 @@ public class Research {
 	private JFrame frame;
 	private JTable Flight_Table;
 	private JScrollPane scrollPane;
+	static boolean isDomestic =true;
+	private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
 
 	public JFrame getFrame() {
 
@@ -65,6 +67,8 @@ public class Research {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initialize() {
+
+
 		//窗口信息
 		frame = new JFrame();
 		Passenger p = new DbSelect().PassengerSelect(Login.PassengerId);
@@ -80,6 +84,7 @@ public class Research {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		setTable(frame);
+
 
 
 		//标签_起飞城市
@@ -101,8 +106,9 @@ public class Research {
 				"昆明", "南宁", "拉萨", "杭州",
 				"南昌", "广州", "福州", "台北",
 				"海口", "香港", "澳门","深圳" }));
+
+
 		startCity.setToolTipText("");
-		//startCity.setBounds(41, 62, 127, 37);
 		startCity.setBounds(208, 62, 127, 37);
 		frame.getContentPane().add(startCity);
 
@@ -112,25 +118,64 @@ public class Research {
 		frame.getContentPane().add(label_1);
 
 		//降落城市下拉框
-		final JComboBox arrivalCity = new JComboBox();
-		arrivalCity.setModel(new DefaultComboBoxModel(new String[] {
-				"北京", "上海", "天津", "重庆",
-				"哈尔滨", "长春", "沈阳",
-				"呼和浩特", "石家庄",
-				"乌鲁木齐", "兰州", "西宁",
-				"西安 ", "银川", "郑州",
-				"济南", "太原", "合肥", "长沙",
-				"武汉", "南京", "成都", "贵阳",
-				"昆明", "南宁", "拉萨", "杭州",
-				"南昌", "广州", "福州", "台北",
-				"海口", "香港", "澳门","深圳"}));
+		// 初始化降落城市下拉框
+		final JComboBox<String> arrivalCity = new JComboBox<>();
+		//updateArrivalCity(arrivalCity, isDomestic);
+		updateFlightCities(startCity, arrivalCity, isDomestic);
 		arrivalCity.setToolTipText("");
 		arrivalCity.setBounds(366, 62, 127, 38);
 		frame.getContentPane().add(arrivalCity);
 
+		//按钮_国内航班
+		JButton button_00 = new JButton("国内航班");
+		button_00.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				isDomestic =true;
+				//updateArrivalCity(arrivalCity, isDomestic);
+				updateFlightCities(startCity, arrivalCity, isDomestic);
+				setTable(frame);
+
+			}
+		});
+		button_00.setBounds(79, 21, 87, 42);
+		frame.getContentPane().add(button_00);
+
+		//按钮_国外航班
+		JButton button_01 = new JButton("国外航班");
+		button_01.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				isDomestic =false;
+				//updateArrivalCity(arrivalCity, isDomestic);
+				updateFlightCities(startCity, arrivalCity, isDomestic);
+				setTable(frame);
+			}
+		});
+		button_01.setBounds(79, 70, 87, 42);
+		frame.getContentPane().add(button_01);
+
+
+		//按钮_交换
+		JButton Exchange = new JButton("交换");
+		Exchange.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+					String s1 = startCity.getItemAt(startCity.getSelectedIndex()).toString();
+					String s2 = arrivalCity.getItemAt(arrivalCity.getSelectedIndex()).toString();
+					startCity.setSelectedItem(s2);
+					arrivalCity.setSelectedItem(s1);
+
+			}
+		});
+		Exchange.setFont(new Font("宋体", Font.PLAIN, 12));
+		Exchange.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		Exchange.setBounds(320, 100, 63, 37);
+		frame.getContentPane().add(Exchange);
+
 		//标签_起飞时间
 		JLabel StartTimeLabel = new JLabel("起飞时间");
-		//StartTimeLabel.setFont(new Font("宋体", Font.PLAIN, 14));
 		StartTimeLabel.setBounds(546, 28, 54, 15);
 		frame.getContentPane().add(StartTimeLabel);
 
@@ -150,7 +195,6 @@ public class Research {
 				window.getFrame().setVisible(true);
 			}
 		});
-		//btnNewButton.setFont(new Font("宋体", Font.PLAIN, 12));
 		btnNewButton.setBounds(837, 7, 87, 42);
 		frame.getContentPane().add(btnNewButton);
 
@@ -160,7 +204,6 @@ public class Research {
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frame.setVisible(false);
-
 				Login window = new Login();
 				window.getFrame().setVisible(true);
 			}
@@ -190,20 +233,10 @@ public class Research {
 				LocalDateTime startDate = LocalDateTime.of(localDate, LocalTime.MIN);  // 2024-11-30T00:00
 				// 创建 FlightProcessor 对象
 				FlightProcessor processor = new FlightProcessor();
+				// 先获得所有航班信息
+				currentFlights = new DbSelect().FlightSelectForPass(isDomestic);
 				// 处理航班数据，查找从 "北京" 到 "深圳" 的路径
-				Flight[] flights = new DbSelect().FlightSelectForPass();
-				// 处理航班数据，查找从 "北京" 到 "深圳" 的路径
-				Flight[] processedFlights = processor.processFlights(flights, s1, s2,startDate);
-				for (Flight flight : processedFlights) {
-					if (flight.getStartTime() == null && flight.getArrivalTime() == null) {
-						// 输出标签
-						System.out.println(flight.getFlightName());
-					} else {
-						// 输出具体航班信息
-						System.out.println(flight.toString());
-					}
-				}
-				//flight.Flight[] flights2 = new DbSelect().FlightSelect(date1,  s1, s2);//返回12列
+				Flight[] processedFlights = processor.processFlights(currentFlights, s1, s2,startDate);
 				if (processedFlights != null) {
 					setTable(frame, processedFlights,s1,s2);
 				} else {
@@ -257,19 +290,20 @@ public class Research {
 		}
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
-		Flight[] flights = new DbSelect().FlightSelectForPass();
-		String[][] flight_ob = new String[flights.length][9];
+		// 更新当前表格的航班数据源
+		currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
+		String[][] flight_ob = new String[currentFlights.length][9];
 		//遍历 flights 数组，将每个航班的信息存入 flight_ob 二维数组，准备显示在表格中。
-		for (int i = 0; i < flights.length; i++) {
-			flight_ob[i][0] = Integer.toString(flights[i].getId());
-			flight_ob[i][1] = flights[i].getFlightName();
-			flight_ob[i][2] = flights[i].getStartCity();
-			flight_ob[i][3] = flights[i].getArrivalCity();
-			flight_ob[i][4] = flights[i].getStartTime().format(formatter);
-			flight_ob[i][5] = flights[i].getArrivalTime().format(formatter);
-			flight_ob[i][6] = String.valueOf(flights[i].getPrice());
+		for (int i = 0; i < currentFlights.length; i++) {
+			flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
+			flight_ob[i][1] = currentFlights[i].getFlightName();
+			flight_ob[i][2] = currentFlights[i].getStartCity();
+			flight_ob[i][3] = currentFlights[i].getArrivalCity();
+			flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
+			flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
+			flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
 			//检查当前登录的乘客是否已经预定该航班
-			if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())) {
+			if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(),isDomestic)) {
 				flight_ob[i][7] = "未预定";
 			} else {
 				flight_ob[i][7] = "已预定";
@@ -300,23 +334,25 @@ public class Research {
 		Flight_Table.setSelectionBackground(Color.LIGHT_GRAY);//选中后
 		Flight_Table.setSelectionForeground(Color.yellow);
 		Flight_Table.setBounds(21, 143, 700, 363);
-
-
+		//滚轴
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 143, 912, 363);
-
 		frame.getContentPane().add(scrollPane);
 		scrollPane.setViewportView(Flight_Table);
+		//鼠标监听事件
 		Flight_Table.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				//跳转预定航班界面
 				if (e.getClickCount() == 2) {//双击事件
 					int row = Flight_Table.getSelectedRow();
-					String preId1 = Flight_Table.getValueAt(row, 0).toString();
-					frame.setVisible(false);
-					Login.FlightId = Integer.parseInt(preId1);
-					ReserveFlight window = new ReserveFlight();
-					window.getFrame().setVisible(true);
+					if (row != -1) {
+						// 使用 currentFlights 数组而不是原来的数据源
+						Flight selectedFlight = currentFlights[row];
+						frame.setVisible(false);
+						Login.FlightId = selectedFlight.getId();
+						ReserveFlight window = new ReserveFlight(isDomestic);
+						window.getFrame().setVisible(true);
+					}
 				}
 			}
 		});
@@ -327,7 +363,7 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		//DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
 		String[][] flight_ob = new String[flights.length][9];
 		for (int i = 0; i < flights.length; i++) {
@@ -346,7 +382,7 @@ public class Research {
 			if(flights[i].getStartTime()==null){
 				flight_ob[i][7] = "";
 			}
-			else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId())&&flights[i].getStartCity()!=null) {
+			else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId(),isDomestic)&&flights[i].getStartCity()!=null) {
 				flight_ob[i][7] = "未预定";
 			}else{
 				flight_ob[i][7] = "已预定";
@@ -391,11 +427,45 @@ public class Research {
 					String preId1 = Flight_Table.getValueAt(row, 0).toString();
 					frame.setVisible(false);
 					Login.FlightId = Integer.parseInt(preId1);
-					ReserveFlight window = new ReserveFlight();
+					ReserveFlight window = new ReserveFlight(isDomestic);
 					window.getFrame().setVisible(true);
 				}
 			}
 		});
 	}
-}
 
+	private void updateFlightCities(JComboBox<String> startCity, JComboBox<String> arrivalCity, boolean isDomestic) {
+		String[] domesticCities = {
+				"北京", "上海", "天津", "重庆", "哈尔滨", "长春", "沈阳",
+				"呼和浩特", "石家庄", "乌鲁木齐", "兰州", "西宁", "西安",
+				"银川", "郑州", "济南", "太原", "合肥", "长沙", "武汉",
+				"南京", "成都", "贵阳", "昆明", "南宁", "拉萨", "杭州",
+				"南昌", "广州", "福州", "台北", "海口", "香港", "澳门", "深圳"
+		};
+
+		String[] internationalCities = {
+				"纽约", "伦敦", "巴黎", "柏林", "阿姆斯特丹", "慕尼黑",
+				"罗马", "东京", "首尔", "曼谷", "悉尼", "奥克兰",
+				"温哥华", "莫斯科", "芝加哥", "洛杉矶", "新加坡", "旧金山"
+		};
+
+		// 设置下拉框的内容为国内或国际城市
+		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(domesticCities);
+		startCity.setModel(model);
+		arrivalCity.setModel(new DefaultComboBoxModel<>(isDomestic ? domesticCities : internationalCities));
+
+		// 将下拉框默认选择重置为第一个项
+		if (startCity.getItemCount() > 0) {
+			startCity.setSelectedIndex(0);
+		}
+		if (arrivalCity.getItemCount() > 0) {
+			arrivalCity.setSelectedIndex(0);
+		}
+
+		// 刷新下拉框显示
+		startCity.revalidate();
+		arrivalCity.revalidate();
+	}
+
+
+}

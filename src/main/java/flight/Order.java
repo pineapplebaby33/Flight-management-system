@@ -2,6 +2,8 @@
 
 package flight;
 
+import frame.Research;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,23 +16,25 @@ public class Order {
 	private String Status = "";
 
 
-	public static boolean IsHasOrder(int pid,int fid)
-	{
+	//p-查询订单√
+	public static boolean IsHasOrder(int pid,int fid,boolean isDomestic) {
 		boolean re=false;
-		Order x=new DbSelect().OrderSelect(pid, fid,"yes");
+		Order x=new DbSelect().OrderSelect(pid, fid,"yes",isDomestic);
 		if(x==null)
 		{
 			re=true;
 		}
 		return re;
 	}
-	public Order(int id, int PassengerId, int Seat, int FlightId, String CreateDate, String Status) {
+
+	//p-订单构造函数
+	public Order(int id, int PassengerId, int Seat, int FlightId, String CreateDate, String Status, boolean isDomestic) {
 		DbSelect dbSelect = new DbSelect();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		this.id = id;
 		this.PassengerId = dbSelect.PassengerSelect(PassengerId);
 		this.Seat = Seat;
-		this.FlightId = dbSelect.FlightSelect(FlightId);
+		this.FlightId = dbSelect.FlightSelect(FlightId,isDomestic);
 		this.CreateDate = LocalDateTime.parse(CreateDate, formatter);
 		this.Status = Status;
 	}

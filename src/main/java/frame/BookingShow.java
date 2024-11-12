@@ -60,7 +60,7 @@ public class BookingShow {
         frame.getContentPane().setLayout(null);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
         String[] columnNames = {"乘客姓名", "身份证号", "座位号", "预定时间", "订单状态", "航班名称"};
-        BookingInfo[] bookingInfos = new DbSelect().BookingInfoSelect();
+        BookingInfo[] bookingInfos = new DbSelect().BookingInfoSelect(AdminFunction.isDomestic);
         String[][] booking_ob = new String[bookingInfos.length][6];
         for (int i = 0; i < bookingInfos.length; i++) {
             booking_ob[i][0] = bookingInfos[i].getPname();
@@ -122,7 +122,7 @@ public class BookingShow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String[] columnNames = {"乘客姓名", "身份证号", "座位号", "预定时间", "订单状态", "航班名称"};
-                BookingInfo[] bookingInfos = new DbSelect().BookingInfoSelect();
+                BookingInfo[] bookingInfos = new DbSelect().BookingInfoSelect(AdminFunction.isDomestic);
                 int len = bookingInfos.length;
                 String FN = FlightName.getText();
                 BookingInfo[] temp = new BookingInfo[len];

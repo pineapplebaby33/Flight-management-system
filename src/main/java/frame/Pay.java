@@ -19,6 +19,7 @@ public class Pay {
 	private JFrame frame;
 	private JPasswordField passwordField;
 	private JButton back;
+	//private boolean isDmestic;
 
 	/**
 	 * Launch the application.
@@ -27,7 +28,8 @@ public class Pay {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Pay window = new Pay();
+					boolean isDmestic=true;
+					Pay window = new Pay(isDmestic);
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -37,11 +39,11 @@ public class Pay {
 	}
 
 
-	public Pay() {
-		initialize();
+	public Pay(boolean isDmestic) {
+		initialize(isDmestic);
 	}
 
-	private void initialize() {
+	private void initialize(boolean isDmestic) {
 		frame = new JFrame();
 		frame.setTitle("支付页面");
 		frame.setBounds(550, 100, 350, 300);
@@ -66,9 +68,9 @@ public class Pay {
 				}
 
 				//检查订单是否重复
-				if (Order.IsHasOrder(Login.PassengerId, Login.FlightId)) {
-					boolean x = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd);
-					x = x && Flight.ReserveFlight(Login.PassengerId,Login.FlightId);
+				if (Order.IsHasOrder(Login.PassengerId, Login.FlightId,Research.isDomestic)) {
+					boolean x = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd,isDmestic);
+					x = x && Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
 					if (x) {
 						frame.setVisible(false);
 						Research window = new Research();
@@ -94,7 +96,7 @@ public class Pay {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				frame.setVisible(false);
-				ReserveFlight window = new ReserveFlight();
+				ReserveFlight window = new ReserveFlight(isDmestic);
 				window.getFrame().setVisible(true);
 			}
 		});
