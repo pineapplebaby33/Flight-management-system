@@ -1,0 +1,154 @@
+package frame;
+
+import flight.*;
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.OSMTileFactoryInfo;
+import org.jxmapviewer.viewer.*;
+import org.jxmapviewer.painter.CompoundPainter;
+import org.jxmapviewer.painter.Painter;
+
+import javax.swing.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.List;
+
+class RoutePainter implements Painter<JXMapViewer> {
+    private final GeoPosition start;
+    private final GeoPosition end;
+
+    public RoutePainter(GeoPosition start, GeoPosition end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    public void paint(Graphics2D g, JXMapViewer map, int width, int height) {
+        // 将地理坐标转换为屏幕坐标
+        Point2D ptStart = map.getTileFactory().geoToPixel(start, map.getZoom());
+        Point2D ptEnd = map.getTileFactory().geoToPixel(end, map.getZoom());
+
+        // 在地图上绘制直线，表示航线
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(2));
+        g.drawLine((int) ptStart.getX(), (int) ptStart.getY(), (int) ptEnd.getX(), (int) ptEnd.getY());
+    }
+}
+
+public class FlightRouteDrawer {
+    private final List<Order> orders;
+    private final JXMapViewer mapViewer;
+
+    // 定义常用城市及其经纬度
+    private static final Map<String, GeoPosition> cityCoordinates = new HashMap<>();
+
+    static {
+        cityCoordinates.put("北京", new GeoPosition(39.9042, 116.4074));
+        cityCoordinates.put("上海", new GeoPosition(31.2304, 121.4737));
+        cityCoordinates.put("天津", new GeoPosition(39.3434, 117.3616));
+        cityCoordinates.put("重庆", new GeoPosition(29.5630, 106.5516));
+        cityCoordinates.put("哈尔滨", new GeoPosition(45.8038, 126.5350));
+        cityCoordinates.put("长春", new GeoPosition(43.8171, 125.3235));
+        cityCoordinates.put("沈阳", new GeoPosition(41.8057, 123.4315));
+        cityCoordinates.put("呼和浩特", new GeoPosition(40.8424, 111.7490));
+        cityCoordinates.put("石家庄", new GeoPosition(38.0428, 114.5149));
+        cityCoordinates.put("乌鲁木齐", new GeoPosition(43.8256, 87.6168));
+        cityCoordinates.put("兰州", new GeoPosition(36.0611, 103.8343));
+        cityCoordinates.put("西宁", new GeoPosition(36.6171, 101.7782));
+        cityCoordinates.put("西安", new GeoPosition(34.3416, 108.9398));
+        cityCoordinates.put("银川", new GeoPosition(38.4872, 106.2309));
+        cityCoordinates.put("郑州", new GeoPosition(34.7466, 113.6254));
+        cityCoordinates.put("济南", new GeoPosition(36.6512, 117.1201));
+        cityCoordinates.put("太原", new GeoPosition(37.8706, 112.5489));
+        cityCoordinates.put("合肥", new GeoPosition(31.8206, 117.2290));
+        cityCoordinates.put("长沙", new GeoPosition(28.2282, 112.9388));
+        cityCoordinates.put("武汉", new GeoPosition(30.5928, 114.3055));
+        cityCoordinates.put("南京", new GeoPosition(32.0603, 118.7969));
+        cityCoordinates.put("成都", new GeoPosition(30.5728, 104.0668));
+        cityCoordinates.put("贵阳", new GeoPosition(26.6470, 106.6302));
+        cityCoordinates.put("昆明", new GeoPosition(25.0406, 102.7123));
+        cityCoordinates.put("南宁", new GeoPosition(22.8170, 108.3669));
+        cityCoordinates.put("拉萨", new GeoPosition(29.6525, 91.1721));
+        cityCoordinates.put("杭州", new GeoPosition(30.2741, 120.1551));
+        cityCoordinates.put("南昌", new GeoPosition(28.6829, 115.8582));
+        cityCoordinates.put("广州", new GeoPosition(23.1291, 113.2644));
+        cityCoordinates.put("福州", new GeoPosition(26.0745, 119.2965));
+        cityCoordinates.put("台北", new GeoPosition(25.0330, 121.5654));
+        cityCoordinates.put("海口", new GeoPosition(20.0442, 110.1999));
+        cityCoordinates.put("香港", new GeoPosition(22.3193, 114.1694));
+        cityCoordinates.put("澳门", new GeoPosition(22.1987, 113.5439));
+        cityCoordinates.put("深圳", new GeoPosition(22.5431, 114.0579));
+
+        cityCoordinates.put("New York", new GeoPosition(40.7128, -74.0060));
+        cityCoordinates.put("Los Angeles", new GeoPosition(34.0522, -118.2437));
+        cityCoordinates.put("London", new GeoPosition(51.5074, -0.1278));
+        cityCoordinates.put("Paris", new GeoPosition(48.8566, 2.3522));
+        // 可以继续添加其他城市的经纬度
+    }
+
+    public FlightRouteDrawer(List<Order> orders) {
+        this.orders = orders;
+        this.mapViewer = new JXMapViewer();
+
+        mapViewer.setTileFactory(new DefaultTileFactory(new OSMTileFactoryInfo()));
+        // 设置初始位置和缩放级别
+        GeoPosition initialPosition = new GeoPosition(40.7128, -74.0060); // 纽约市经纬度
+        mapViewer.setZoom(1); // 设置初始缩放级别（1-7，越小显示范围越大）
+        mapViewer.setAddressLocation(initialPosition); // 设置地图的中心位置
+    }
+
+    // 根据城市名称获取 GeoPosition，如果未找到则返回默认位置
+    private GeoPosition getGeoPositionFromCity(String cityName) {
+        return cityCoordinates.getOrDefault(cityName, new GeoPosition(0, 0)); // 默认 (0,0) 表示找不到城市
+    }
+
+
+
+// 其他代码保持不变
+
+    public void drawRoutes() {
+        Set<Waypoint> waypoints = new HashSet<>();  // 使用 HashSet 代替 ArrayList
+        List<Painter<JXMapViewer>> painters = new ArrayList<>();
+
+        // 处理每个订单，绘制航班路线
+        for (Order order : orders) {
+            GeoPosition start = getGeoPositionFromCity(order.getFlightId().getStartCity());
+            GeoPosition end = getGeoPositionFromCity(order.getFlightId().getArrivalCity());
+
+            // 使用 DefaultWaypoint 替代 Waypoint
+            waypoints.add(new DefaultWaypoint(start));
+            waypoints.add(new DefaultWaypoint(end));
+
+            // 绘制航班路线
+            RoutePainter routePainter = new RoutePainter(start, end);
+            painters.add(routePainter);
+        }
+
+        // WaypointPainter 用于绘制 Waypoints
+        WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+        waypointPainter.setWaypoints(waypoints);  // 现在传入的是 Set<Waypoint> 类型
+        painters.add(waypointPainter);
+
+        // 设置复合绘图器，将航班路线和 Waypoints 都绘制出来
+        mapViewer.setOverlayPainter(new CompoundPainter<>(painters));
+
+        // 显示地图窗口
+        JFrame frame = new JFrame("Flight Route Map");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(mapViewer);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
+    }
+
+    public static void main (String[]args){
+        // 创建两个实例订单，用于测试
+        List<Order> testOrders = new ArrayList<>();
+        testOrders.add(new Order(1,1,1,1,"2016-03-04-05-20-01","PAID",true));// 纽约 -> 洛杉矶
+        testOrders.add(new Order(22,12,12,12,"2024-11-12-14-24-39","PAID",true));// 伦敦 -> 巴黎
+
+        // 创建 FlightRouteDrawer 并绘制航线
+        FlightRouteDrawer drawer = new FlightRouteDrawer(testOrders);
+        drawer.drawRoutes();
+    }
+
+}

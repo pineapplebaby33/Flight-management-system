@@ -469,7 +469,7 @@ public class DbSelect {
 
 	 */
 
-	//A-管理员准确寻找√
+	//A-管理员准确寻找√(有时间)
 	public Flight[] FlightSelect(String StartTime, String StartCity, String ArrivalCity,boolean isDomestic) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
@@ -655,7 +655,7 @@ public class DbSelect {
 		return null;
 	}
 
-	//A-P-查询并返回Flight by id
+	//A-P-查询并返回Flight by id√
 	public Flight FlightSelect(int id,boolean isDomestic) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();

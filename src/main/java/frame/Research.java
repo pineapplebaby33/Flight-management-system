@@ -25,11 +25,14 @@ import flight.Order;
 import flight.Passenger;
 
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Research {
@@ -192,18 +195,7 @@ public class Research {
 		dateChooser.setBounds(521, 66, 126, 42);
 		frame.getContentPane().add(dateChooser);
 
-		//我的订单界面
-		JButton btnNewButton = new JButton("我的订单");
-		btnNewButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.setVisible(false);
-				PassengerOrder window = new PassengerOrder();
-				window.getFrame().setVisible(true);
-			}
-		});
-		btnNewButton.setBounds(837, 7, 87, 42);
-		frame.getContentPane().add(btnNewButton);
+
 
 
 		//返回登录界面
@@ -263,6 +255,19 @@ public class Research {
 		label_2.setBounds(12, 510, 344, 15);
 		frame.getContentPane().add(label_2);
 
+		//我的订单界面
+		JButton btnNewButton = new JButton("我的订单");
+		btnNewButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.setVisible(false);
+				PassengerOrder window = new PassengerOrder();
+				window.getFrame().setVisible(true);
+			}
+		});
+		btnNewButton.setBounds(837, 7, 87, 42);
+		frame.getContentPane().add(btnNewButton);
+
 		//按钮_刷新列表
 		JButton fresh = new JButton("刷新列表");
 		fresh.addMouseListener(new MouseAdapter() {
@@ -271,8 +276,26 @@ public class Research {
 				setTable(frame);
 			}
 		});
-		fresh.setBounds(837, 56, 87, 42);
+		fresh.setBounds(837, 53, 87, 42);
 		frame.getContentPane().add(fresh);
+
+		//按钮_飞行记录
+		JButton map = new JButton("飞行记录");
+		map.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				flight.Order[] order = new DbSelect().OrderSelect(Login.PassengerId,Research.isDomestic,"yes");
+				List<Order> orderList = Arrays.asList(order);
+				try {
+					new FlightMapGenerator().generateMap(orderList);
+				} catch (IOException ex) {
+					throw new RuntimeException(ex);
+				}
+				//frame.setVisible(false);setTable(frame);
+			}
+		});
+		map.setBounds(837, 100, 87, 42);
+		frame.getContentPane().add(map);
 
 		//按钮_退出登录
 		JButton button_2 = new JButton("退出登录");

@@ -49,37 +49,6 @@ public class PassengerOrder {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
-		/*
-		//按钮_退出登录
-		JButton btnNewButton_1 = new JButton("退出登录");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.setVisible(false);
-				Login window = new Login();
-				window.getFrame().setVisible(true);
-			}
-		});
-		btnNewButton_1.setFont(new Font("宋体", Font.PLAIN, 40));
-		btnNewButton_1.setBounds(1611, 0, 361, 49);
-		frame.getContentPane().add(btnNewButton_1);
-
-
-		JButton button = new JButton("搜索");
-		button.setFont(new Font("宋体", Font.PLAIN, 40));
-		button.setBounds(1717, 83, 173, 41);
-		frame.getContentPane().add(button);
-
-		JLabel lblNewLabel_8 = new JLabel("价格");
-		lblNewLabel_8.setFont(new Font("宋体", Font.PLAIN, 40));
-		lblNewLabel_8.setBounds(1423, 205, 92, 44);
-		frame.getContentPane().add(lblNewLabel_8);
-
-		JLabel lblNewLabel_9 = new JLabel("航班状态");
-		lblNewLabel_9.setFont(new Font("宋体", Font.PLAIN, 40));
-		lblNewLabel_9.setBounds(1611, 205, 169, 44);
-		frame.getContentPane().add(lblNewLabel_9);
-
-		 */
 
 		//取消订单提示
 		JLabel label = new JLabel("双击订单可以进入取消订单页面");

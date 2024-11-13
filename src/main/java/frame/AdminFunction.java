@@ -3,18 +3,12 @@ package frame;
 import java.awt.Color;
 import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JTable;
 import javax.swing.table.TableColumn;
 
 import flight.*;
@@ -24,9 +18,6 @@ import flight.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
-
-import javax.swing.JScrollPane;
-import javax.swing.JRadioButton;
 
 public class AdminFunction {
     private JFrame AdminFrame;
@@ -200,8 +191,21 @@ public class AdminFunction {
         AdminFrame.getContentPane().add(dateChooser);
 
 
-
-
+        // 创建复选框
+        JCheckBox checkBox = new JCheckBox("无时间查找");
+        checkBox.setBounds(520, 96, 153, 37); // 设置位置和大小
+        // 添加鼠标监听器
+        checkBox.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (checkBox.isSelected()) {
+                    System.out.println("复选框已选中：执行选中操作");
+                } else {
+                    System.out.println("复选框未选中：执行取消操作");
+                }
+            }
+        });
+        AdminFrame.getContentPane().add(checkBox);
 
         //标签
         JLabel Introedit = new JLabel(
@@ -220,10 +224,14 @@ public class AdminFunction {
                 String s2 = arrivalCity.getItemAt(arrivalCity.getSelectedIndex()).toString();
                 String date1 = dateChooser.getText();
                     if (s1.equals(" ") && s2.equals(" ")) {
-                        show_table(AdminFrame,new DbSelect().FlightSelect(AdminFunction.isDomestic));
-                    } else {
+                        show_table(AdminFrame,new DbSelect().FlightSelect(AdminFunction.isDomestic));//刷新
+                    } else if(checkBox.isSelected()){
                         show_table(AdminFrame, new DbSelect().FlightSelect(date1, s1, s2,isDomestic));
-                }
+                        }
+                        else{
+                            show_table(AdminFrame, new DbSelect().FlightSelect(date1, s1, s2,isDomestic));
+                        }
+
             }
         });
         button.setBounds(694, 96, 81, 37);
