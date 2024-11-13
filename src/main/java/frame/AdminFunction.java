@@ -25,6 +25,7 @@ public class AdminFunction {
     private JScrollPane scrollPane;
     static boolean isDomestic =true;
     private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
+    private boolean check;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -199,8 +200,10 @@ public class AdminFunction {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (checkBox.isSelected()) {
+                    check = true;
                     System.out.println("复选框已选中：执行选中操作");
                 } else {
+                    check = false;
                     System.out.println("复选框未选中：执行取消操作");
                 }
             }
@@ -220,15 +223,25 @@ public class AdminFunction {
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
+                if (checkBox.isSelected()) {
+                    check = true;
+                    System.out.println("复选框已选中：执行选中操作1");
+                } else {
+                    check = false;
+                    System.out.println("复选框未选中：执行取消操作1");
+                }
                 String s1 = startCity.getItemAt(startCity.getSelectedIndex()).toString();
                 String s2 = arrivalCity.getItemAt(arrivalCity.getSelectedIndex()).toString();
                 String date1 = dateChooser.getText();
                     if (s1.equals(" ") && s2.equals(" ")) {
+                        System.out.println("刷新");
                         show_table(AdminFrame,new DbSelect().FlightSelect(AdminFunction.isDomestic));//刷新
-                    } else if(checkBox.isSelected()){
-                        show_table(AdminFrame, new DbSelect().FlightSelect(date1, s1, s2,isDomestic));
+                    } else if(check){
+                        System.out.println("无时间");
+                        show_table(AdminFrame, new DbSelect().FlightSelect(s1, s2,isDomestic));
                         }
                         else{
+                        System.out.println("有时间");
                             show_table(AdminFrame, new DbSelect().FlightSelect(date1, s1, s2,isDomestic));
                         }
 

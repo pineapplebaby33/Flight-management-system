@@ -14,8 +14,6 @@ public class TimeThread implements Runnable {
 	//// 声明一个线程控制标志，用于停止线程，使用 volatile 确保线程间可见性
 	//volatile 关键字确保该变量在线程之间是可见的（不会因为线程缓存而造成数据不一致）
 	public volatile boolean ThreadFlag = true;
-
-
 	@Override
 	public void run() {
 		// 假设 df 是指定的日期时间格式
@@ -25,6 +23,7 @@ public class TimeThread implements Runnable {
 			// 使用 DateTimeFormatter 格式化成字符串
 			//String formattedNow = now.format(df);
 			Flight.AutoUpdateStatus(now);
+			System.out.println("TTgengxin");
 			// 1s*60*5=5min
 			int time = 1000 * 60 * 1;
 			try {

@@ -2,6 +2,7 @@ package flight;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
 enum Flight_Status {
@@ -54,8 +55,21 @@ public class Flight {
 		this.FlightName = FlightName;
 		*/
 		this.id = id;
-		this.StartTime = (StartTime != null) ? LocalDateTime.parse(StartTime, formatter) : null;
+		/*
+		this.StartTime = (StartTime != null ) ? LocalDateTime.parse(StartTime, formatter) : null;
 		this.ArrivalTime = (ArrivalTime != null) ? LocalDateTime.parse(ArrivalTime, formatter) : null;
+
+		 */
+		try {
+			// 检查 StartTime 是否为空或空字符串
+			this.StartTime = (StartTime != null && !StartTime.isEmpty()) ? LocalDateTime.parse(StartTime, formatter) : null;
+			// 检查 ArrivalTime 是否为空或空字符串
+			this.ArrivalTime = (ArrivalTime != null && !ArrivalTime.isEmpty()) ? LocalDateTime.parse(ArrivalTime, formatter) : null;
+		} catch (DateTimeParseException e) {
+			System.err.println("日期格式解析错误：无法解析 StartTime 或 ArrivalTime - " + e.getMessage());
+			e.printStackTrace();
+		}
+
 
 		// Debug输出
 		//System.out.println("Initializing Flight ID: " + id + ", StartTime: " + this.StartTime + ", ArrivalTime: " + this.ArrivalTime);
@@ -198,9 +212,18 @@ public class Flight {
 	//自动更新航班状态
 	public static void AutoUpdateStatus(LocalDateTime NowDate) {
 		DbSelect sel = new DbSelect();
-		Flight[] flights = sel.FlightSelect(true);
 		DbUpdate up = new DbUpdate();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+		Flight[] flights = sel.FlightSelect(true);
+		UpdateTOTerminate(flights,up,formatter,NowDate,true);
+		System.out.println("国内更新完毕");
+		Flight[] flights1 = sel.FlightSelect(false);
+		UpdateTOTerminate(flights1,up,formatter,NowDate,false);
+		System.out.println("国外更新完毕");
+	}
+
+	public static void UpdateTOTerminate(Flight[] flights, DbUpdate up, DateTimeFormatter formatter, LocalDateTime NowDate,boolean isDmestic) {
+		System.out.println(flights.length);
 		for (int i = 0; i < flights.length; i++) {
 			if (flights[i].getFlightStatus().equals(Flight_Status.AVAILABLE.getStatus())
 					|| flights[i].getFlightStatus().equals(Flight_Status.FULL.getStatus())) {
@@ -208,21 +231,22 @@ public class Flight {
 				LocalDateTime startTime = flights[i].getStartTime();
 				long minutesDifference = Duration.between(NowDate, startTime).toMinutes();
 				// 如果出发时间在当前时间之后且不超过120分钟，则更新航班状态
-				if (minutesDifference >= 0 && minutesDifference <= 120){
+				if (minutesDifference >= 0 && minutesDifference <= 120 || minutesDifference < 0){
 					boolean re = up.FlightUpdate(
-									flights[i].id,
-									flights[i].getStartTime().format(formatter),
-									flights[i].getArrivalTime().format(formatter),
-									flights[i].StartCity,
-									flights[i].ArrivalCity,
-									flights[i].DepartureDate,
-									flights[i].price,
-									flights[i].CurrentPassengers,
-									flights[i].SeatCapacity,
-									Flight_Status.TERMINATE.getStatus(),
-									flights[i]
-											.GetPassengerString(flights[i].PassengerId),
-									flights[i].FlightName,true);
+							flights[i].id,
+							flights[i].getStartTime().format(formatter),
+							flights[i].getArrivalTime().format(formatter),
+							flights[i].StartCity,
+							flights[i].ArrivalCity,
+							flights[i].DepartureDate,
+							flights[i].price,
+							flights[i].CurrentPassengers,
+							flights[i].SeatCapacity,
+							Flight_Status.TERMINATE.getStatus(),
+							flights[i]
+									.GetPassengerString(flights[i].PassengerId),
+							flights[i].FlightName,isDmestic);
+					System.out.println("已更正状态");
 					if (!re) {
 						System.err.println("航班状态更新失败");
 					}

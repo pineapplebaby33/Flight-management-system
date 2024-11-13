@@ -524,6 +524,57 @@ public class DbSelect {
 		return null;
 	}
 
+	//A-管理员准确寻找√(无时间)
+	public Flight[] FlightSelect(String StartCity, String ArrivalCity,boolean isDomestic) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			String _sql = "select * from "+tableName+"where";
+			if (StartCity != null && StartCity.length() > 0) {
+				_sql += " StartCity = '" + StartCity + "'";
+				_sql += " and ";
+			}
+			if (ArrivalCity != null && ArrivalCity.length() > 0) {
+				_sql += " ArrivalCity = '" + ArrivalCity + "'";
+				_sql += " and ";
+			}
+
+			_sql = _sql.substring(0, _sql.length() - 5);
+			_sql += ";";
+			this.pst = cn.prepareStatement(_sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			this.ret = pst.executeQuery();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			ret.last();
+			if (ret.getRow() > 0) {
+				Flight[] ad = new Flight[ret.getRow()];
+				ret.beforeFirst();
+				int _i = 0;
+				while (ret.next()) {
+					Flight x = new Flight(ret.getInt(1), ret.getString(2),
+							ret.getString(3), ret.getString(4),
+							ret.getString(5), ret.getString(6),
+							ret.getFloat(7), ret.getInt(8), ret.getInt(9),
+							ret.getString(10), ret.getString(11),
+							ret.getString(12));
+					ad[_i] = x;
+					_i++;
+				}
+				this.ret.close();
+				this.cn.close();
+				return ad;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	//没有调用
 	public Flight[] FlightSelect(String FlightName,boolean isDomestic) {
 		this.db = new DbConnect();
@@ -836,6 +887,69 @@ public class DbSelect {
 	}
 
 	 */
+
+	//获取最新的ID,自动更新航班√
+	public int NewGetId(boolean isDomestic){
+			this.db = new DbConnect();
+			this.cn = this.db.Get_Connection();
+			int lastId = -1; // 默认值，表示未找到
+			try {
+				// 根据 isDomestic 参数选择查询的表
+				String tableName = isDomestic ? "`flight`" : "`flight1`";
+				this.pst = cn.prepareStatement("SELECT id FROM " + tableName + " ORDER BY id DESC LIMIT 1;");
+				this.ret = pst.executeQuery();
+
+				if (ret.next()) { // 获取第一条记录，即 id 最大值
+					lastId = ret.getInt("id");
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					if (this.ret != null) this.ret.close();
+					if (this.pst != null) this.pst.close();
+					if (this.cn != null) this.cn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			return lastId;
+
+
+	}
+
+	// 查询指定日期是否有航班
+	public boolean hasFlightOnDate(String date,boolean isDomestic) {
+		boolean hasFlight = false;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			// 定义 SQL 查询语句
+			String sql = "SELECT COUNT(*) FROM "+tableName+" WHERE DATE(StartTime) = ?";
+			pst = cn.prepareStatement(sql);
+			pst.setString(1, date);  // 设置查询参数为指定日期
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				// 获取查询结果，如果有航班则返回 true
+				hasFlight = rs.getInt(1) > 0;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pst != null) pst.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return hasFlight;
+	}
+
 
 
 

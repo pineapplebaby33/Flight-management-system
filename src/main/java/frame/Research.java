@@ -32,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -313,6 +314,7 @@ public class Research {
 		frame.getContentPane().add(button_2);
 	}
 
+	/*
 	//创建表格_by frame 初始化/刷新
 	private void setTable(final JFrame frame) {
 		if (scrollPane != null) {
@@ -387,6 +389,91 @@ public class Research {
 			}
 		});
 	}
+
+	 */
+
+
+		// 创建表格_by frame 初始化/刷新
+		private void setTable(final JFrame frame) {
+			if (scrollPane != null) {
+				frame.getContentPane().remove(scrollPane); // 清除旧的表格
+			}
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+			String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式"};
+
+			// 更新当前表格的航班数据源
+			currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
+
+			// 按起飞时间排序，从早到晚
+			Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
+
+			// 将航班信息填充到 flight_ob 二维数组中
+			String[][] flight_ob = new String[currentFlights.length][9];
+			for (int i = 0; i < currentFlights.length; i++) {
+				flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
+				flight_ob[i][1] = currentFlights[i].getFlightName();
+				flight_ob[i][2] = currentFlights[i].getStartCity();
+				flight_ob[i][3] = currentFlights[i].getArrivalCity();
+				flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
+				flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
+				flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
+				// 检查当前登录的乘客是否已经预定该航班
+				if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
+					flight_ob[i][7] = "未预定";
+				} else {
+					flight_ob[i][7] = "已预定";
+				}
+				flight_ob[i][8] = "直飞";
+			}
+
+			// 创建 JTable 表格，显示航班数据，并设置表格不可编辑。
+			Flight_Table = new JTable(flight_ob, columnNames) {
+				@Serial
+				private static final long serialVersionUID = -4737302915707325665L;
+
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			};
+
+			// 设置表格列的宽度和其他属性
+			TableColumn column;
+			int columns = Flight_Table.getColumnCount();
+			for (int i = 0; i < columns; i++) {
+				column = Flight_Table.getColumnModel().getColumn(i);
+				column.setPreferredWidth(100);
+			}
+			Flight_Table.getColumnModel().getColumn(0).setPreferredWidth(20); // 第一列
+			Flight_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // 单选模式
+			Flight_Table.setSelectionBackground(Color.LIGHT_GRAY); // 选中后背景色
+			Flight_Table.setSelectionForeground(Color.yellow); // 选中后前景色
+			Flight_Table.setBounds(21, 143, 700, 363);
+
+			// 添加滚动面板
+			scrollPane = new JScrollPane();
+			scrollPane.setBounds(12, 143, 912, 363);
+			frame.getContentPane().add(scrollPane);
+			scrollPane.setViewportView(Flight_Table);
+
+			// 鼠标监听事件
+			Flight_Table.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					// 双击事件
+					if (e.getClickCount() == 2) {
+						int row = Flight_Table.getSelectedRow();
+						if (row != -1) {
+							// 使用 currentFlights 数组而不是原来的数据源
+							Flight selectedFlight = currentFlights[row];
+							frame.setVisible(false);
+							Login.FlightId = selectedFlight.getId();
+							ReserveFlight window = new ReserveFlight(isDomestic);
+							window.getFrame().setVisible(true);
+						}
+					}
+				}
+			});
+		}
+
 
 	//创建表格_by frame 精准查询
 	private void setTable(final JFrame frame, Flight[] flights,String startcity,String arrivalcity) {
