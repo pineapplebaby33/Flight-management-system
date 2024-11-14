@@ -95,11 +95,23 @@ public class PassengerOrder {
 							JMenuItem option1 = new JMenuItem("取消航班");
 							option1.addActionListener(actionEvent -> {
 								// 执行第一个选项的操作
-								String preId1 = table.getValueAt(row, 0).toString();
-								frame.setVisible(false);
-								Login.OrderId = Integer.parseInt(preId1);
-								CancelOrder window = new CancelOrder();
-								window.getFrame().setVisible(true);
+								String flightname = table.getValueAt(row, 1).toString();
+								String info = new DbSelect().queryTransit(Login.PassengerId,flightname);
+								if(info.equals("未找到匹配的记录")){
+									String preId1 = table.getValueAt(row, 0).toString();
+									frame.setVisible(false);
+									Login.OrderId = Integer.parseInt(preId1);
+									CancelOrder window = new CancelOrder();
+									window.getFrame().setVisible(true);
+								}
+								else{
+									String preId1 = table.getValueAt(row, 0).toString();
+									frame.setVisible(false);
+									Login.OrderId = Integer.parseInt(preId1);
+									TransitWarn window = new TransitWarn(info,flightname);
+									window.getFrame().setVisible(true);
+								}
+
 							});
 							popupMenu.add(option1);
 

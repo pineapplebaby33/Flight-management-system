@@ -819,6 +819,174 @@ public class DbSelect {
 		return hasFlight;
 	}
 
+	//查询中转数据
+	public String queryTransit(int pid, String flightName) {
+		System.out.println("查询 transit 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		String result = "";
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT * FROM transit WHERE Pid = ? AND (StartFlightName = ? OR ArrivalFlightName = ?)";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置参数
+			this.pst.setInt(1, pid);
+			this.pst.setString(2, flightName);
+			this.pst.setString(3, flightName);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 处理查询结果
+			if (ret.next()) {
+				// 拼接结果字符串
+				result = "起飞航班名: " + ret.getString("StartFlightName") +
+						", 起飞城市: " + ret.getString("StartCity") +
+						", 中转城市: " + ret.getString("TransitCity") +
+						", 到达城市: " + ret.getString("ArrivalCity") +
+						", 中转航班名: " + ret.getString("ArrivalFlightName");
+			} else {
+				result = "未找到匹配的记录";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result = "查询出错";
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	//查询OrderID
+	public Integer queryOrderId(int pid, int fid) {
+		System.out.println("查询订单表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		Integer orderId = null;
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT Id FROM `order` WHERE PassengerId = ? AND FlightId = ? AND Status = 'PAID'";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+			this.pst.setInt(2, fid);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 如果查询结果存在，则获取订单 ID
+			if (ret.next()) {
+				orderId = ret.getInt("Id");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return orderId;
+	}
+
+	//查找另一个航班名
+	public String findOtherFlightName(int pid, String flightName) {
+		System.out.println("查询 transit 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		String otherFlightName = null;
+
+		try {
+			// SQL 查询语句，查找 pid 匹配的记录，其中 StartFlightName 或 ArrivalFlightName 与 flightName 相等
+			String sql = "SELECT StartFlightName, ArrivalFlightName FROM transit WHERE Pid = ? AND (StartFlightName = ? OR ArrivalFlightName = ?)";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+			this.pst.setString(2, flightName);
+			this.pst.setString(3, flightName);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 处理查询结果
+			if (ret.next()) {
+				String startFlightName = ret.getString("StartFlightName");
+				String arrivalFlightName = ret.getString("ArrivalFlightName");
+
+				// 如果 StartFlightName 等于传入的 flightName，则返回 ArrivalFlightName；反之亦然
+				if (startFlightName.equals(flightName)) {
+					otherFlightName = arrivalFlightName;
+				} else if (arrivalFlightName.equals(flightName)) {
+					otherFlightName = startFlightName;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return otherFlightName;
+	}
+
+	//根据航班名查找fid
+	public Integer findFlightIdByName(String flightName) {
+		System.out.println("查询 flight 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		Integer flightId = null;
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT Id FROM flight WHERE FlightName = ?";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setString(1, flightName);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 如果查询结果存在，则获取航班 ID
+			if (ret.next()) {
+				flightId = ret.getInt("Id");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return flightId;
+	}
+
+
+
+
 
 	public static void main(String[] args) {
 		// System.out.println(new DbSelect().OrderSelect(3, 1));
