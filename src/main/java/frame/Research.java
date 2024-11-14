@@ -186,7 +186,7 @@ public class Research {
 
 
 
-
+	/*
 		//返回登录界面
 		JButton button_1 = new JButton("返回");
 		button_1.addActionListener(new ActionListener() {
@@ -200,6 +200,8 @@ public class Research {
 		button_1.setFont(new Font("宋体", Font.PLAIN, 14));
 		button_1.setBounds(869, 1208, 173, 41);
 		frame.getContentPane().add(button_1);
+
+	 */
 
 
 		//查询按钮

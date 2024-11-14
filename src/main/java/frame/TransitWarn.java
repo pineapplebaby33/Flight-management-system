@@ -1,4 +1,5 @@
 package frame;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -129,6 +130,7 @@ public class TransitWarn {
                 } else {
                     AllDialog.Dialog(frame, "操作失败，请重试");
                 }
+
             }
         });
         button_1.setBounds(283, 280, 93, 47);

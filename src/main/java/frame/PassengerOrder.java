@@ -119,25 +119,29 @@ public class PassengerOrder {
 							JMenuItem option2 = new JMenuItem("改签航班");
 							option2.addActionListener(actionEvent -> {
 								System.out.println("选择改签航班");
-								String preId1 = table.getValueAt(row, 0).toString();
-								frame.setVisible(false);
-								Login.OrderId = Integer.parseInt(preId1);
-								Reschedule window = new Reschedule();
-								window.getFrame().setVisible(true);
+								String flightname = table.getValueAt(row, 1).toString();
+								String info = new DbSelect().queryTransit(Login.PassengerId,flightname);
+								if(info.equals("未找到匹配的记录")){
+									String preId1 = table.getValueAt(row, 0).toString();
+									frame.setVisible(false);
+									Login.OrderId = Integer.parseInt(preId1);
+									CancelOrder window = new CancelOrder();
+									window.getFrame().setVisible(true);
+								}
+								else{
+									String preId1 = table.getValueAt(row, 0).toString();
+									frame.setVisible(false);
+									Login.OrderId = Integer.parseInt(preId1);
+									TransitWarn window = new TransitWarn(info,flightname);
+									window.getFrame().setVisible(true);
+								}
 							});
 							popupMenu.add(option2);
 
-							// 创建第二个菜单项
+							// 创建第三个菜单项
 							JMenuItem option3 = new JMenuItem("选座");
 							option2.addActionListener(actionEvent -> {
 								System.out.println("选择座位");
-								/*
-								String preId1 = table.getValueAt(row, 0).toString();
-								frame.setVisible(false);
-								Login.OrderId = Integer.parseInt(preId1);
-								CancelOrder window = new CancelOrder();
-								window.getFrame().setVisible(true);
-								 */
 							});
 							popupMenu.add(option3);
 

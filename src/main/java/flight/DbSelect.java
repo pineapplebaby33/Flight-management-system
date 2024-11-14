@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbSelect {
 	private DbConnect db = null;
@@ -224,6 +226,42 @@ public class DbSelect {
 		Passenger p = new Passenger(_id, _s1, _s2, _s3, _s4, _s5);
 		db.close();
 		return p;
+	}
+
+	//查询密码
+	public String getPasswordByPid(int pid) {
+		String password = null;
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT Password FROM passenger WHERE Id = ?";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 获取查询结果
+			if (ret.next()) {
+				password = ret.getString("Password");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 关闭资源
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return password;
 	}
 
 
@@ -711,6 +749,67 @@ public class DbSelect {
 		return f;
 	}
 
+	//P-查询并返回Flight[] 改签时使用，有航班状态限制√
+	public Flight[] FlightSelectForTransit(String startCity, String arrivalCity, boolean isDomestic) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		List<Flight> flights = new ArrayList<>(); // 使用列表来暂存查询结果
+
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+
+			// SQL 查询语句，按出发城市和目的城市过滤
+			String sql = "SELECT * FROM " + tableName + " WHERE StartCity = ? AND ArrivalCity = ? AND (FlightStatus='AVAILABLE' OR FlightStatus='FULL')";
+			this.pst = cn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+			// 设置查询参数
+			this.pst.setString(1, startCity);
+			this.pst.setString(2, arrivalCity);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 遍历查询结果并创建 Flight 对象
+			while (ret.next()) {
+				Flight x = new Flight(
+						ret.getInt("Id"),
+						ret.getString("StartTime"),
+						ret.getString("ArrivalTime"),
+						ret.getString("StartCity"),
+						ret.getString("ArrivalCity"),
+						ret.getString("DepartureDate"),
+						ret.getFloat("Price"),
+						ret.getInt("CurrentPassengers"),
+						ret.getInt("SeatCapacity"),
+						ret.getString("FlightStatus"),
+						ret.getString("PassengerId"),
+						ret.getString("FlightName")
+				);
+				flights.add(x); // 将 Flight 对象添加到列表
+			}
+
+			// 将 List 转换为 Flight[]
+			if (!flights.isEmpty()) {
+				return flights.toArray(new Flight[0]);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null; // 如果没有符合条件的记录，则返回 null
+	}
+
+
 	//A-查询预定信息√
 	public BookingInfo[] BookingInfoSelect(Boolean isDomestic) {
 		this.db = new DbConnect();
@@ -983,6 +1082,47 @@ public class DbSelect {
 		}
 		return flightId;
 	}
+
+	//返回起始地址
+	public List<String> findCitiesByFlightNameAndPid(String flightName, int pid) {
+		System.out.println("查询 transit 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		List<String> cities = new ArrayList<>();
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT StartCity, ArrivalCity FROM transit WHERE Pid = ? AND (StartFlightName = ? OR ArrivalFlightName = ?)";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+			this.pst.setString(2, flightName);
+			this.pst.setString(3, flightName);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 处理查询结果
+			if (ret.next()) {
+				// 将 StartCity 和 ArrivalCity 添加到列表
+				cities.add(ret.getString("StartCity"));   // 0 是起始地址
+				cities.add(ret.getString("ArrivalCity")); // 1 是目的地址
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return cities;
+	}
+
 
 
 
