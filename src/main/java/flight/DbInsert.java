@@ -14,19 +14,11 @@ public class DbInsert {
 	private boolean re = false;
 	private PreparedStatement pst = null;
 
-	/*
-	public boolean PassengerInsert(Passenger p) {
-		return new DbInsert().PassengerInsert(p.getRealName(),
-				p.getIdentityId(), p.getPassword(),
-				p.GetOrderString(p.getOrderList()));
-	}
-
-	 */
-
 	public boolean AdminInsert(Admin admin) {
 		return new DbInsert().AdminInsert(admin.getUsername(), admin.getPwd());
 	}
 
+	/*
 	public boolean FlightInsert(Flight f) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		return new DbInsert().FlightInsert(
@@ -38,6 +30,8 @@ public class DbInsert {
 				f.getFlightStatus(), f.GetPassengerString(f.getPassengerId()),
 				f.getFlightName(),true);
 	}
+
+	 */
 
 	public boolean OrderInsert(Order o,boolean isDomestic) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
@@ -94,21 +88,24 @@ public class DbInsert {
 	}
 
 	//P-插入订单√
-	public boolean OrderInsert(int PassengerId, int Seat, int FlightId, String CreateDate, String Status,boolean isDomestic) {
+	public boolean OrderInsert(int PassengerId, String Seat, int FlightId, String CreateDate, String Status,boolean isDomestic) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
 			// 根据 isDomestic 参数选择查询的表
 			String tableName = isDomestic ? "`order`" : "`order1`";
-			this.pst = cn
-					.prepareStatement("INSERT INTO "+tableName+"(`Id`, `PassengerId`, `Seat`, `FlightId`, `CreateDate`, `Status`) VALUES (NULL,"
-							+ PassengerId
-							+ ","
-							+ Seat
-							+ ","
-							+ FlightId
-							+ ",'"
-							+ CreateDate + "','" + Status + "');");
+			this.pst = cn.prepareStatement(
+					"INSERT INTO " + tableName + " (`Id`, `PassengerId`, `Seat`, `FlightId`, `CreateDate`, `Status`) VALUES (NULL, ?, ?, ?, ?, ?);"
+			);
+
+			// 使用 PreparedStatement 设置参数
+			this.pst.setInt(1, PassengerId);         // PassengerId 是整数
+			this.pst.setString(2, Seat);              // Seat 是字符串，如 "6D"
+			this.pst.setInt(3, FlightId);             // FlightId 是整数
+			this.pst.setString(4, CreateDate);        // CreateDate 是字符串，格式应符合数据库要求
+			this.pst.setString(5, Status);            // Status 是字符串
+			this.pst.executeUpdate();
+
 			this.re = pst.executeUpdate() == 1;
 
 		} catch (Exception e) {
@@ -158,6 +155,52 @@ public class DbInsert {
 							+ PassengerId
 							+ "','"
 							+ FlightName + "');");
+			this.re = pst.executeUpdate() == 1;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return this.re;
+
+	}
+
+	//A-添加航班(自动生成)√
+	public boolean FlightInsert(int ID,String StartTime, String ArrivalTime,
+								String StartCity, String ArrivalCity, String DepartureDate,
+								float price, int CurrentPassengers, int SeatCapacity,
+								String FlightStatus, String PassengerId, String FlightName,boolean isDomestic) {
+
+		if (!Flight.IsFlight(StartTime, ArrivalTime, StartCity, ArrivalCity,
+				DepartureDate, price, CurrentPassengers, SeatCapacity,
+				FlightStatus, PassengerId, FlightName)) {//验证航班有效信息
+			AllDialog.Dialog(frame, "航班信息无效(出发城市不得与到达城市相同，出发时间必须在到达时间之前)");
+			System.err.println("航班信息无效(出发城市不得与到达城市相同，出发时间必须在到达时间之前)");
+			return false;
+		}
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			this.pst = cn.prepareStatement("INSERT INTO " + tableName
+					+ "(`Id`, `StartTime`, `ArrivalTime`, `StartCity`, `ArrivalCity`, `DepartureDate`, `Price`, `CurrentPassengers`, `SeatCapacity`, `FlightStatus`, `PassengerId`, `FlightName`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+// 设置参数
+			this.pst.setInt(1, ID);
+			this.pst.setString(2, StartTime); // 确保 StartTime 是正确的格式
+			this.pst.setString(3, ArrivalTime); // 确保 ArrivalTime 是正确的格式
+			this.pst.setString(4, StartCity);
+			this.pst.setString(5, ArrivalCity);
+			this.pst.setString(6, DepartureDate); // 确保 DepartureDate 是正确的格式
+			this.pst.setDouble(7, price);
+			this.pst.setInt(8, CurrentPassengers);
+			this.pst.setInt(9, SeatCapacity);
+			this.pst.setString(10, FlightStatus);
+			this.pst.setString(11, PassengerId);
+			this.pst.setString(12, FlightName);
+
+// 执行插入
+			this.pst.executeUpdate();
 			this.re = pst.executeUpdate() == 1;
 
 		} catch (Exception e) {

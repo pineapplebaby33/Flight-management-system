@@ -11,12 +11,12 @@ public class BookingInfo {
 	private String pname;
 	private String pident;
 	private int oid;
-	private int seat;
+	private String seat;
 	private LocalDateTime oCreateDate;
 	private String oStatus;
 
 	BookingInfo(int fid, int pid, String pname, String pident, int oid,
-			int seat, LocalDateTime oCreateDate, String oStatus) {
+			String seat, LocalDateTime oCreateDate, String oStatus) {
 		this.fid = fid;
 		this.pid = pid;
 		this.pname = pname;
@@ -28,7 +28,7 @@ public class BookingInfo {
 	}
 
 	BookingInfo(Flight f, Passenger p, String pname, String pident, int oid,
-			int seat, LocalDateTime oCreateDate, String oStatus) {
+			String seat, LocalDateTime oCreateDate, String oStatus) {
 		this.f = f;
 		this.p = p;
 		this.pname = pname;
@@ -59,7 +59,7 @@ public class BookingInfo {
 		return oid;
 	}
 
-	public int getSeat() {
+	public String getSeat() {
 		return seat;
 	}
 

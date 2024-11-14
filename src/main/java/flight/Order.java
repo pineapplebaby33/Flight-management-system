@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
 public class Order {
 	private int id = 0;
 	private Passenger PassengerId = null;
-	private int Seat = 0;
+	private String Seat = "";
 	private Flight FlightId = null;
 	private LocalDateTime CreateDate;
 	private String Status = "";
@@ -28,7 +28,7 @@ public class Order {
 	}
 
 	//p-订单构造函数
-	public Order(int id, int PassengerId, int Seat, int FlightId, String CreateDate, String Status, boolean isDomestic) {
+	public Order(int id, int PassengerId, String Seat, int FlightId, String CreateDate, String Status, boolean isDomestic) {
 		DbSelect dbSelect = new DbSelect();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		this.id = id;
@@ -48,7 +48,7 @@ public class Order {
 		return PassengerId;
 	}
 
-	public int getSeat() {
+	public String getSeat() {
 		return Seat;
 	}
 

@@ -216,14 +216,14 @@ public class Flight {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		Flight[] flights = sel.FlightSelect(true);
 		UpdateTOTerminate(flights,up,formatter,NowDate,true);
-		System.out.println("国内更新完毕");
+		System.out.println("国内航班状态更新完毕");
 		Flight[] flights1 = sel.FlightSelect(false);
 		UpdateTOTerminate(flights1,up,formatter,NowDate,false);
-		System.out.println("国外更新完毕");
+		System.out.println("国外航班状态更新完毕");
 	}
 
 	public static void UpdateTOTerminate(Flight[] flights, DbUpdate up, DateTimeFormatter formatter, LocalDateTime NowDate,boolean isDmestic) {
-		System.out.println(flights.length);
+		System.out.println("当前"+(isDmestic?"国内航班有":"国外航班有")+flights.length+"个");
 		for (int i = 0; i < flights.length; i++) {
 			if (flights[i].getFlightStatus().equals(Flight_Status.AVAILABLE.getStatus())
 					|| flights[i].getFlightStatus().equals(Flight_Status.FULL.getStatus())) {

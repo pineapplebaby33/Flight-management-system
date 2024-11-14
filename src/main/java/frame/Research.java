@@ -9,14 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.table.TableColumn;
 
 import flight.DbSelect;
@@ -31,10 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Research {
 
@@ -399,7 +390,7 @@ public class Research {
 				frame.getContentPane().remove(scrollPane); // 清除旧的表格
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-			String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式"};
+			String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式","航班状态"};
 
 			// 更新当前表格的航班数据源
 			currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
@@ -408,7 +399,7 @@ public class Research {
 			Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
 
 			// 将航班信息填充到 flight_ob 二维数组中
-			String[][] flight_ob = new String[currentFlights.length][9];
+			String[][] flight_ob = new String[currentFlights.length][10];
 			for (int i = 0; i < currentFlights.length; i++) {
 				flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
 				flight_ob[i][1] = currentFlights[i].getFlightName();
@@ -424,6 +415,7 @@ public class Research {
 					flight_ob[i][7] = "已预定";
 				}
 				flight_ob[i][8] = "直飞";
+				flight_ob[i][9] = currentFlights[i].getFlightStatus();
 			}
 
 			// 创建 JTable 表格，显示航班数据，并设置表格不可编辑。
@@ -480,8 +472,8 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
-		String[][] flight_ob = new String[flights.length][9];
+		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式","航班状态" };
+		String[][] flight_ob = new String[flights.length][10];
 		for (int i = 0; i < flights.length; i++) {
 			flight_ob[i][0] = Integer.toString(flights[i].getId());
 			flight_ob[i][1] = flights[i].getFlightName();
@@ -510,6 +502,12 @@ public class Research {
 			}
 			else
 				flight_ob[i][8] = "中转";
+			if(flights[i].getStartTime()==null){
+				flight_ob[i][9] = "";
+			}else {
+				flight_ob[i][9] = currentFlights[i].getFlightStatus();
+			}
+
 		}
 		Flight_Table = new JTable(flight_ob, columnNames) {
 			private static final long serialVersionUID = -5723427406160453043L;
@@ -535,16 +533,71 @@ public class Research {
 		frame.getContentPane().add(scrollPane);
 		scrollPane.setViewportView(Flight_Table);
 		Flight_Table.addMouseListener(new MouseAdapter() {
+
+
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
+				if (e.getClickCount() == 2) { // 检测双击事件
 					int row = Flight_Table.getSelectedRow();
-					String preId1 = Flight_Table.getValueAt(row, 0).toString();
+					if (row == -1) return; // 如果未选中任何行，直接返回
+
+					// 获取选中的航班ID和中转标志
+					String flightId = Flight_Table.getValueAt(row, 0).toString();
+					String transferFlag = Flight_Table.getValueAt(row, 8).toString();
+					String startLocation = Flight_Table.getValueAt(row, 1).toString(); // 假设第1列为起始地址
+					String endLocation = Flight_Table.getValueAt(row, 2).toString(); // 假设第2列为终点地址
+
+					// 首先预定当前选中航班
 					frame.setVisible(false);
-					Login.FlightId = Integer.parseInt(preId1);
+					Login.FlightId = Integer.parseInt(flightId);
 					ReserveFlight window = new ReserveFlight(isDomestic);
 					window.getFrame().setVisible(true);
+
+					// 如果是中转航班，自动预定后续航班
+					if ("中转".equals(transferFlag)) {
+						List<String> routeList = new ArrayList<>();
+						routeList.add(startLocation); // 添加起始地址
+
+						int[] rowWrapper = {row + 1}; // 使用数组封装 row
+						Timer timer = new Timer(10000, null); // 定时器设置
+						timer.addActionListener(actionEvent -> {
+							if (rowWrapper[0] < Flight_Table.getRowCount()) {
+								String nextTransferFlag = Flight_Table.getValueAt(rowWrapper[0], 8).toString();
+								String nextEndLocation = Flight_Table.getValueAt(rowWrapper[0], 2).toString(); // 获取终点地址
+
+								// 遇到非 "中转" 的航班，停止预定
+								if ("".equals(nextTransferFlag)) {
+									routeList.add(nextEndLocation); // 添加最终目的地
+									Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList); // 保存到全局 HashMap
+									timer.stop();
+								} else {
+									// 获取下一个航班ID和中转地址
+									String nextFlightId = Flight_Table.getValueAt(rowWrapper[0], 0).toString();
+									String transferLocation = Flight_Table.getValueAt(rowWrapper[0], 1).toString(); // 中转地址
+									routeList.add(transferLocation); // 添加中转地址
+
+									// 继续预定中转航班
+									Login.FlightId = Integer.parseInt(nextFlightId);
+									ReserveFlight nextWindow = new ReserveFlight(isDomestic);
+									nextWindow.getFrame().setVisible(true);
+
+									rowWrapper[0]++; // 更新数组中的 row 值
+								}
+							} else {
+								// 添加最终目的地（如果循环结束但未添加）
+								if (!routeList.contains(endLocation)) {
+									routeList.add(endLocation);
+								}
+								Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList); // 保存到全局 HashMap
+								timer.stop();
+							}
+						});
+						timer.setRepeats(true);
+						timer.start();
+					}
 				}
 			}
+
+
 		});
 	}
 

@@ -9,12 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
 
 import flight.DbSelect;
@@ -58,27 +53,28 @@ public class PassengerOrder {
 
 		//查询所有订单
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-		String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定"};
+		String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","座位号"};
 		flight.Order[] order = new DbSelect().OrderSelect(Login.PassengerId,Research.isDomestic,"yes");
 		String[][] o_ob2 =null;
 		if(order!=null)
 		{
-			o_ob2 = new String[order.length][8];
+			o_ob2 = new String[order.length][9];
 			if (order != null) {
 				for (int i = 0; i < order.length; i++) {
 					o_ob2[i][0] = Integer.toString(order[i].getId());
-					o_ob2[i][1] = Integer.toString(order[i].getSeat());
+					o_ob2[i][1] = order[i].getFlightId().getFlightName();
 					o_ob2[i][2] = order[i].getFlightId().getStartCity();
 					o_ob2[i][3] = order[i].getFlightId().getArrivalCity();
 					o_ob2[i][4] = order[i].getFlightId().getStartTime().format(formatter);
 					o_ob2[i][5] = order[i].getFlightId().getArrivalTime().format(formatter);
 					o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
 					o_ob2[i][7] = "已预定";
+					o_ob2[i][8] = order[i].getSeat();
 				}
 
 			}
 		}else{
-			o_ob2 = new String[1][8];
+			o_ob2 = new String[1][9];
 			label.setText("当前无订单!");
 		}
 		table = new JTable(o_ob2, columnNames) {
@@ -89,18 +85,57 @@ public class PassengerOrder {
 			}
 		};
 		table.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) {
+					if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+						int row = table.getSelectedRow();
+						if (row != -1) {  // 确保选中了有效行
+							// 显示弹出菜单
+							JPopupMenu popupMenu = new JPopupMenu();
+							// 创建第一个菜单项
+							JMenuItem option1 = new JMenuItem("取消航班");
+							option1.addActionListener(actionEvent -> {
+								// 执行第一个选项的操作
+								String preId1 = table.getValueAt(row, 0).toString();
+								frame.setVisible(false);
+								Login.OrderId = Integer.parseInt(preId1);
+								CancelOrder window = new CancelOrder();
+								window.getFrame().setVisible(true);
+							});
+							popupMenu.add(option1);
 
-				if (e.getClickCount() == 2) {// 检测双击事件
-					// 获取选中的行
-					int row = table.getSelectedRow();
-					String preId1 = table.getValueAt(row, 0).toString();
-					frame.setVisible(false);
-					Login.OrderId = Integer.parseInt(preId1);
-					CancelOrder window = new CancelOrder();
-					window.getFrame().setVisible(true);
+							// 创建第二个菜单项
+							JMenuItem option2 = new JMenuItem("改签航班");
+							option2.addActionListener(actionEvent -> {
+								System.out.println("选择改签航班");
+								String preId1 = table.getValueAt(row, 0).toString();
+								frame.setVisible(false);
+								Login.OrderId = Integer.parseInt(preId1);
+								Reschedule window = new Reschedule();
+								window.getFrame().setVisible(true);
+							});
+							popupMenu.add(option2);
+
+							// 创建第二个菜单项
+							JMenuItem option3 = new JMenuItem("选座");
+							option2.addActionListener(actionEvent -> {
+								System.out.println("选择座位");
+								/*
+								String preId1 = table.getValueAt(row, 0).toString();
+								frame.setVisible(false);
+								Login.OrderId = Integer.parseInt(preId1);
+								CancelOrder window = new CancelOrder();
+								window.getFrame().setVisible(true);
+								 */
+							});
+							popupMenu.add(option3);
+
+							// 在鼠标位置弹出菜单
+							popupMenu.show(e.getComponent(), e.getX(), e.getY());
+						}
+					}
 				}
-			}
+
+
 
 		});
 		table.setBounds(44, 129, 823, 396);

@@ -23,7 +23,6 @@ public class TimeThread implements Runnable {
 			// 使用 DateTimeFormatter 格式化成字符串
 			//String formattedNow = now.format(df);
 			Flight.AutoUpdateStatus(now);
-			System.out.println("TTgengxin");
 			// 1s*60*5=5min
 			int time = 1000 * 60 * 1;
 			try {

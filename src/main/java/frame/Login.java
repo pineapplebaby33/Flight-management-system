@@ -17,6 +17,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class Login {
@@ -27,6 +30,7 @@ public class Login {
     private JFrame frame;
     private JTextField RealName;
     private JPasswordField passwordField;
+    public static Map<Integer, List<String>> transferFlightsMap = new HashMap<>();
 
 
     public static void main(String[] args) {
@@ -37,6 +41,7 @@ public class Login {
                 try {
                     Login window = new Login();
                     window.frame.setVisible(true);
+                    printTransferRoutes();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -59,7 +64,7 @@ public class Login {
         Thread t1 = new Thread(updateBegin);
         t1.setPriority(Thread.MAX_PRIORITY);
         t1.start();
-        System.out.println("更新完毕");
+        System.out.println("航班状态更新完毕");
 
         //自动添加7天后的航班
         Generate gen = new Generate();
@@ -144,6 +149,15 @@ public class Login {
         frame.getContentPane().add(button_1);
 
     }
+
+    public static void printTransferRoutes() {
+        for (Map.Entry<Integer, List<String>> entry : Login.transferFlightsMap.entrySet()) {
+            Integer flightId = entry.getKey();
+            List<String> route = entry.getValue();
+            System.out.println("Flight ID: " + flightId + " Route: " + route);
+        }
+    }
+
 
     //getFrame函数，用于返回登录页面
     public JFrame getFrame() {

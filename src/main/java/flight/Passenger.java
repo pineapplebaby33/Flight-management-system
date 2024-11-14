@@ -5,6 +5,7 @@ import frame.Research;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 public class Passenger {
 	private int id = 0;
@@ -49,7 +50,7 @@ public class Passenger {
 
 
 	//预定航班√
-	public static boolean ReserveFlight(int pid, int fid, String pwd,Boolean  isDomestic) {
+	public static int ReserveFlight(int pid, int fid, String pwd,Boolean  isDomestic) {
 		DbSelect select = new DbSelect();
 		Flight f = select.FlightSelect(fid,isDomestic);
 		//检查航班状态
@@ -62,27 +63,44 @@ public class Passenger {
 					DbInsert insert = new DbInsert();
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 					String CreateDate = df.format(new Date());
-					// 插入订单
-					boolean re = insert.OrderInsert(p.getId(), p.getId(),
+					// 插入订单;
+					String seatNumber = generateSeatNumber(f.getSeatCapacity());
+					boolean re = insert.OrderInsert(p.getId(), seatNumber,
 							f.getId(), CreateDate, "PAID",isDomestic);
 					// 更新航班和乘客信息
-					re = re && Flight.ReserveFlight(pid, fid,isDomestic)
+					re = re //&& Flight.ReserveFlight(pid, fid,isDomestic)
 							&& p.UpdateOrderList(fid,isDomestic);
 					if (re) {
-						return true;
+						return 1;
 					}
 				} else {
 					System.err.println("该乘客已预订该航班，无法重复预订");
 				}
 			} else {
 				System.err.println("密码错误");
-				return false;
+				return 2;
 			}
 		} else {
 			System.err.println("航班状态异常，无法预订");
-			return false;
+			return 3;
 		}
-		return false;
+		return 4;
+	}
+
+	//P-随机生成座位(插入订单时使用)
+	public static String generateSeatNumber(int seatCapacity) {
+		char[] seatLetters = {'A', 'B', 'C', 'D', 'E', 'F', 'G'};
+		int seatsPerLetter = seatCapacity / seatLetters.length;
+
+		Random random = new Random();
+
+		// 随机选择一个字母
+		char seatLetter = seatLetters[random.nextInt(seatLetters.length)];
+
+		// 在范围 1 到 seatsPerLetter 之间随机选择一个数字
+		int seatNumber = random.nextInt(seatsPerLetter) + 1;
+
+		return  Integer.toString(seatNumber) + seatLetter ;
 	}
 
 	/*

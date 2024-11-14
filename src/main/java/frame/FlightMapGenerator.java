@@ -180,8 +180,8 @@ public class FlightMapGenerator {
     public static void main(String[] args) throws IOException {
         // 创建测试订单
         List<Order> testOrders = new ArrayList<>();
-        testOrders.add(new Order(1, 1, 1, 1, "2016-03-04-05-20-01", "PAID", true));
-        testOrders.add(new Order(2, 2, 2, 2, "2024-11-12-10-00-00", "PAID", true));
+        testOrders.add(new Order(1, 1, "12A", 1, "2016-03-04-05-20-01", "PAID", true));
+        testOrders.add(new Order(2, 2, "44E", 2, "2024-11-12-10-00-00", "PAID", true));
 
         // 生成地图
         new FlightMapGenerator().generateMap(testOrders);

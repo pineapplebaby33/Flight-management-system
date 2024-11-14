@@ -15,21 +15,6 @@ import flight.Flight;
 
 public class ReserveFlight {
 	private JFrame frame;
-	/*
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ReserveFlight window = new ReserveFlight(isDmestic);
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	 */
 
 	public ReserveFlight(boolean isDmestic) {
 		initialize(isDmestic);
@@ -130,8 +115,8 @@ public class ReserveFlight {
 		ArrCity.setText(f.getArrivalCity());
 		StartTime.setText(f.getStartTime().format(formatter));
 		ArrTime.setText(f.getArrivalTime().format(formatter));
-		Price.setText(Float.toString(f.getPrice()) + "￥");
-		Seat.setText(Integer.toString(f.getSeatCapacity()));
+		Price.setText(f.getPrice() + "￥");
+		Seat.setText(Integer.toString(f.getSeatCapacity()-f.getCurrentPassengers()));
 
 	}
 

@@ -63,7 +63,7 @@ public class OrderShow {
 		for (int i = 0; i < orders.length; i++) {
 			order_ob[i][0] = Integer.toString(orders[i].getId());
 			order_ob[i][1] = orders[i].getPassengerId().getRealName();
-			order_ob[i][2] = Integer.toString(orders[i].getSeat());
+			order_ob[i][2] = orders[i].getSeat();
 			order_ob[i][3] = orders[i].getFlightId().getFlightName();
 			order_ob[i][4] = orders[i].getCreateDate().format(formatter);
 			order_ob[i][5] = orders[i].getStatus();

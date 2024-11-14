@@ -69,15 +69,17 @@ public class Pay {
 
 				//检查订单是否重复
 				if (Order.IsHasOrder(Login.PassengerId, Login.FlightId,Research.isDomestic)) {
-					boolean x = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd,isDmestic);
-					x = x && Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
-					if (x) {
+					int x1 = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd,isDmestic);
+					if (x1==1) {
 						frame.setVisible(false);
 						Research window = new Research();
 						window.getFrame().setVisible(true);
+						boolean x2 =Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
 						AllDialog.Dialog(window.getFrame(), "购票成功");
-					} else {
+					} else if(x1==2){
 						AllDialog.Dialog(frame, "支付失败，请检查密码");
+					}else if(x1==3) {
+						AllDialog.Dialog(frame, "支付失败，当前航班已满");
 					}
 				} else {
 					AllDialog.Dialog(frame, "请勿重复预订");

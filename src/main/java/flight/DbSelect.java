@@ -248,12 +248,12 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				ret.beforeFirst();
 				int _id = 1;
-				int _i1 = 1, _i2 = 1, _i3 = 1;
-				String _s1 = "", _s2 = "";
+				int _i1 = 1,  _i3 = 1;
+				String _s1 = "", _s2 = "",_i2 = "";
 				while (ret.next()) {
 					_id = ret.getInt(1);
 					_i1 = ret.getInt(2);
-					_i2 = ret.getInt(3);
+					_i2 = ret.getString(3);
 					_i3 = ret.getInt(4);
 					_s1 = ret.getString(5);
 					_s2 = ret.getString(6);
@@ -291,12 +291,12 @@ public class DbSelect {
 			if (ret.getRow() > 0) {
 				ret.beforeFirst();
 				int _id = 1;
-				int _i1 = 1, _i2 = 1, _i3 = 1;
-				String _s1 = "", _s2 = "";
+				int _i1 = 1,  _i3 = 1;
+				String _s1 = "", _s2 = "",_i2 = "";
 				while (ret.next()) {
 					_id = ret.getInt(1);
 					_i1 = ret.getInt(2);
-					_i2 = ret.getInt(3);
+					_i2 = ret.getString(3);
 					_i3 = ret.getInt(4);
 					_s1 = ret.getString(5);
 					_s2 = ret.getString(6);
@@ -337,7 +337,7 @@ public class DbSelect {
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
-							ret.getInt(3), ret.getInt(4), ret.getString(5),
+							ret.getString(3), ret.getInt(4), ret.getString(5),
 							ret.getString(6),isDomestic);
 					ad[_i] = x;
 					_i++;
@@ -368,13 +368,13 @@ public class DbSelect {
 			e.printStackTrace();
 		}
 		int _id = 1;
-		int _i1 = 1, _i2 = 1, _i3 = 1;
-		String _s1 = "", _s2 = "";
+		int _i1 = 1, _i3 = 1;
+		String _s1 = "", _s2 = "", _i2 = "";
 		try {
 			while (ret.next()) {
 				_id = ret.getInt(1);
 				_i1 = ret.getInt(2);
-				_i2 = ret.getInt(3);
+				_i2 = ret.getString(3);
 				_i3 = ret.getInt(4);
 				_s1 = ret.getString(5);
 				_s2 = ret.getString(6);
@@ -412,7 +412,7 @@ public class DbSelect {
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
-							ret.getInt(3), ret.getInt(4), ret.getString(5),
+							ret.getString(3), ret.getInt(4), ret.getString(5),
 							ret.getString(6),isDomestic);
 					ad[_i] = x;
 					_i++;
@@ -428,46 +428,6 @@ public class DbSelect {
 		return null;
 	}
 
-	/*
-	public Order[] PassengerOrders(int pid) {
-
-		this.db = new DbConnect();
-		this.cn = this.db.Get_Connection();
-		try {
-			this.pst = cn
-					.prepareStatement("select * from `order` where PassengerId="
-							+ pid + ";");
-			this.ret = pst.executeQuery();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			ret.last();
-			if (ret.getRow() > 0) {
-				Order[] ad = new Order[ret.getRow()];
-				ret.beforeFirst();
-				int _i = 0;
-				while (ret.next()) {
-					Order x = new Order(ret.getInt(1), ret.getInt(2),
-							ret.getInt(3), ret.getInt(4), ret.getString(5),
-							ret.getString(6),isDomestic);
-					ad[_i] = x;
-					_i++;
-				}
-				this.ret.close();
-				this.cn.close();
-				return ad;
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	 */
 
 	//A-管理员准确寻找√(有时间)
 	public Flight[] FlightSelect(String StartTime, String StartCity, String ArrivalCity,boolean isDomestic) {
@@ -750,52 +710,6 @@ public class DbSelect {
 
 		return f;
 	}
-	/*
-	//查询并返回Flight by id
-	public Flight FlightSelect(int id) {
-		this.db = new DbConnect();
-		this.cn = this.db.Get_Connection();
-		try {
-			this.pst = cn.prepareStatement("select * from flight where Id="
-					+ id + ";");
-			this.ret = pst.executeQuery();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		int _id = 1;
-		String _s1 = "", _s2 = "", _s3 = "", _s4 = "", _s5 = "";
-		float _p = 1f;
-		int _i1 = 1, _i2 = 1;
-		String _s6 = "", _s7 = "", _s8 = "";
-		try {
-			while (ret.next()) {
-				_id = ret.getInt(1);
-				_s1 = ret.getString(2);
-				_s2 = ret.getString(3);
-				_s3 = ret.getString(4);
-				_s4 = ret.getString(5);
-				_s5 = ret.getString(6);
-				_p = ret.getFloat(7);
-				_i1 = ret.getInt(8);
-				_i2 = ret.getInt(9);
-				_s6 = ret.getString(10);
-				_s7 = ret.getString(11);
-				_s8 = ret.getString(12);
-			}
-			this.ret.close();
-			this.cn.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// System.out.println(_id+" "+_s1+" "+_s2+" "+_s3+" "+_s4+" "+_s5+" "+_p+" "+_i1+" "+_i2+" "+_s6+" "+_s7);
-		Flight f = new Flight(_id, _s1, _s2, _s3, _s4, _s5, _p, _i1, _i2, _s6,
-				_s7, _s8);
-
-		return f;
-	}
-
-	 */
 
 	//A-查询预定信息√
 	public BookingInfo[] BookingInfoSelect(Boolean isDomestic) {
@@ -817,13 +731,17 @@ public class DbSelect {
 				int _i = 0;
 				while (ret.next()) {
 					Order x = new Order(ret.getInt(1), ret.getInt(2),
-							ret.getInt(3), ret.getInt(4), ret.getString(5),
+							ret.getString(3), ret.getInt(4), ret.getString(5),
 							ret.getString(6),isDomestic);
 					BookingInfo b = new BookingInfo(x.getFlightId(),
-							x.getPassengerId(), x.getPassengerId()
-									.getRealName(), x.getPassengerId()
-									.getIdentityId(), x.getId(), x.getSeat(),
-							x.getCreateDate(), x.getStatus());
+													x.getPassengerId(),
+													x.getPassengerId().getRealName(),
+													x.getPassengerId().getIdentityId(),
+													x.getId(),
+													x.getSeat(),
+													x.getCreateDate(),
+							x.getStatus()
+					);
 					ad[_i] = b;
 					_i++;
 				}
@@ -838,55 +756,6 @@ public class DbSelect {
 		}
 		return null;
 	}
-
-	//public BookingInfo[] BookingInfoSelect(int fid)
-	/*
-	public BookingInfo[] BookingInfoSelect(int fid) {
-
-		this.db = new DbConnect();
-		this.cn = this.db.Get_Connection();
-		try {
-			this.pst = cn
-					.prepareStatement("select * from `order` where FlightId="
-							+ fid + ";");
-			this.ret = pst.executeQuery();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		try {
-			ret.last();
-			if (ret.getRow() > 0) {
-				BookingInfo[] ad = new BookingInfo[ret.getRow()];
-				ret.beforeFirst();
-
-				int _i = 0;
-				while (ret.next()) {
-					Order x = new Order(ret.getInt(1), ret.getInt(2),
-							ret.getInt(3), ret.getInt(4), ret.getString(5),
-							ret.getString(6));
-					BookingInfo b = new BookingInfo(x.getFlightId(),
-							x.getPassengerId(), x.getPassengerId()
-									.getRealName(), x.getPassengerId()
-									.getIdentityId(), x.getId(), x.getSeat(),
-							x.getCreateDate(), x.getStatus());
-					ad[_i] = b;
-					_i++;
-				}
-				this.ret.close();
-				this.cn.close();
-
-				return ad;
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	 */
 
 	//获取最新的ID,自动更新航班√
 	public int NewGetId(boolean isDomestic){
@@ -949,10 +818,6 @@ public class DbSelect {
 		}
 		return hasFlight;
 	}
-
-
-
-
 
 
 	public static void main(String[] args) {

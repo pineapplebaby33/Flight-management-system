@@ -65,7 +65,7 @@ public class BookingShow {
         for (int i = 0; i < bookingInfos.length; i++) {
             booking_ob[i][0] = bookingInfos[i].getPname();
             booking_ob[i][1] = bookingInfos[i].getPident();
-            booking_ob[i][2] = Integer.toString(bookingInfos[i].getSeat());
+            booking_ob[i][2] = bookingInfos[i].getSeat();
             booking_ob[i][3] = bookingInfos[i].getoCreateDate().format(formatter);
             booking_ob[i][4] = bookingInfos[i].getoStatus();
             booking_ob[i][5] = bookingInfos[i].getF().getFlightName();
@@ -152,8 +152,7 @@ public class BookingShow {
                     for (int i = 0; i < bookingInfos.length; i++) {
                         booking_ob[i][0] = bookingInfos[i].getPname();
                         booking_ob[i][1] = bookingInfos[i].getPident();
-                        booking_ob[i][2] = Integer.toString(bookingInfos[i]
-                                .getSeat());
+                        booking_ob[i][2] = bookingInfos[i].getSeat();
                         booking_ob[i][3] = bookingInfos[i].getoCreateDate().format(formatter);
                         booking_ob[i][4] = bookingInfos[i].getoStatus();
                         booking_ob[i][5] = bookingInfos[i].getF()

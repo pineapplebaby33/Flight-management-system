@@ -178,7 +178,7 @@ class FlightGenerator {
          */
 
         // 示例：生成指定数量的国际航班（10 条）
-        FlightGenerator generatorInternational = new FlightGenerator(101, "2024-11-19", 15, false);
+        FlightGenerator generatorInternational = new FlightGenerator(159, "2024-11-22", 15, false);
         List<String> flightsInternational = generatorInternational.generateFlights();
         System.out.println("国际航班：");
         for (String flight : flightsInternational) {
@@ -197,17 +197,18 @@ public class Generate{
         LocalDateTime sevenDaysLater = now.plusDays(7);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedNow = sevenDaysLater.format(df);
-        System.out.println(formattedNow);
+        System.out.println("今天是"+formattedNow);
+
         boolean HasData = sel.hasFlightOnDate(formattedNow,true);
         if(!HasData){
             System.out.println("正在生成7天后的国内航班");
-            AUTOgenerate(true);
+            AUTOgenerate(formattedNow,true);
         }
         else System.out.println("已有7天后的国内航班");
         boolean HasData1 = sel.hasFlightOnDate(formattedNow,false);
         if(!HasData1){
             System.out.println("正在生成7天后的国外航班");
-            AUTOgenerate(false);
+            AUTOgenerate(formattedNow,false);
         }
         else System.out.println("已有7天后的国外航班");
 
@@ -215,12 +216,13 @@ public class Generate{
 
 
 
-    public void AUTOgenerate(boolean isDomestic) {
+    public void AUTOgenerate(String formattedNow,boolean isDomestic) {
         this.sel = new DbSelect();
-        int newid = sel.NewGetId(isDomestic) + 1; //
+        int newid = sel.NewGetId(isDomestic) + 1;
+        System.out.println((isDomestic?"国内航班":"国外航班")+"当前记录的最新ID是"+newid);
         // 使用获取到的newid
         try {
-            FlightGenerator generatorDomestic = new FlightGenerator(newid, "2024-11-20", 15, isDomestic);
+            FlightGenerator generatorDomestic = new FlightGenerator(newid, formattedNow, 15, isDomestic);
             List<String> flightsDomestic = generatorDomestic.generateFlights();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 
@@ -245,11 +247,11 @@ public class Generate{
                         LocalDateTime parsedDepartureTime = LocalDateTime.parse(st, formatter);
                         LocalDateTime parsedArrivalTime = LocalDateTime.parse(at, formatter);
 
-                        System.out.println("成功解析的出发时间：" + parsedDepartureTime);
-                        System.out.println("成功解析的到达时间：" + parsedArrivalTime);
+                        //System.out.println("成功解析的出发时间：" + parsedDepartureTime);
+                        //System.out.println("成功解析的到达时间：" + parsedArrivalTime);
 
-                        // 调用 DbUpdate 方法导入数据库
-                        boolean x = new DbInsert().FlightInsert(st, at,
+                        // 调用 DbInsert 方法导入数据库
+                        boolean x = new DbInsert().FlightInsert(FlightId,st, at,
                                 sc, ac, st, price, currentPassengers, ca,
                                 FS, "", name, isDomestic);
 

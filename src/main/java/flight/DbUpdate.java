@@ -118,18 +118,38 @@ public class DbUpdate {
 
 	}
 
-	//P-更新Order表
-	public boolean OrderUpdate(int id, int PassengerId, int Seat, int FlightId,
+	//P-更新Order表删除订单时使用√
+	public boolean OrderUpdate(int id, int PassengerId, String Seat, int FlightId,
 			String CreateDate, String Status,boolean isDomestic) {
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
 			// 根据 isDomestic 参数选择查询的表
 			String tableName = isDomestic ? "`order`" : "`order1`";
-			this.pst = cn.prepareStatement("UPDATE "+tableName+"SET `PassengerId`="
-					+ PassengerId + ",`Seat`=" + Seat + ",`FlightId`="
-					+ FlightId + ",`CreateDate`='" + CreateDate
-					+ "',`Status`='" + Status + "' WHERE Id=" + id + ";");
+			// 使用占位符 ? 避免直接拼接参数
+			this.pst = cn.prepareStatement("UPDATE " + tableName + " SET `PassengerId` = ?, `Seat` = ?, `FlightId` = ?, `CreateDate` = ?, `Status` = ? WHERE Id = ?");
+
+			// 使用 PreparedStatement 设置参数
+			this.pst.setInt(1, PassengerId);          // PassengerId 是整数
+			this.pst.setString(2, Seat);               // Seat 是字符串，比如 "20C"
+			this.pst.setInt(3, FlightId);              // FlightId 是整数
+			this.pst.setString(4, CreateDate);         // CreateDate 是字符串或日期格式
+			this.pst.setString(5, Status);             // Status 是字符串
+			this.pst.setInt(6, id);                    // id 是整数，WHERE 条件中的标识符
+
+			// 执行更新操作
+			this.pst.executeUpdate();
+			this.re = pst.executeUpdate() == 1;
+
+
+// 使用 PreparedStatement 设置参数
+			this.pst.setInt(1, PassengerId);         // PassengerId 是整数
+			this.pst.setString(2, Seat);              // Seat 是字符串，如 "6D"
+			this.pst.setInt(3, FlightId);             // FlightId 是整数
+			this.pst.setString(4, CreateDate);        // CreateDate 是字符串，格式应符合数据库要求
+			this.pst.setString(5, Status);            // Status 是字符串
+			this.pst.executeUpdate();
+
 			this.re = pst.executeUpdate() == 1;
 
 		} catch (Exception e) {

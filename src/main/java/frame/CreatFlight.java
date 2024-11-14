@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 
 import flight.DbInsert;
+import flight.DbSelect;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -220,6 +221,8 @@ public class CreatFlight {
 				String FlightStatus = FlightStateCombox.getItemAt(
 						FlightStateCombox.getSelectedIndex()).toString();
 				Float price = Float.parseFloat(PriceText.getText());
+				//DbSelect sel = new DbSelect();
+				//int newid  =sel.NewGetId(AdminFunction.isDomestic) + 1;
 				boolean x = new DbInsert().FlightInsert(StartTime, ArrTime,
 						StartCity, ArrCity, ArrTime, price, 0, Seat,
 						FlightStatus, "", FlightName,AdminFunction.isDomestic);
