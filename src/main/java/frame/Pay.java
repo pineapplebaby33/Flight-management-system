@@ -13,6 +13,7 @@ import javax.swing.JPasswordField;
 import flight.Flight;
 import flight.Order;
 import flight.Passenger;
+import listeners.PaymentCompleteListener;
 
 public class Pay {
 
@@ -20,6 +21,11 @@ public class Pay {
 	private JPasswordField passwordField;
 	private JButton back;
 	//private boolean isDmestic;
+	private PaymentCompleteListener paymentListener; // 添加支付完成监听器
+
+	public void setPaymentCompleteListener(PaymentCompleteListener listener) {
+		this.paymentListener = listener;
+	}
 
 	/**
 	 * Launch the application.
@@ -66,16 +72,22 @@ public class Pay {
 				for (int i = 0; i < cpwd.length; i++) {
 					pwd += cpwd[i];
 				}
-
 				//检查订单是否重复
 				if (Order.IsHasOrder(Login.PassengerId, Login.FlightId,Research.isDomestic)) {
 					int x1 = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd,isDmestic);
+					System.out.println("在PAY里Passenger.ReserveFlight");
 					if (x1==1) {
 						frame.setVisible(false);
 						Research window = new Research();
 						window.getFrame().setVisible(true);
 						boolean x2 =Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
 						AllDialog.Dialog(window.getFrame(), "购票成功");
+
+						// 调用支付完成监听器，通知支付成功
+						if (paymentListener != null) {
+							paymentListener.onPaymentComplete();
+						}
+
 					} else if(x1==2){
 						AllDialog.Dialog(frame, "支付失败，请检查密码");
 					}else if(x1==3) {

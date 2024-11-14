@@ -5,16 +5,19 @@ import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 import flight.DbSelect;
 import flight.Flight;
 
 public class ReserveFlight {
 	private JFrame frame;
+	private List<ReserveFlight> transitWindows = new ArrayList<>();//存储所有中转窗口的列表
+	private Timer timer;//定时器
+
 
 	public ReserveFlight(boolean isDmestic) {
 		initialize(isDmestic);
@@ -22,6 +25,7 @@ public class ReserveFlight {
 
 	private void initialize(boolean isDmestic) {
 		Flight f = new DbSelect().FlightSelect(Login.FlightId, isDmestic);
+
 		frame = new JFrame();
 		frame.setBounds(100, 100, 738, 548);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,6 +51,7 @@ public class ReserveFlight {
 		flightNamelabel.setBounds(43, 36, 62, 29);
 		frame.getContentPane().add(flightNamelabel);
 
+		/*
 		//跳转支付界面
 		JButton Create = new JButton("点击支付");
 		Create.addMouseListener(new MouseAdapter() {
@@ -54,6 +59,26 @@ public class ReserveFlight {
 			public void mouseClicked(MouseEvent e) {
 				frame.setVisible(false);
 				Pay windowPay = new Pay(isDmestic);
+
+
+				windowPay.getFrame().setVisible(true);
+			}
+		});
+		Create.setBounds(92, 386, 153, 37);
+		frame.getContentPane().add(Create);
+
+		 */
+
+
+		//跳转支付界面
+		JButton Create = new JButton("点击支付");
+		Create.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.setVisible(false);
+				System.out.println("ReserveFlight跳转支付界面");
+				Pay windowPay = new Pay(isDmestic);
+				System.out.println("支付界面跳转ReserveFlight");
 				windowPay.getFrame().setVisible(true);
 			}
 		});

@@ -23,9 +23,9 @@ import java.util.Map;
 
 
 public class Login {
-    static int FlightId = 0;
+    public static int FlightId = 0;
     static int AdminId = 0;
-    static int PassengerId = 0;
+    public static int PassengerId = 0;
     static int OrderId = 0;
     private JFrame frame;
     private JTextField RealName;

@@ -1,6 +1,7 @@
 //乘客信息，取消航班预定，返回预定列表
 package flight;
 
+import frame.Login;
 import frame.Research;
 
 import java.text.SimpleDateFormat;
@@ -65,14 +66,16 @@ public class Passenger {
 					String CreateDate = df.format(new Date());
 					// 插入订单;
 					String seatNumber = generateSeatNumber(f.getSeatCapacity());
+					if (Order.IsHasOrder(pid, fid,isDomestic)) {
 					boolean re = insert.OrderInsert(p.getId(), seatNumber,
 							f.getId(), CreateDate, "PAID",isDomestic);
+					System.out.println("在Passenger.ReserveFlight里insert.OrderInsert");
 					// 更新航班和乘客信息
 					re = re //&& Flight.ReserveFlight(pid, fid,isDomestic)
 							&& p.UpdateOrderList(fid,isDomestic);
 					if (re) {
 						return 1;
-					}
+					}}
 				} else {
 					System.err.println("该乘客已预订该航班，无法重复预订");
 				}

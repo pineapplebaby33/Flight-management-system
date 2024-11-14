@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 public class DbInsert {
 	private JFrame frame;
@@ -33,6 +35,7 @@ public class DbInsert {
 
 	 */
 
+	/*
 	public boolean OrderInsert(Order o,boolean isDomestic) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		return new DbInsert().OrderInsert(o.getPassengerId().getId(),
@@ -40,6 +43,8 @@ public class DbInsert {
 				o.getCreateDate().format(formatter),
 				o.getStatus(),isDomestic);
 	}
+
+	 */
 
 	//P-注册用户√
 	public boolean PassengerInsert(String RealName, String IdentityId, String Password, String OrderList,String OrderList1) {
@@ -89,6 +94,7 @@ public class DbInsert {
 
 	//P-插入订单√
 	public boolean OrderInsert(int PassengerId, String Seat, int FlightId, String CreateDate, String Status,boolean isDomestic) {
+		System.out.println("插入订单");
 		this.db = new DbConnect();
 		this.cn = this.db.Get_Connection();
 		try {
@@ -104,7 +110,7 @@ public class DbInsert {
 			this.pst.setInt(3, FlightId);             // FlightId 是整数
 			this.pst.setString(4, CreateDate);        // CreateDate 是字符串，格式应符合数据库要求
 			this.pst.setString(5, Status);            // Status 是字符串
-			this.pst.executeUpdate();
+			//this.pst.executeUpdate();
 
 			this.re = pst.executeUpdate() == 1;
 
@@ -200,7 +206,7 @@ public class DbInsert {
 			this.pst.setString(12, FlightName);
 
 // 执行插入
-			this.pst.executeUpdate();
+			//this.pst.executeUpdate();
 			this.re = pst.executeUpdate() == 1;
 
 		} catch (Exception e) {
@@ -209,6 +215,60 @@ public class DbInsert {
 		return this.re;
 
 	}
+
+	//
+	public boolean insertTransitData(Map<Integer, List<String>> transferFlightsMap,int pid) {
+		System.out.println("插入中转数据");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		boolean isSuccessful = true;
+
+		try {
+			// 准备 SQL 语句，使用新的字段名称
+			String sql = "INSERT INTO transit (`FlightId`, `StartFlightName`, `StartCity`, " +
+					"`TransitCity`, `ArrivalCity`, `ArrivalFlightName`,`Pid`) VALUES (?, ?, ?, ?, ?, ?,?)";
+			this.pst = cn.prepareStatement(sql);
+
+			// 遍历 transferFlightsMap
+			for (Map.Entry<Integer, List<String>> entry : transferFlightsMap.entrySet()) {
+				int flightId = entry.getKey();
+				List<String> routeList = entry.getValue();
+
+				// 确保 routeList 包含至少5个元素
+				if (routeList.size() < 5) {
+					System.err.println("航班ID: " + flightId + " 的路线数据不足，无法插入");
+					isSuccessful = false;
+					continue;
+				}
+
+				// 设置参数
+				this.pst.setInt(1, flightId);                 // FlightId
+				this.pst.setString(2, routeList.get(0));       // StartFlightName
+				this.pst.setString(3, routeList.get(1));       // StartCity
+				this.pst.setString(4, routeList.get(2));       // TransitCity
+				this.pst.setString(5, routeList.get(3));       // ArrivalCity
+				this.pst.setString(6, routeList.get(4));       // ArrivalFlightName
+				this.pst.setInt(7, pid);
+				// 执行插入
+				if (pst.executeUpdate() != 1) {
+					isSuccessful = false;
+					System.err.println("插入中转数据失败，航班ID: " + flightId);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			isSuccessful = false;
+		} finally {
+			try {
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return isSuccessful;
+	}
+
 
 	public static void main(String[] args) {
 		/*

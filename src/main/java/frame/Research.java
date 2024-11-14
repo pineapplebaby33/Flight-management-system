@@ -13,10 +13,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.table.TableColumn;
 
-import flight.DbSelect;
-import flight.Flight;
-import flight.Order;
-import flight.Passenger;
+import flight.*;
 
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -534,67 +531,101 @@ public class Research {
 		scrollPane.setViewportView(Flight_Table);
 		Flight_Table.addMouseListener(new MouseAdapter() {
 
-
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) { // 检测双击事件
+				if (e.getClickCount() == 2) {
 					int row = Flight_Table.getSelectedRow();
-					if (row == -1) return; // 如果未选中任何行，直接返回
+					if (row == -1) return;
 
-					// 获取选中的航班ID和中转标志
+					//获取航班信息
 					String flightId = Flight_Table.getValueAt(row, 0).toString();
 					String transferFlag = Flight_Table.getValueAt(row, 8).toString();
-					String startLocation = Flight_Table.getValueAt(row, 1).toString(); // 假设第1列为起始地址
-					String endLocation = Flight_Table.getValueAt(row, 2).toString(); // 假设第2列为终点地址
+					String startname = Flight_Table.getValueAt(row, 1).toString();
+					String startLocation = Flight_Table.getValueAt(row, 2).toString();
+					String endLocation = Flight_Table.getValueAt(row, 3).toString();
 
-					// 首先预定当前选中航班
 					frame.setVisible(false);
 					Login.FlightId = Integer.parseInt(flightId);
 					ReserveFlight window = new ReserveFlight(isDomestic);
 					window.getFrame().setVisible(true);
 
-					// 如果是中转航班，自动预定后续航班
+
 					if ("中转".equals(transferFlag)) {
+						//初始化中转航班列表
 						List<String> routeList = new ArrayList<>();
-						routeList.add(startLocation); // 添加起始地址
+						routeList.add(startname);//添加起始航班号
+						routeList.add(startLocation);//添加起始地址
 
-						int[] rowWrapper = {row + 1}; // 使用数组封装 row
-						Timer timer = new Timer(10000, null); // 定时器设置
+						int[] rowWrapper = {row + 1};//选中列表序数
+						List<ReserveFlight> transitWindows = new ArrayList<>();
+						Timer timer = new Timer(10000, null);//10秒检查一次
+
+						//计时器任务
 						timer.addActionListener(actionEvent -> {
-							if (rowWrapper[0] < Flight_Table.getRowCount()) {
+							if (rowWrapper[0] < Flight_Table.getRowCount()) {//有剩余航班
+								//检查是否为中转
 								String nextTransferFlag = Flight_Table.getValueAt(rowWrapper[0], 8).toString();
-								String nextEndLocation = Flight_Table.getValueAt(rowWrapper[0], 2).toString(); // 获取终点地址
+								String nextEndLocation = Flight_Table.getValueAt(rowWrapper[0], 3).toString();
 
-								// 遇到非 "中转" 的航班，停止预定
+								//不是中转
 								if ("".equals(nextTransferFlag)) {
-									routeList.add(nextEndLocation); // 添加最终目的地
-									Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList); // 保存到全局 HashMap
-									timer.stop();
-								} else {
-									// 获取下一个航班ID和中转地址
-									String nextFlightId = Flight_Table.getValueAt(rowWrapper[0], 0).toString();
-									String transferLocation = Flight_Table.getValueAt(rowWrapper[0], 1).toString(); // 中转地址
-									routeList.add(transferLocation); // 添加中转地址
 
-									// 继续预定中转航班
+									Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList);
+									timer.stop();
+
+									// 输出 transferFlightsMap
+									System.out.println("空空最终的中转航班路线:");
+									Login.transferFlightsMap.forEach((key, value) -> System.out.println("航班ID: " + key + " 路线: " + value));
+									boolean transit = new DbInsert().insertTransitData(Login.transferFlightsMap,Login.PassengerId);
+									System.out.println("生成中转航空"+transit);
+								} else {
+									String nextFlightId = Flight_Table.getValueAt(rowWrapper[0], 0).toString();//下一个航班ID更新
+									String transferLocation = Flight_Table.getValueAt(rowWrapper[0], 2).toString();//中转地址
+									String arriavlename = Flight_Table.getValueAt(rowWrapper[0], 1).toString();//下一个航班名
+									routeList.add(transferLocation);
+									routeList.add(nextEndLocation);//添加终点地址
+									routeList.add(arriavlename);
+
+									//更新为下一个中转航班
 									Login.FlightId = Integer.parseInt(nextFlightId);
 									ReserveFlight nextWindow = new ReserveFlight(isDomestic);
 									nextWindow.getFrame().setVisible(true);
+									transitWindows.add(nextWindow);
 
-									rowWrapper[0]++; // 更新数组中的 row 值
+									rowWrapper[0]++;
 								}
 							} else {
-								// 添加最终目的地（如果循环结束但未添加）
 								if (!routeList.contains(endLocation)) {
 									routeList.add(endLocation);
 								}
-								Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList); // 保存到全局 HashMap
+								Login.transferFlightsMap.put(Integer.parseInt(flightId), routeList);
 								timer.stop();
+
+								// 输出 transferFlightsMap
+								System.out.println("最终的中转航班路线:");
+								Login.transferFlightsMap.forEach((key, value) -> System.out.println("航班ID: " + key + " 路线: " + value));
+
 							}
 						});
 						timer.setRepeats(true);
 						timer.start();
+
 					}
+					/*
+					int row = Flight_Table.getSelectedRow();
+					String preId1 = Flight_Table.getValueAt(row, 0).toString();
+					frame.setVisible(false);
+					Login.FlightId = Integer.parseInt(preId1);
+					System.out.println("Research跳转预定航班");
+					ReserveFlight window = new ReserveFlight(isDomestic);
+					System.out.println("预定航班跳转Research");
+					window.getFrame().setVisible(true);
+
+					 */
 				}
+
+				// 在停止计时器后输出 transferFlightsMap
+				System.out.println("最终的中转航班路线:");
+				Login.transferFlightsMap.forEach((key, value) -> System.out.println("航班ID: " + key + " 路线: " + value));
 			}
 
 
