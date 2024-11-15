@@ -91,7 +91,6 @@ public class CancelOrder {
                 String pwd="";
                 for (int i = 0; i < pass.length; i++) {
                     pwd += pass[i];
-
                 }
                 //查询订单
                 Order o = new DbSelect().OrderSelect(Login.OrderId,Research.isDomestic);

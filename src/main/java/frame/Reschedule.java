@@ -1,11 +1,9 @@
 package frame;
 
-import java.awt.EventQueue;
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.table.TableColumn;
-import java.awt.Color;
-import java.awt.Font;
 
 import flight.*;
 
@@ -19,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class Reschedule {
     private JFrame frame;
@@ -81,18 +80,19 @@ public class Reschedule {
         button.setBounds(48, 280, 93, 47);
         frame.getContentPane().add(button);
 
-        //返回按钮
+        //确认按钮
         JButton button1 = new JButton("确定");
-        button.addMouseListener(new MouseAdapter() {
+        button1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
-                PassengerOrder wMyOrder = new PassengerOrder();
-                wMyOrder.getFrame().setVisible(true);
+                RescheduleSearch window = new RescheduleSearch(info,flightname,false);//查询中转
+                //RescheduleSearch window = new RescheduleSearch("a","BJ122452");
+                window.getFrame().setVisible(true);
             }
         });
-        button.setBounds(48, 280, 93, 47);
-        frame.getContentPane().add(button);
+        button1.setBounds(500, 280, 93, 47);
+        frame.getContentPane().add(button1);
     }
 
     public JFrame getFrame() {
@@ -113,7 +113,7 @@ class RescheduleSearch {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    RescheduleSearch window = new RescheduleSearch("a","BJ122452");
+                    RescheduleSearch window = new RescheduleSearch("a","BJ122452",false);
                     window.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -122,27 +122,38 @@ class RescheduleSearch {
         });
     }
 
-    public RescheduleSearch(String info,String flightname) {
-        initialize(info,flightname);
+    public RescheduleSearch(String info,String flightname,boolean straight) {
+        initialize(info,flightname,straight);
     }
 
-    private void initialize(String info,String flightname) {
+    private void initialize(String info,String flightname,boolean straight) {
         frame = new JFrame();
         frame.setTitle("改签搜索界面");
         frame.setBounds(100, 100, 950, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
+        List<String> cities;
 
+        if(straight){
+            cities = new DbSelect().getCitiesByFlightName(flightname);//直飞查找出发城市和目的城市
+            if (cities.get(0) != null && cities.get(1) != null) {
+                System.out.println("起始城市: " + cities.get(0));
+                System.out.println("目的城市: " + cities.get(1));
+            } else {
+                System.out.println("未找到对应的航班记录");
+            }
+        }else{
+            cities = new DbSelect().findCitiesByFlightNameAndPid(flightname, Login.PassengerId);
+            //cities = new DbSelect().findCitiesByFlightNameAndPid(flightname,12);//查询中转航班的起始地址和目的地址
+            if (!cities.isEmpty()) {
+                System.out.println("起始地址: " + cities.get(0));
+                System.out.println("目的地址: " + cities.get(1));
+            } else {
+                System.out.println("未找到匹配的记录");
+            }
 
-        //List<String> cities = new DbSelect().findCitiesByFlightNameAndPid(flightname, Login.PassengerId);
-        List<String> cities = new DbSelect().findCitiesByFlightNameAndPid(flightname,12);
-        if (!cities.isEmpty()) {
-            System.out.println("起始地址: " + cities.get(0));
-            System.out.println("目的地址: " + cities.get(1));
-        } else {
-            System.out.println("未找到匹配的记录");
         }
-        setTable1(frame,cities,flightname);
+        setTable1(frame,cities,flightname,straight);
 
         JLabel label2 = new JLabel("起始地址: " + cities.get(0)+"     "+"目的地址: " + cities.get(1));
         label2.setFont(new Font("宋体", Font.PLAIN, 15));
@@ -150,11 +161,23 @@ class RescheduleSearch {
         label2.setBounds(0, 0, 750, 63);
         frame.getContentPane().add(label2);
 
+
         //日期选择器
         final DateChooser dateChooser = new DateChooser(frame.getContentPane(),
                 100);
         dateChooser.setBounds(300, 0, 126, 63);
         frame.getContentPane().add(dateChooser);
+
+        //按钮_刷新列表
+        JButton fresh = new JButton("刷新列表");
+        fresh.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                setTable1(frame,cities,flightname,straight);
+            }
+        });
+        fresh.setBounds(837, 53, 87, 42);
+        frame.getContentPane().add(fresh);
 
         //返回登录界面
         JButton button_1 = new JButton("返回");
@@ -192,7 +215,7 @@ class RescheduleSearch {
                 // 处理航班数据，查找从 "北京" 到 "深圳" 的路径
                 Flight[] processedFlights = processor.processFlights(currentFlights, s1, s2,startDate);
                 if (processedFlights != null) {
-                    setTable(frame, processedFlights,s1,s2,flightname);
+                    setTable(frame, processedFlights,s1,s2,flightname,straight);
                 } else {
                     AllDialog.Dialog(frame, "当前没有符合条件的航班");
                 }
@@ -205,7 +228,7 @@ class RescheduleSearch {
     }
 
     // 创建表格_by frame 初始化/刷新
-    private void setTable1(final JFrame frame,List<String> cities,String flightname) {
+    private void setTable1(final JFrame frame,List<String> cities,String flightname,boolean straight) {
         if (scrollPane != null) {
             frame.getContentPane().remove(scrollPane); // 清除旧的表格
         }
@@ -278,8 +301,10 @@ class RescheduleSearch {
                         Flight selectedFlight = currentFlights[row];
                         frame.setVisible(false);
                         Login.FlightId = selectedFlight.getId();
-                        ReserveFlight window = new ReserveFlight(isDomestic);
-                        DeleteTransit(flightname,true);
+                        ReserveFlight window = new ReserveFlight(isDomestic);//预定直飞
+                        System.out.println("无查询-改签预定直飞路线");
+                        DeleteTransit(flightname,straight);//删除原来的航班
+                        System.out.println("无查询-改签删除原来"+(straight?"直飞":"中转")+"路线");
                         window.getFrame().setVisible(true);
                     }
                 }
@@ -288,7 +313,7 @@ class RescheduleSearch {
     }
 
     //创建表格_by frame 精准查询
-    private void setTable(final JFrame frame, Flight[] flights,String startcity,String arrivalcity,String flightname) {
+    private void setTable(final JFrame frame, Flight[] flights,String startcity,String arrivalcity,String flightname,boolean straight) {
         if (scrollPane != null) {
             frame.getContentPane().remove(scrollPane); // 清除旧的表格
         }
@@ -368,7 +393,8 @@ class RescheduleSearch {
 
                     frame.setVisible(false);
                     Login.FlightId = Integer.parseInt(flightId);
-                    ReserveFlight window = new ReserveFlight(isDomestic);
+                    ReserveFlight window = new ReserveFlight(isDomestic);//预定直飞或中转第一班
+                    System.out.println("有查询-改签预定直飞/中转第一班路线");
                     window.getFrame().setVisible(true);
 
 
@@ -401,7 +427,8 @@ class RescheduleSearch {
                                     boolean transit = new DbInsert().insertTransitData(Login.transferFlightsMap,Login.PassengerId);
                                     System.out.println("生成中转航空"+transit);
 
-                                    DeleteTransit(flightname,false);
+                                    DeleteTransit(flightname,straight);//删除原来中转航班
+                                    System.out.println("有查询-改签中转航班-删除原来"+(straight?"直飞":"中转")+"路线");
                                 } else {
                                     String nextFlightId = Flight_Table.getValueAt(rowWrapper[0], 0).toString();//下一个航班ID更新
                                     String transferLocation = Flight_Table.getValueAt(rowWrapper[0], 2).toString();//中转地址
@@ -413,6 +440,7 @@ class RescheduleSearch {
                                     //更新为下一个中转航班
                                     Login.FlightId = Integer.parseInt(nextFlightId);
                                     ReserveFlight nextWindow = new ReserveFlight(isDomestic);
+                                    System.out.println("有查询-改签预定中转第二班路线");
                                     nextWindow.getFrame().setVisible(true);
                                     transitWindows.add(nextWindow);
 
@@ -434,6 +462,10 @@ class RescheduleSearch {
                         timer.setRepeats(true);
                         timer.start();
 
+                    }else{
+                        // 直飞航班的删除操作
+                        DeleteTransit(startname, straight);
+                        System.out.println("有查询-改签直飞航班-删除原来"+(straight?"直飞":"中转")+"路线");
                     }
 
                 }
@@ -447,32 +479,35 @@ class RescheduleSearch {
     }
 
     private  void DeleteTransit(String flightname,boolean straight) {
-        String anotherflightname = new DbSelect().findOtherFlightName(Login.PassengerId,flightname);
-        int anotherfid = new DbSelect().findFlightIdByName(anotherflightname);
-        int anotherOrderid = new DbSelect().queryOrderId(Login.PassengerId,anotherfid);
-        String pwd = new DbSelect().getPasswordByPid(Login.PassengerId);
+        boolean x;
+        boolean x1=false;
+        //删除原订单
+        Order o = new DbSelect().OrderSelect(Login.OrderId,Research.isDomestic);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+        x = new DbUpdate().OrderUpdate(Login.OrderId, o.getPassengerId().getId(), o.getSeat(),
+                o.getFlightId().getId(),
+                o.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
+                && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),Login.Pwd,Research.isDomestic);//成功取消航班
+        System.out.println("已删除第一班路线"+flightname);
 
-        if(straight) {
-            //查询原订单
-            Order o = new DbSelect().OrderSelect(Login.OrderId,Research.isDomestic);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-            boolean x = new DbUpdate().OrderUpdate(Login.OrderId, o.getPassengerId().getId(), o.getSeat(),
-                    o.getFlightId().getId(),
-                    o.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
-                    && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
-
-        }else{
-            //查询订单
+        if(!straight){
+            System.out.println("原订单是中转航班");
+            String anotherflightname = new DbSelect().findOtherFlightName(Login.PassengerId,flightname);
+            System.out.println("另一个航班名为"+anotherflightname);
+            int anotherfid = new DbSelect().findFlightIdByName(anotherflightname);
+            System.out.println("另一个航班ID为"+anotherfid);
+            int anotherOrderid = new DbSelect().queryOrderId(Login.PassengerId,anotherfid);
+            System.out.println("另一个航班订单ID为"+anotherfid);
+            //删除其他订单
             Order o1 = new DbSelect().OrderSelect(anotherOrderid,Research.isDomestic);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-            boolean x1 = new DbUpdate().OrderUpdate(anotherOrderid, o1.getPassengerId().getId(), o1.getSeat(),
+            x1 = new DbUpdate().OrderUpdate(anotherOrderid, o1.getPassengerId().getId(), o1.getSeat(),
                     o1.getFlightId().getId(),
                     o1.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
-                    && Passenger.UnsubscribeFlight(o1.getPassengerId().getId(),o1.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
-
+                    && Passenger.UnsubscribeFlight(o1.getPassengerId().getId(),o1.getFlightId().getId(),Login.Pwd,Research.isDomestic);//成功取消航班
+            System.out.println("已删除第二班路线");
         }
-        /*
-        if (x&&x1) {
+
+        if (x) {
             frame.setVisible(false);
             PassengerOrder wMyOrder = new PassengerOrder();
             wMyOrder.getFrame().setVisible(true);
@@ -481,8 +516,11 @@ class RescheduleSearch {
             AllDialog.Dialog(frame, "操作失败，请重试");
         }
 
-         */
+
     }
 
 
+    public Frame getFrame() {
+        return frame;
+    }
 }

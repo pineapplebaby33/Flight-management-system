@@ -26,6 +26,7 @@ public class Login {
     public static int FlightId = 0;
     static int AdminId = 0;
     public static int PassengerId = 0;
+    public static String Pwd = "";
     static int OrderId = 0;
     private JFrame frame;
     private JTextField RealName;
@@ -121,6 +122,7 @@ public class Login {
                 for (int i = 0; i < pwd.length; i++) {
                     password += pwd[i];
                 }
+                Login.Pwd = password;
                 //判断用户权限
                 boolean bo = Admin.CheckAdmin(user, password);
                 if (bo) {

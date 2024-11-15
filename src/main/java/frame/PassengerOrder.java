@@ -97,7 +97,7 @@ public class PassengerOrder {
 								// 执行第一个选项的操作
 								String flightname = table.getValueAt(row, 1).toString();
 								String info = new DbSelect().queryTransit(Login.PassengerId,flightname);
-								if(info.equals("未找到匹配的记录")){
+								if(info.equals("未找到匹配的记录")){//直飞
 									String preId1 = table.getValueAt(row, 0).toString();
 									frame.setVisible(false);
 									Login.OrderId = Integer.parseInt(preId1);
@@ -108,7 +108,7 @@ public class PassengerOrder {
 									String preId1 = table.getValueAt(row, 0).toString();
 									frame.setVisible(false);
 									Login.OrderId = Integer.parseInt(preId1);
-									TransitWarn window = new TransitWarn(info,flightname);
+									TransitWarn window = new TransitWarn(info,flightname);//先提醒
 									window.getFrame().setVisible(true);
 								}
 
@@ -121,18 +121,20 @@ public class PassengerOrder {
 								System.out.println("选择改签航班");
 								String flightname = table.getValueAt(row, 1).toString();
 								String info = new DbSelect().queryTransit(Login.PassengerId,flightname);
-								if(info.equals("未找到匹配的记录")){
+								if(info.equals("未找到匹配的记录")){//直飞
 									String preId1 = table.getValueAt(row, 0).toString();
 									frame.setVisible(false);
 									Login.OrderId = Integer.parseInt(preId1);
-									CancelOrder window = new CancelOrder();
+									RescheduleSearch window = new RescheduleSearch(info,flightname,true);//直接查询
+									System.out.println("直飞航班改签");
 									window.getFrame().setVisible(true);
 								}
 								else{
 									String preId1 = table.getValueAt(row, 0).toString();
 									frame.setVisible(false);
 									Login.OrderId = Integer.parseInt(preId1);
-									TransitWarn window = new TransitWarn(info,flightname);
+									Reschedule window = new Reschedule(info,flightname);//先提醒，后查询
+									System.out.println("中转航班改签");
 									window.getFrame().setVisible(true);
 								}
 							});

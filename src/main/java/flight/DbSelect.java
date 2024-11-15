@@ -809,6 +809,45 @@ public class DbSelect {
 		return null; // 如果没有符合条件的记录，则返回 null
 	}
 
+	// 根据 flightname 查询起始城市和目的城市
+	// 根据 flightname 查询起始城市和目的城市
+	public List<String> getCitiesByFlightName(String flightName) {
+		List<String> cities = new ArrayList<>(); // 用于存储起始城市和目的城市
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT StartCity, ArrivalCity FROM flight WHERE FlightName = ?";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setString(1, flightName);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 获取查询结果
+			if (ret.next()) {
+				cities.add(ret.getString("StartCity"));   // 添加起始城市到列表
+				cities.add(ret.getString("ArrivalCity")); // 添加目的城市到列表
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 关闭资源
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return cities;
+	}
+
+
 
 	//A-查询预定信息√
 	public BookingInfo[] BookingInfoSelect(Boolean isDomestic) {
