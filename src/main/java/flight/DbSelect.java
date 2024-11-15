@@ -1162,6 +1162,45 @@ public class DbSelect {
 		return cities;
 	}
 
+	// 根据 OrderId 查询 Food
+	// 根据 OrderId 查询 Food
+	public int QueryFoodByOrderId(int OrderId) {
+		this.db = new DbConnect(); // 假设 DbConnect 是用于管理数据库连接的类
+		this.cn = this.db.Get_Connection(); // 获取数据库连接
+		int Food = -1; // 初始化为 -1，表示未找到
+
+		try {
+			// 使用参数化查询，防止SQL注入
+			this.pst = cn.prepareStatement("SELECT `Food` FROM `food` WHERE `OrderId` = ?");
+
+			// 设置参数
+			this.pst.setInt(1, OrderId);
+
+			// 执行查询
+			this.ret = this.pst.executeQuery();
+
+			// 获取查询结果
+			if (ret.next()) {
+				Food = ret.getInt("Food");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 关闭资源，防止资源泄露
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return Food;
+	}
+
+
+
 
 
 

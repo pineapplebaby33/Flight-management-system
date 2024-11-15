@@ -269,6 +269,39 @@ public class DbInsert {
 		return isSuccessful;
 	}
 
+	// 插入订单方法
+	public boolean FoodInsert(int OrderId, int Food) {
+		this.db = new DbConnect(); // 假设 DbConnect 是您用于管理数据库连接的类
+		this.cn = this.db.Get_Connection(); // 获取数据库连接
+		try {
+			// 使用参数化查询避免SQL注入
+			this.pst = cn.prepareStatement(
+					"INSERT INTO `food`(`OrderId`, `Food`) VALUES (?, ?)"
+			);
+
+			// 设置参数
+			this.pst.setInt(1, OrderId);
+			this.pst.setInt(2, Food);
+
+			// 执行插入操作
+			this.re = this.pst.executeUpdate() == 1;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 关闭资源，防止资源泄露
+			try {
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		return this.re;
+	}
+
+
+
 
 	public static void main(String[] args) {
 		/*

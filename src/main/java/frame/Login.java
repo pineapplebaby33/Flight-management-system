@@ -32,6 +32,7 @@ public class Login {
     private JTextField RealName;
     private JPasswordField passwordField;
     public static Map<Integer, List<String>> transferFlightsMap = new HashMap<>();
+    public static int food = 0;
 
 
     public static void main(String[] args) {
