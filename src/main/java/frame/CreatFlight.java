@@ -112,7 +112,7 @@ public class CreatFlight {
 					"武汉", "南京", "成都", "贵阳",
 					"昆明", "南宁", "拉萨", "杭州",
 					"南昌", "广州", "福州", "台北",
-					"海口", "香港", "澳门" }));
+					"海口", "香港", "澳门","深圳" }));
 			ArrCitycomboBox.setToolTipText("");
 			ArrCitycomboBox.setBounds(188, 141, 126, 35);
 			frame.getContentPane().add(ArrCitycomboBox);

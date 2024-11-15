@@ -130,9 +130,16 @@ public class EnrollPassenger {
 				for (int i = 0; i < pa.length; i++) {
 					pwd += pa[i];
 				}
+				boolean ismath = ismath(iden);
 				if (realName.equals("") || iden.equals("") || pwd.equals("")) {
 					AllDialog.Dialog(frame, "请输入完整信息");
-				} else {
+				}else if(!ismath){
+					AllDialog.Dialog(frame, "身份证号格式不正确");
+				}
+				else if(iden.length()!=18){
+					AllDialog.Dialog(frame, "身份证号位数不为18位");
+				}
+				else {
 					boolean x = new DbInsert().PassengerInsert(realName, iden, pwd, "","");
 					if (x) {
 						frame.setVisible(false);
@@ -151,4 +158,14 @@ public class EnrollPassenger {
 		frame.getContentPane().add(button);
 
 	}
+
+	private boolean ismath(String iden){
+		for (char c : iden.toCharArray()) {
+			if (!Character.isDigit(c)) {
+				return false; // 如果遇到非数字字符，返回false
+			}
+		}
+		return true;
+	}
+
 }

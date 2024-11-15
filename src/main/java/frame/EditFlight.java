@@ -145,7 +145,7 @@ public class EditFlight {
 		JLabel Warning = new JLabel("");
 		Warning.setFont(new Font("宋体", Font.PLAIN, 15));
 		Warning.setForeground(Color.RED);
-		Warning.setBounds(338, 36, 200, 37);
+		Warning.setBounds(307, 36, 300, 37);
 
 		frame.getContentPane().add(Warning);
 		JLabel lblyyyymmddhhmmss = new JLabel(
@@ -237,11 +237,19 @@ public class EditFlight {
 			ATtextField_1.disable();
 			Capp.disable();
 			PriceText.disable();
-			PriceText.disable();
 			ArrCitycomboBox.disable();
 			StartCitycomboBox.disable();
 			FlightStateCombox.disable();
 			Warning.setText("航班已终止，无法操作");
+		}
+		// 检查航班状态是否为 AVAILABLE/FULL
+		if (f.getFlightStatus().equals("AVAILABLE") || f.getFlightStatus().equals("FULL")) {
+			IdtextField.disable();
+			STtextField.disable();
+			ATtextField_1.disable();
+			ArrCitycomboBox.disable();
+			StartCitycomboBox.disable();
+			Warning.setText("航班已发布，部分功能无法修改");
 		}
 		// 设置各个输入框的初始值
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");

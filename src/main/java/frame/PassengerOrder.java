@@ -140,12 +140,15 @@ public class PassengerOrder {
 							});
 							popupMenu.add(option2);
 
+							/*
 							// 创建第三个菜单项
 							JMenuItem option3 = new JMenuItem("选座");
 							option2.addActionListener(actionEvent -> {
 								System.out.println("选择座位");
 							});
 							popupMenu.add(option3);
+
+							 */
 
 							// 在鼠标位置弹出菜单
 							popupMenu.show(e.getComponent(), e.getX(), e.getY());

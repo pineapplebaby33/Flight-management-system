@@ -125,7 +125,10 @@ public class Login {
                 Login.Pwd = password;
                 //判断用户权限
                 boolean bo = Admin.CheckAdmin(user, password);
-                if (bo) {
+                if (user.equals("") || pwd.equals("") ) {
+                    AllDialog.Dialog(frame, "请输入完整信息");
+                }
+                else if (bo) {
                     //跳转到管理员界面
                     frame.setVisible(false);
                     Login.AdminId = new DbSelect().AdminSelect(user).getId();
