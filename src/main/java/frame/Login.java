@@ -2,16 +2,11 @@
 
 package frame;
 
-import java.awt.EventQueue;
+import java.awt.*;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import flight.*;
-
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -75,27 +70,36 @@ public class Login {
         //主窗口-f
         frame = new JFrame();
         frame.setTitle("登录页面");
-        frame.setBounds(100, 100, 607, 423);
+        frame.setBounds(100, 100, 950, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        // 加载背景图像
+        ImageIcon background = new ImageIcon("C:\\Users\\shan\\Desktop\\Flight\\src\\背景图.jpg");
+        JLabel backgroundLabel = new JLabel(background);
+        backgroundLabel.setBounds(0, 0, 950, 600);
+
+        // 设置背景图像标签为内容面板
+        frame.setContentPane(backgroundLabel);
+        frame.setLayout(null); // 使用绝对布局，避免覆盖背景
+
         //用户名-f
         JLabel label = new JLabel("用户名");
-        label.setBounds(49, 117, 108, 29);
+        label.setBounds(350, 180, 200, 35);
         frame.getContentPane().add(label);
 
         RealName = new JTextField();
-        RealName.setBounds(194, 114, 273, 35);
+        RealName.setBounds(450, 180, 200, 35);
         frame.getContentPane().add(RealName);
         RealName.setColumns(10);
 
         //密码-f
         JLabel label_1 = new JLabel("密码");
-        label_1.setBounds(49, 200, 108, 29);
+        label_1.setBounds(375, 240, 200, 35);
         frame.getContentPane().add(label_1);
 
         passwordField = new JPasswordField();
-        passwordField.setBounds(194, 197, 273, 32);
+        passwordField.setBounds(450, 240, 200, 35);
         frame.getContentPane().add(passwordField);
 
         //注册-f
@@ -108,7 +112,7 @@ public class Login {
                 window.getFrame().setVisible(true);
             }
         });
-        button.setBounds(106, 273, 153, 37);
+        button.setBounds(375, 320, 120, 40);
         frame.getContentPane().add(button);
 
         //登录-f-j
@@ -151,8 +155,25 @@ public class Login {
 
             }
         });
-        button_1.setBounds(351, 273, 153, 37);
+        button_1.setBounds(530, 320, 120, 40);
         frame.getContentPane().add(button_1);
+
+        // 标题标签
+        JLabel title = new JLabel("幸福航空欢迎您");
+        title.setBounds(375, 80, 300, 60); // 设置标题居中
+        title.setHorizontalAlignment(JLabel.CENTER);
+        // 设置字体颜色为蓝色
+        title.setForeground(Color.BLUE);
+        // 设置字体为更可爱的样式
+        title.setFont(new Font("宋体", Font.BOLD, 28)); // 示例使用 Comic Sans MS
+        frame.getContentPane().add(title);
+
+        // 标题标签
+        JLabel auther = new JLabel("by 珊珊");
+        auther.setBounds(375, 120, 300, 60); // 设置标题居中
+        auther.setHorizontalAlignment(JLabel.CENTER);
+        auther.setFont(auther.getFont().deriveFont(12f)); // 设置字体大小
+        frame.getContentPane().add(auther);
 
     }
 
