@@ -24,6 +24,19 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+
+import java.util.Arrays;
+import java.util.List;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.SpiderWebPlot;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class FlightRecommendation {
     private JFrame frame;
@@ -42,6 +55,7 @@ public class FlightRecommendation {
                 try {
                     FlightRecommendation window = new FlightRecommendation();
                     window.frame.setVisible(true);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -175,6 +189,7 @@ public class FlightRecommendation {
         }
 
 
+
         //窗口信息
         frame = new JFrame();
         Passenger p = new DbSelect().PassengerSelect(Login.PassengerId);
@@ -185,62 +200,6 @@ public class FlightRecommendation {
             frame.setTitle("个性信息");
         }
 
-        /*
-        //页面布局
-        frame.setBounds(250, 50, 950, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().setLayout(null);
-
-        //问候
-        JLabel label0 = new JLabel("亲爱的" + p.getRealName() + "乘客您好！感谢与您的相遇！在为您服务期间：");
-        label0.setBounds(233, 0, 600, 29);
-        frame.getContentPane().add(label0);
-
-        //国内外偏好
-        int a = 12;
-        int b = 6;
-        int c = 7;
-        JLabel label1 = new JLabel("您预定了国内航班:" + flights.length + "次， 国际航班：" + flight1s.length + "次");
-        label1.setBounds(233, 21, 600, 29);
-        frame.getContentPane().add(label1);
-
-        //时间偏好
-        String n = "北京";
-        JLabel label8 = new JLabel("其中，您最常落地的城市是：" + mostFrequentDestination + "，有" + maxDestinationCount + "次");
-        label8.setBounds(233, 40, 600, 29);
-        frame.getContentPane().add(label8);
-
-        //时间偏好
-        JLabel label2 = new JLabel("您的航班起飞时间在早晨 (00:00-11:59): " + morningCount + " 次， 下午 (12:00-17:59): " + afternoonCount + " 次， 晚上 (18:00-23:59): " + eveningCount + " 次");
-        label2.setBounds(233, 140, 600, 29);
-        frame.getContentPane().add(label2);
-
-        //日期偏好
-        JLabel label3 = new JLabel("您的航班出发日期在寒暑假:" + summerVacationCount + "次， 在节假日:" + holidayCount + "次， 在工作日:" + workdayCount + "次");
-        label3.setBounds(233, 60, 600, 29);
-        frame.getContentPane().add(label3);
-
-        //价格偏好
-        JLabel label4 = new JLabel("您的航班历史最低价格:" + minPrice + "元， 历史最高价格:" + maxPrice + "元");
-        label4.setBounds(233, 80, 600, 29);
-        frame.getContentPane().add(label4);
-
-        //直飞偏好
-        JLabel label5 = new JLabel("您预定直飞航班:" + a + "次， 中转航班:" + b + "次");
-        label5.setBounds(233, 100, 600, 29);
-        frame.getContentPane().add(label5);
-
-        //推荐套餐
-        JLabel label6 = new JLabel("以下是我们根据您的个人偏好为您推荐的套餐：");
-        label6.setBounds(233, 120, 600, 29);
-        frame.getContentPane().add(label6);
-
-        //推荐套餐
-        JLabel label7 = new JLabel("以下是我们根据您的个人偏好为您推荐的近日航班：");
-        label7.setBounds(233, 200, 600, 29);
-        frame.getContentPane().add(label7);
-
-         */
         // 页面布局
         frame.setBounds(250, 50, 950, 800); // 增加高度到 800
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -307,6 +266,10 @@ public class FlightRecommendation {
         label7.setFont(new Font("Microsoft YaHei", Font.BOLD, 16));
         frame.getContentPane().add(label7);
 
+        // 调用 createRadarChart 函数生成雷达图
+        createRadarChart(frame, morningCount, afternoonCount, eveningCount,
+                summerVacationCount, holidayCount, workdayCount,flights.length,flight1s.length);
+
 
     }
 
@@ -332,6 +295,31 @@ public class FlightRecommendation {
         return false;
     }
 
+
+
+    public void createRadarChart(JFrame frame, int morningCount, int afternoonCount, int eveningCount,
+                                 int summerVacationCount, int holidayCount, int workdayCount,
+                                 int domesticCount, int internationalCount) {
+        // 创建数据集
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(morningCount, "Flight Count", "早晨 (00:00-11:59)");
+        dataset.addValue(afternoonCount, "Flight Count", "下午 (12:00-17:59)");
+        dataset.addValue(eveningCount, "Flight Count", "晚上 (18:00-23:59)");
+        dataset.addValue(summerVacationCount, "Flight Count", "暑假");
+        dataset.addValue(holidayCount, "Flight Count", "节假日");
+        dataset.addValue(workdayCount, "Flight Count", "工作日");
+        dataset.addValue(domesticCount, "Flight Count", "国内航班");
+        dataset.addValue(internationalCount, "Flight Count", "国际航班");
+
+        // 使用 SpiderWebPlot 创建雷达图
+        SpiderWebPlot plot = new SpiderWebPlot(dataset);
+        JFreeChart radarChart = new JFreeChart("航班数据分布", JFreeChart.DEFAULT_TITLE_FONT, plot, false);
+
+        // 创建 ChartPanel 并设置大小和位置
+        ChartPanel chartPanel = new ChartPanel(radarChart);
+        chartPanel.setBounds(500, 50, 350, 300); // 设置图表在右上角，宽高为300x300
+        frame.getContentPane().add(chartPanel);
+    }
 
 
 
