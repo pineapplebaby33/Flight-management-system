@@ -2,9 +2,7 @@
 // 并显示在表格中。用户可以通过点击表格中的航班条目进行预定
 package frame;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class Research {
 
@@ -230,6 +229,34 @@ public class Research {
 		label_2.setBounds(12, 510, 344, 15);
 		frame.getContentPane().add(label_2);
 
+
+		//当前套餐标签
+		JLabel label_3 = new JLabel("当前套餐:");
+		label_3.setForeground(Color.BLACK);
+		label_3.setBounds(650, 28, 54, 15);
+		frame.getContentPane().add(label_3);
+		label_3.setForeground(new Color(20, 149, 231));
+
+		// 创建一个 JLabel 作为链接
+		DbSelect sa = new DbSelect();
+		String packagestatus = sa.queryPackageStatus(33);
+		JLabel lblLink = new JLabel("<html><a href=''>"+packagestatus+"</a></html>");
+		lblLink.setBounds(720, 15, 87, 42); // 设置位置和大小
+		lblLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // 鼠标悬停时显示手型光标
+		lblLink.setToolTipText("了解更多");
+		lblLink.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				frame.setVisible(false); // 隐藏当前界面
+				FlightRecommendation window = new FlightRecommendation(); // 创建航班推荐界面
+				window.getFrame().setVisible(true); // 显示航班推荐界面
+			}
+		});
+
+// 将 JLabel 添加到窗口中
+		frame.getContentPane().add(lblLink);
+
+
 		//我的订单界面
 		JButton btnNewButton = new JButton("我的订单");
 		btnNewButton.addMouseListener(new MouseAdapter() {
@@ -242,6 +269,7 @@ public class Research {
 		});
 		btnNewButton.setBounds(837, 7, 87, 42);
 		frame.getContentPane().add(btnNewButton);
+
 
 		//按钮_刷新列表
 		JButton fresh = new JButton("刷新列表");

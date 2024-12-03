@@ -38,12 +38,26 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.SpiderWebPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import java.awt.Window;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+
+
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+
+
+
 public class FlightRecommendation {
     private JFrame frame;
     private JTable Flight_Table;
     private JScrollPane scrollPane;
     static boolean isDomestic =true;
     private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
+    private boolean HasOrderPackage = false;
 
     public JFrame getFrame() {
 
@@ -260,17 +274,143 @@ public class FlightRecommendation {
         label6.setFont(new Font("Microsoft YaHei", Font.BOLD, 16));
         frame.getContentPane().add(label6);
 
+        // 添加推荐套餐的下拉框和文字框
+        JLabel packageLabel = new JLabel("请选择套餐:");
+        packageLabel.setBounds(50, 450, 100, 30);
+        frame.getContentPane().add(packageLabel);
+
+        // 下拉框选项
+        String[] packages = {"国内随心飞", "国外随心飞", "学生寒暑假"};
+        JComboBox<String> packageComboBox = new JComboBox<>(packages);
+        packageComboBox.setBounds(150, 450, 150, 30);
+        frame.getContentPane().add(packageComboBox);
+
+        // 显示套餐内容的文本框
+        JTextArea packageDetails = new JTextArea();
+        packageDetails.setBounds(320, 450, 400, 100);
+        packageDetails.setLineWrap(true);
+        packageDetails.setWrapStyleWord(true);
+        packageDetails.setEditable(false);
+        packageDetails.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+        packageDetails.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        frame.getContentPane().add(packageDetails);
+
+        // 初始化套餐内容
+        packageDetails.setText(FlightRecommendation.getPackageDetails("国内随心飞"));
+
+
+        // 添加下拉框监听器，动态更新文本框内容
+        packageComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedPackage = (String) packageComboBox.getSelectedItem();
+                packageDetails.setText(getPackageDetails(selectedPackage));
+            }
+        });
+
+
+        //输出订购信息
+        //判断订单能否生效
+        DbSelect sa = new DbSelect();
+        //返回当前状态
+        String packagestatus = sa.queryPackageStatus(33);
+        System.out.println("当前状态: " + packagestatus);
+        JLabel show1 = new JLabel("当前套餐:"+packagestatus);
+        show1.setBounds(420, 400, 120, 30);
+        frame.getContentPane().add(show1);
+
+
+
+        //返回所有已购状态
+        List<Map<String, Object>> packages1 = sa.queryAllPackageStatus(33);
+        // 用于存储所有已满状态的套餐名称
+        List<String> fullPackages = new ArrayList<>();
+        // 遍历返回结果，筛选出已满状态的套餐名称
+        for (Map<String, Object> packageInfo : packages1) {
+            if ((boolean) packageInfo.get("IsFull")) {
+                fullPackages.add((String) packageInfo.get("Package"));
+            }
+        }
+        // 转换为数组
+        String[] fullPackageArray = fullPackages.toArray(new String[0]);
+        // 输出已满状态的套餐名称数组
+        System.out.println("Full Packages: " + Arrays.toString(fullPackageArray));
+
+
+        String history = (fullPackageArray.length > 0)
+                ? String.join(", ", fullPackageArray)
+                : "无已购套餐";
+        JLabel show2 = new JLabel("历史已购套餐: " + history);
+        show2.setBounds(570, 400, 150, 30);
+        frame.getContentPane().add(show2);
+
+        //跳转支付界面
+        JButton Create = new JButton("立马下单❤");
+        Create.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                for(String packagename : fullPackageArray){
+                    if(packagename.equals(packageComboBox.getSelectedItem()))
+                        HasOrderPackage = true;
+                }
+                System.out.println("packageComboBox.getSelectedItem(): " + packageComboBox.getSelectedItem());
+                System.out.println("是否重复预定："+HasOrderPackage);
+
+                if(!Objects.equals(packagestatus, "无")){//在订购中
+                    AllDialog.Dialog(frame, "您当前正在享受"+packagestatus+"套餐,\n等待当前订单结束之后再订购其他套餐");
+                }else if(HasOrderPackage){//是否重复预定
+                    AllDialog.Dialog(frame, "您已订购过该套餐，请勿重复预定！\n可以选择其他未订购过的套餐");
+                }else{//可以预定
+                    frame.setVisible(false);
+                    System.out.println("FlightRecommendation跳转预定套餐界面");
+                    PackagePay pp = new PackagePay();
+                    System.out.println("预定套餐界面跳转FlightRecommendation");
+                    pp.getFrame().setVisible(true);
+                }
+
+            }
+        });
+        Create.setBounds(92, 500, 153, 37);
+        frame.getContentPane().add(Create);
+
         // 推荐航班标题
         JLabel label7 = new JLabel("<html><font color='rgb(173,193,212')>以下是我们根据您的个人偏好为您推荐的近日航班:</font></html>");
-        label7.setBounds(50, 440, 850, 30); // 向下移动
+        label7.setBounds(50, 640, 850, 30); // 向下移动
         label7.setFont(new Font("Microsoft YaHei", Font.BOLD, 16));
         frame.getContentPane().add(label7);
+
+        JButton button_2 = new JButton("返回");
+        button_2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.setVisible(false);
+                Research wResearch = new Research();
+                wResearch.getFrame().setVisible(true);
+            }
+        });
+        button_2.setFont(new Font("宋体", Font.PLAIN, 12));
+        button_2.setBounds(376, 700, 100, 20);
+        frame.getContentPane().add(button_2);
 
         // 调用 createRadarChart 函数生成雷达图
         createRadarChart(frame, morningCount, afternoonCount, eveningCount,
                 summerVacationCount, holidayCount, workdayCount,flights.length,flight1s.length);
 
 
+    }
+
+    // FlightRecommendation 类中
+    private static String getPackageDetails(String packageName) {
+        switch (packageName) {
+            case "国内随心飞":
+                return "套餐内容:\n- 国内航班10次\n- 有效期：无限时期！！\n- 特定航班折扣高达50%";
+            case "国外随心飞":
+                return "套餐内容:\n- 国际航班10次\n- 全场：1000元！！\n- 适用于热门国际航线";
+            case "学生寒暑假":
+                return "套餐内容:\n- 学生专属优惠只要400元！！！\n- 有效期：寒暑假期间！！\n- 限定次数：4次\n- 适用于所有国内航线";
+            default:
+                return "无相关信息";
+        }
     }
 
     // 判断是否是寒暑假

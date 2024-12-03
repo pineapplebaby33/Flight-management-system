@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DbSelect {
 	private DbConnect db = null;
@@ -1261,8 +1263,134 @@ public class DbSelect {
 		return Food;
 	}
 
+	//根据pid查询package表，返回套餐状态
+	public String queryPackageStatus(int pid) {
+		System.out.println("查询 Package 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		String packageStatus = "无"; // 默认返回值为 "无"
 
+		try {
+			// SQL 查询语句，获取指定 PId 的当前套餐和次数
+			String sql = "SELECT Package, COUNT(*) AS Count " +
+					"FROM package " +
+					"WHERE PId = ? " +
+					"GROUP BY Package";
+			this.pst = cn.prepareStatement(sql);
 
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 存储每种套餐的计数
+			Map<String, Integer> packageCounts = new HashMap<>();
+
+			while (ret.next()) {
+				String packageName = ret.getString("Package");
+				int count = ret.getInt("Count");
+				packageCounts.put(packageName, count);
+			}
+
+			// 判断逻辑
+			if (packageCounts.containsKey("国外随心飞")) {
+				int abroadCount = packageCounts.get("国外随心飞");
+				if (abroadCount < 11) {
+					packageStatus = "国外随心飞"; // 当前套餐未满
+				}
+			} else if (packageCounts.containsKey("国内随心飞")) {
+				int domesticCount = packageCounts.get("国内随心飞");
+				if (domesticCount < 11) {
+					packageStatus = "国内随心飞"; // 当前套餐未满
+				}
+			} else if (packageCounts.containsKey("学生寒暑假")) {
+				int studentCount = packageCounts.get("学生寒暑假");
+				if (studentCount < 5) {
+					packageStatus = "学生寒暑假"; // 当前套餐未满
+				}
+			} else {
+				packageStatus = "无"; // 没有任何套餐记录
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return packageStatus;
+	}
+
+	// 根据 pid 查询 package 表，返回所有订阅的套餐状态(名称+是否已满)
+	public List<Map<String, Object>> queryAllPackageStatus(int pid) {
+		System.out.println("查询 Package 表...");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		// 用于存储所有订阅的套餐状态
+		List<Map<String, Object>> packageStatusList = new ArrayList<>();
+
+		try {
+			// SQL 查询语句，获取指定 PId 的当前套餐和次数
+			String sql = "SELECT Package, COUNT(*) AS Count " +
+					"FROM package " +
+					"WHERE PId = ? " +
+					"GROUP BY Package";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, pid);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 遍历查询结果，存储套餐信息
+			while (ret.next()) {
+				Map<String, Object> packageInfo = new HashMap<>();
+				String packageName = ret.getString("Package");
+				int count = ret.getInt("Count");
+
+				// 存储套餐名称和计数
+				packageInfo.put("Package", packageName);
+				packageInfo.put("Count", count);
+
+				// 判断是否达到最大限制
+				boolean isFull = false;
+				if (packageName.equals("国外随心飞") && count >= 11) {
+					isFull = true;
+				} else if (packageName.equals("国内随心飞") && count >= 11) {
+					isFull = true;
+				} else if (packageName.equals("学生寒暑假") && count >= 5) {
+					isFull = true;
+				}
+
+				// 存储是否达到最大限制的状态
+				packageInfo.put("IsFull", isFull);
+
+				// 添加到结果列表
+				packageStatusList.add(packageInfo);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return packageStatusList;
+	}
 
 
 
@@ -1317,6 +1445,9 @@ public class DbSelect {
 		 * TestObject.print(f);
 		 */
 
+		DbSelect sa = new DbSelect();
+		String ps = sa.queryPackageStatus(33);
+		System.out.println(ps);
 
 	}
 }
