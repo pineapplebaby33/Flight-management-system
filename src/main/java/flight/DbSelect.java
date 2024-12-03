@@ -809,6 +809,68 @@ public class DbSelect {
 		return null; // 如果没有符合条件的记录，则返回 null
 	}
 
+	//p-查询并返回Flight by pid，生成航班推荐时使用
+	public Flight[] FlightSelectByPassengerId(int PassengerId, boolean isDomestic) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			String _sql = "SELECT * FROM " + tableName + " WHERE PassengerId LIKE ? OR PassengerId LIKE ?";
+
+			// 准备 SQL 语句
+			this.pst = cn.prepareStatement(_sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			this.pst.setString(1, "%;" + PassengerId + ";%"); // 匹配中间包含的情况
+			this.pst.setString(2, PassengerId + ";%");       // 匹配以 PassengerId 开头的情况
+			this.ret = pst.executeQuery();
+
+			// 处理查询结果
+			ret.last(); // 移动到结果集最后一行，获取行数
+			if (ret.getRow() > 0) {
+				Flight[] flights = new Flight[ret.getRow()];
+				ret.beforeFirst(); // 回到结果集的起始位置
+				int index = 0;
+
+				// 遍历结果集
+				while (ret.next()) {
+					// 创建 Flight 对象并存储到数组
+					Flight flight = new Flight(
+							ret.getInt(1),    // Flight ID
+							ret.getString(2), // StartTime
+							ret.getString(3), // StartCity
+							ret.getString(4), // ArrivalCity
+							ret.getString(5), // FlightName
+							ret.getString(6), // PassengerId
+							ret.getFloat(7),  // Price
+							ret.getInt(8),    // AvailableSeats
+							ret.getInt(9),    // TotalSeats
+							ret.getString(10),// AircraftType
+							ret.getString(11),// Airline
+							ret.getString(12) // OtherInfo
+					);
+					flights[index] = flight;
+					index++;
+				}
+
+				// 关闭连接
+				this.ret.close();
+				this.cn.close();
+				return flights; // 返回结果
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (this.ret != null) this.ret.close();
+				if (this.cn != null) this.cn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null; // 如果没有结果或发生异常，返回 null
+	}
+
+
 	// 根据 flightname 查询起始城市和目的城市
 	// 根据 flightname 查询起始城市和目的城市
 	public List<String> getCitiesByFlightName(String flightName) {

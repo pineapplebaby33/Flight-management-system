@@ -186,22 +186,6 @@ public class Research {
 
 
 
-	/*
-		//返回登录界面
-		JButton button_1 = new JButton("返回");
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.setVisible(false);
-				Login window = new Login();
-				window.getFrame().setVisible(true);
-			}
-		});
-
-		button_1.setFont(new Font("宋体", Font.PLAIN, 14));
-		button_1.setBounds(869, 1208, 173, 41);
-		frame.getContentPane().add(button_1);
-
-	 */
 
 
 		//查询按钮
@@ -485,6 +469,7 @@ public class Research {
 					flights[i].getArrivalTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
 					"";
 			flight_ob[i][6] = (flights[i].getPrice()==0.0f)?"":String.valueOf(flights[i].getPrice());
+			//是否预定栏
 			if(flights[i].getStartTime()==null){
 				flight_ob[i][7] = "";
 			}
@@ -493,6 +478,7 @@ public class Research {
 			}else{
 				flight_ob[i][7] = "已预定";
 			}
+			//直飞中转栏
 			if(flights[i].getStartTime()==null){
 				flight_ob[i][8] = "";
 			}
@@ -501,10 +487,11 @@ public class Research {
 			}
 			else
 				flight_ob[i][8] = "中转";
+
 			if(flights[i].getStartTime()==null){
 				flight_ob[i][9] = "";
 			}else {
-				flight_ob[i][9] = currentFlights[i].getFlightStatus();
+				flight_ob[i][9] = flights[i].getFlightStatus();
 			}
 
 		}

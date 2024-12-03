@@ -236,13 +236,6 @@ class filter {
         LocalDate localDate = LocalDate.parse(startime, dateFormatter);
         // 将 LocalDate 转换为 LocalDateTime 的当天开始时间
         LocalDateTime startDate = LocalDateTime.of(localDate, LocalTime.MIN);  // 2024-11-30T00:00
-        /*
-        flight.Flight[] flights = new DbSelect().FlightSelect(startime,  "北京", "深圳");//返回12列
-        if (flights == null) {
-            System.err.println("No flights returned from database.");
-            flights = new Flight[0]; // 初始化为空数组，避免 NullPointerException
-        }*/
-        // 构建 FlightInfo[] flights 数组
 
         Flight[] flights = {
                 new Flight(1, "2024-11-30-06-00-00", "2024-11-30-08-00-00", "北京", "上海", "2024-11-30", 500.0f, 100, 150, "AVAILABLE", "0", "Flight A"),
@@ -253,23 +246,7 @@ class filter {
                 new Flight(6, "2024-11-30-09-30-00", "2024-11-30-11-30-00",  "北京", "深圳", "2024-11-30", 1000.0f, 100, 150, "AVAILABLE", "0", "Flight F"),
                 new Flight(7, "2024-12-30-09-30-00", "2024-12-30-11-30-00", "北京", "深圳", "2024-12-30", 1000.0f, 100, 150, "AVAILABLE","0", "Flight G")
         };
-        /*
-        for (Flight flight : flights) {
-            System.out.println("ID: " + flight.getId());
-            System.out.println("Start Time: " + flight.getStartTime());
-            System.out.println("Arrival Time: " + flight.getArrivalTime());
-            System.out.println("Start City: " + flight.getStartCity());
-            System.out.println("Arrival City: " + flight.getArrivalCity());
-            System.out.println("Departure Date: " + flight.getDepartureDate());
-            System.out.println("Price: " + flight.getPrice());
-            System.out.println("Current Passengers: " + flight.getCurrentPassengers());
-            System.out.println("Seat Capacity: " + flight.getSeatCapacity());
-            System.out.println("Flight Status: " + flight.getFlightStatus());
-            System.out.println("Passenger ID: " + Arrays.toString(flight.getPassengerId()));
-            System.out.println("Flight Name: " + flight.getFlightName());
-            System.out.println("-------------------------------------------------");
-        }
-        */
+
 
         // 创建 FlightProcessor 对象
         FlightProcessor processor = new FlightProcessor();

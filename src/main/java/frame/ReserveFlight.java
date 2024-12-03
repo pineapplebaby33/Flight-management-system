@@ -51,27 +51,9 @@ public class ReserveFlight {
 		flightNamelabel.setBounds(43, 36, 62, 29);
 		frame.getContentPane().add(flightNamelabel);
 
-		/*
-		//跳转支付界面
-		JButton Create = new JButton("点击支付");
-		Create.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				frame.setVisible(false);
-				Pay windowPay = new Pay(isDmestic);
-
-
-				windowPay.getFrame().setVisible(true);
-			}
-		});
-		Create.setBounds(92, 386, 153, 37);
-		frame.getContentPane().add(Create);
-
-		 */
-
 
 		//跳转支付界面
-		JButton Create = new JButton("点击支付");
+		JButton Create = new JButton("点击预定");
 		Create.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
