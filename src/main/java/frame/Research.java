@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import flight.*;
@@ -30,6 +31,7 @@ public class Research {
 	private JScrollPane scrollPane;
 	static boolean isDomestic =true;
 	private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
+	private String packagestatus= "无";
 
 	public JFrame getFrame() {
 
@@ -74,7 +76,7 @@ public class Research {
 		frame.setBounds(250, 50, 950, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
-		setTable(frame);
+
 
 
 
@@ -239,7 +241,8 @@ public class Research {
 
 		// 创建一个 JLabel 作为链接
 		DbSelect sa = new DbSelect();
-		String packagestatus = sa.queryPackageStatus(Login.PassengerId);
+		packagestatus = sa.queryPackageStatus(Login.PassengerId);
+		System.out.println("查询结果packagestatus"+packagestatus);
 		JLabel lblLink = new JLabel("<html><a href=''>"+packagestatus+"</a></html>");
 		lblLink.setBounds(720, 15, 87, 42); // 设置位置和大小
 		lblLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // 鼠标悬停时显示手型光标
@@ -255,6 +258,8 @@ public class Research {
 
 // 将 JLabel 添加到窗口中
 		frame.getContentPane().add(lblLink);
+
+
 
 
 		//我的订单界面
@@ -314,85 +319,10 @@ public class Research {
 		});
 		button_2.setBounds(800, 516, 109, 36);
 		frame.getContentPane().add(button_2);
+
+		setTable(frame);
 	}
 
-	/*
-	//创建表格_by frame 初始化/刷新
-	private void setTable(final JFrame frame) {
-		if (scrollPane != null) {
-			frame.getContentPane().remove(scrollPane); // 清除旧的表格
-		}
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式" };
-		// 更新当前表格的航班数据源
-		currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
-		String[][] flight_ob = new String[currentFlights.length][9];
-		//遍历 flights 数组，将每个航班的信息存入 flight_ob 二维数组，准备显示在表格中。
-		for (int i = 0; i < currentFlights.length; i++) {
-			flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
-			flight_ob[i][1] = currentFlights[i].getFlightName();
-			flight_ob[i][2] = currentFlights[i].getStartCity();
-			flight_ob[i][3] = currentFlights[i].getArrivalCity();
-			flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
-			flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
-			flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
-			//检查当前登录的乘客是否已经预定该航班
-			if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(),isDomestic)) {
-				flight_ob[i][7] = "未预定";
-			} else {
-				flight_ob[i][7] = "已预定";
-			}
-			flight_ob[i][8] = "直飞";
-		}
-
-		//创建 JTable 表格，显示航班数据，并设置表格不可编辑。
-		Flight_Table = new JTable(flight_ob, columnNames) {
-			//serialVersionUID 是一个唯一的标识符，用于验证序列化和反序列化的对象版本一致性。
-			// 如果没有一致的 serialVersionUID，在序列化版本不匹配时可能会抛出 InvalidClassException
-			@Serial
-			private static final long serialVersionUID = -4737302915707325665L;
-			public boolean isCellEditable(int row, int column) {
-				return false;
-			}
-		};
-		//设置表格列的宽度，选择模式为单选，设置选中航班时的背景色和前景色，并设置表格的位置和大小
-		TableColumn column = null;
-		int colunms = Flight_Table.getColumnCount();
-		//遍历列
-		for (int i = 0; i < colunms; i++) {
-			column = Flight_Table.getColumnModel().getColumn(i);
-			column.setPreferredWidth(100);
-		}
-		Flight_Table.getColumnModel().getColumn(0).setPreferredWidth(20);//第一列
-		Flight_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);//单选模式
-		Flight_Table.setSelectionBackground(Color.LIGHT_GRAY);//选中后
-		Flight_Table.setSelectionForeground(Color.yellow);
-		Flight_Table.setBounds(21, 143, 700, 363);
-		//滚轴
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 143, 912, 363);
-		frame.getContentPane().add(scrollPane);
-		scrollPane.setViewportView(Flight_Table);
-		//鼠标监听事件
-		Flight_Table.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				//跳转预定航班界面
-				if (e.getClickCount() == 2) {//双击事件
-					int row = Flight_Table.getSelectedRow();
-					if (row != -1) {
-						// 使用 currentFlights 数组而不是原来的数据源
-						Flight selectedFlight = currentFlights[row];
-						frame.setVisible(false);
-						Login.FlightId = selectedFlight.getId();
-						ReserveFlight window = new ReserveFlight(isDomestic);
-						window.getFrame().setVisible(true);
-					}
-				}
-			}
-		});
-	}
-
-	 */
 
 
 		// 创建表格_by frame 初始化/刷新
@@ -401,33 +331,66 @@ public class Research {
 				frame.getContentPane().remove(scrollPane); // 清除旧的表格
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-			String[] columnNames = {"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式","航班状态"};
+			System.out.println("生成表格判断packagestatus"+packagestatus);
+			String[] columnNames={};
+			String[][] flight_ob = new String[0][0];
+			if(Objects.equals(packagestatus, "无")){
+				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式", "航班状态"};
+				// 更新当前表格的航班数据源
+				currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
 
-			// 更新当前表格的航班数据源
-			currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
-
-			// 按起飞时间排序，从早到晚
-			Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
-
-			// 将航班信息填充到 flight_ob 二维数组中
-			String[][] flight_ob = new String[currentFlights.length][10];
-			for (int i = 0; i < currentFlights.length; i++) {
-				flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
-				flight_ob[i][1] = currentFlights[i].getFlightName();
-				flight_ob[i][2] = currentFlights[i].getStartCity();
-				flight_ob[i][3] = currentFlights[i].getArrivalCity();
-				flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
-				flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
-				flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
-				// 检查当前登录的乘客是否已经预定该航班
-				if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
-					flight_ob[i][7] = "未预定";
-				} else {
-					flight_ob[i][7] = "已预定";
+				// 按起飞时间排序，从早到晚
+				Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
+				// 将航班信息填充到 flight_ob 二维数组中
+				flight_ob = new String[currentFlights.length][10];
+				for (int i = 0; i < currentFlights.length; i++) {
+					flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
+					flight_ob[i][1] = currentFlights[i].getFlightName();
+					flight_ob[i][2] = currentFlights[i].getStartCity();
+					flight_ob[i][3] = currentFlights[i].getArrivalCity();
+					flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
+					flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
+					flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
+					// 检查当前登录的乘客是否已经预定该航班
+					if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
+						flight_ob[i][7] = "未预定";
+					} else {
+						flight_ob[i][7] = "已预定";
+					}
+					flight_ob[i][8] = "直飞";
+					flight_ob[i][9] = currentFlights[i].getFlightStatus();
 				}
-				flight_ob[i][8] = "直飞";
-				flight_ob[i][9] = currentFlights[i].getFlightStatus();
 			}
+			else{
+				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "原价", "特惠价", "是否预定", "模式", "航班状态"};
+
+				// 更新当前表格的航班数据源
+				currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
+				// 按起飞时间排序，从早到晚
+				Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
+				// 将航班信息填充到 flight_ob 二维数组中
+				flight_ob = new String[currentFlights.length][11];
+				for (int i = 0; i < currentFlights.length; i++) {
+					flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
+					flight_ob[i][1] = currentFlights[i].getFlightName();
+					flight_ob[i][2] = currentFlights[i].getStartCity();
+					flight_ob[i][3] = currentFlights[i].getArrivalCity();
+					flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
+					flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
+					flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
+					flight_ob[i][7] = String.format("%.1f", PackageOrder.discountPrice(currentFlights[i].getPrice(), packagestatus));
+					// 检查当前登录的乘客是否已经预定该航班
+					if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
+						flight_ob[i][8] = "未预定";
+					} else {
+						flight_ob[i][8] = "已预定";
+					}
+					flight_ob[i][9] = "直飞";
+					flight_ob[i][10] = currentFlights[i].getFlightStatus();
+				}
+
+			}
+
 
 			// 创建 JTable 表格，显示航班数据，并设置表格不可编辑。
 			Flight_Table = new JTable(flight_ob, columnNames) {
@@ -451,6 +414,9 @@ public class Research {
 			Flight_Table.setSelectionBackground(Color.LIGHT_GRAY); // 选中后背景色
 			Flight_Table.setSelectionForeground(Color.yellow); // 选中后前景色
 			Flight_Table.setBounds(21, 143, 700, 363);
+			// 为第 6 列设置黑色文字 + 红色删除线的渲染器
+			Research.setThickRedStrikeThroughRenderer(Flight_Table, 6);
+
 
 			// 添加滚动面板
 			scrollPane = new JScrollPane();
@@ -476,6 +442,8 @@ public class Research {
 				}
 			});
 		}
+
+
 
 
 	//创建表格_by frame 精准查询
@@ -703,5 +671,39 @@ public class Research {
 		arrivalCity.setSelectedIndex(0);
 	}
 
+	public static void setThickRedStrikeThroughRenderer(JTable table, int columnIndex) {
+		table.getColumnModel().getColumn(columnIndex).setCellRenderer(new DefaultTableCellRenderer() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+
+				// 获取当前文字的宽高
+				FontMetrics fm = g.getFontMetrics();
+				int textWidth = fm.stringWidth(getText());
+				int textHeight = fm.getHeight();
+
+				// 设置删除线颜色为红色
+				g.setColor(Color.RED);
+
+				// 设置粗删除线的粗细
+				Graphics2D g2d = (Graphics2D) g;
+				g2d.setStroke(new BasicStroke(1)); // 删除线粗细：2px
+
+				// 绘制删除线（位置：文字中间）
+				int y = getHeight() / 2; // 水平线位置
+				g2d.drawLine(0, y, textWidth, y);
+			}
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+				// 设置字体颜色为黑色
+				label.setForeground(Color.BLACK);
+
+				return label;
+			}
+		});
+	}
 
 }
