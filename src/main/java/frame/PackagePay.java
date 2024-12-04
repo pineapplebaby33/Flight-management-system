@@ -1,8 +1,6 @@
 package frame;
 
-import flight.Flight;
-import flight.Order;
-import flight.Passenger;
+import flight.*;
 import listeners.PaymentCompleteListener;
 
 import javax.swing.*;
@@ -39,12 +37,12 @@ public class PackagePay {
     /**
      * Launch the application.
      */
-    /*
+
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    PackagePay window = new PackagePay();
+                    PackagePay window = new PackagePay("");
                     window.frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -54,16 +52,29 @@ public class PackagePay {
     }
 
 
-    public PackagePay() {
-        initialize();
+    public PackagePay(String getSelectedItem) {
+        initialize(getSelectedItem);
     }
 
-    private void initialize() {
+    private void initialize(String getSelectedItem) {
         frame = new JFrame();
-        frame.setTitle("支付页面");
-        frame.setBounds(550, 100, 350, 300);
+        frame.setTitle("套餐订购支付界面");
+        frame.setBounds(550, 100, 550, 300);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
+
+        //输出订购信息
+        //判断订单能否生效
+        DbSelect sa = new DbSelect();
+        //返回当前状态
+        //String packagestatus = sa.queryPackageStatus(33);
+        //返回所选状态
+        System.out.println("再次确认订购信息 " + getSelectedItem);
+        JLabel show1 = new JLabel("请再次确认订购信息: "+getSelectedItem);
+        show1.setBounds(10, 10, 220, 30);
+        show1.setForeground(Color.red);
+        frame.getContentPane().add(show1);
+
 
         JLabel label = new JLabel(
                 "确认支付请输入密码");
@@ -81,30 +92,17 @@ public class PackagePay {
                 for (int i = 0; i < cpwd.length; i++) {
                     pwd += cpwd[i];
                 }
-                //检查订单是否重复
-                if (Order.IsHasOrder(Login.PassengerId, Login.FlightId,Research.isDomestic)) {
-                    int x1 = Passenger.ReserveFlight(Login.PassengerId, Login.FlightId, pwd,isDmestic);
-                    System.out.println("在PAY里Passenger.ReserveFlight");
-                    if (x1==1) {
-                        frame.setVisible(false);
-                        Research window = new Research();
-                        window.getFrame().setVisible(true);
-                        boolean x2 = Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
-                        AllDialog.Dialog(window.getFrame(), "购票成功");
-
-                        // 调用支付完成监听器，通知支付成功
-                        if (paymentListener != null) {
-                            paymentListener.onPaymentComplete();
-                        }
-
-                    } else if(x1==2){
-                        AllDialog.Dialog(frame, "支付失败，请检查密码");
-                    }else if(x1==3) {
-                        AllDialog.Dialog(frame, "支付失败，当前航班已满");
-                    }
-                } else {
-                    AllDialog.Dialog(frame, "请勿重复预订");
+                int x = PackageOrder.ReservePackageOrder(pwd,Login.PassengerId,getSelectedItem,0,0);//插入套餐订单
+                System.out.println("在PackagePay里PackageOrder.ReservePackageOrder成功");
+                if (x==1) {
+                    frame.setVisible(false);
+                    FlightRecommendation window = new FlightRecommendation();//返回个性推荐界面
+                    window.getFrame().setVisible(true);
+                    AllDialog.Dialog(window.getFrame(), "购票成功");
+                } else if(x==2){
+                    AllDialog.Dialog(frame, "支付失败，请检查密码");
                 }
+
             }
         });
         sure.setBounds(41, 157, 93, 38);
@@ -119,14 +117,17 @@ public class PackagePay {
             @Override
             public void mouseClicked(MouseEvent e) {
                 frame.setVisible(false);
-                ReserveFlight window = new ReserveFlight(isDmestic);
+                FlightRecommendation window = new FlightRecommendation();
                 window.getFrame().setVisible(true);
+
             }
         });
         back.setBounds(178, 157, 103, 38);
         frame.getContentPane().add(back);
     }
-*/
+
+
+
     public Window getFrame() {
         return frame;
     }

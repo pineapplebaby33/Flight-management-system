@@ -269,7 +269,7 @@ public class DbInsert {
 		return isSuccessful;
 	}
 
-	// 插入订单方法
+	// 插入订餐表
 	public boolean FoodInsert(int OrderId, int Food) {
 		this.db = new DbConnect(); // 假设 DbConnect 是您用于管理数据库连接的类
 		this.cn = this.db.Get_Connection(); // 获取数据库连接
@@ -299,6 +299,33 @@ public class DbInsert {
 		}
 		return this.re;
 	}
+
+	// 插入 package 表数据
+	public boolean PackageInsert(int PId, String Package, float Price, int OId) {
+		System.out.println("插入 package 表数据");
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 准备 SQL 插入语句
+			this.pst = cn.prepareStatement(
+					"INSERT INTO `package` (`id`, `PId`, `Package`, `Price`, `OId`) VALUES (NULL, ?, ?, ?, ?);"
+			);
+
+			// 使用 PreparedStatement 设置参数
+			this.pst.setInt(1, PId);            // PId 是整数
+			this.pst.setString(2, Package);     // Package 是字符串
+			this.pst.setFloat(3, Price);        // Price 是浮点数
+			this.pst.setInt(4, OId);            // Old 是整数
+
+			// 执行插入操作
+			this.re = pst.executeUpdate() == 1;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return this.re; // 返回操作结果
+	}
+
 
 
 

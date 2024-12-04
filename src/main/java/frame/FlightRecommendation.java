@@ -313,7 +313,8 @@ public class FlightRecommendation {
         //判断订单能否生效
         DbSelect sa = new DbSelect();
         //返回当前状态
-        String packagestatus = sa.queryPackageStatus(33);
+        //String packagestatus = sa.queryPackageStatus(33);
+        String packagestatus = sa.queryPackageStatus(Login.PassengerId);
         System.out.println("当前状态: " + packagestatus);
         JLabel show1 = new JLabel("当前套餐:"+packagestatus);
         show1.setBounds(420, 400, 120, 30);
@@ -322,7 +323,9 @@ public class FlightRecommendation {
 
 
         //返回所有已购状态
-        List<Map<String, Object>> packages1 = sa.queryAllPackageStatus(33);
+        //List<Map<String, Object>> packages1 = sa.queryAllPackageStatus(33);
+        List<Map<String, Object>> packages1 = sa.queryAllPackageStatus(Login.PassengerId);
+        System.out.println("Login.PassengerId: " + Login.PassengerId);
         // 用于存储所有已满状态的套餐名称
         List<String> fullPackages = new ArrayList<>();
         // 遍历返回结果，筛选出已满状态的套餐名称
@@ -349,9 +352,12 @@ public class FlightRecommendation {
         Create.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                HasOrderPackage = false;
                 for(String packagename : fullPackageArray){
+                    System.out.println("packagename："+packagename);
                     if(packagename.equals(packageComboBox.getSelectedItem()))
                         HasOrderPackage = true;
+
                 }
                 System.out.println("packageComboBox.getSelectedItem(): " + packageComboBox.getSelectedItem());
                 System.out.println("是否重复预定："+HasOrderPackage);
@@ -363,7 +369,7 @@ public class FlightRecommendation {
                 }else{//可以预定
                     frame.setVisible(false);
                     System.out.println("FlightRecommendation跳转预定套餐界面");
-                    PackagePay pp = new PackagePay();
+                    PackagePay pp = new PackagePay((String)packageComboBox.getSelectedItem());
                     System.out.println("预定套餐界面跳转FlightRecommendation");
                     pp.getFrame().setVisible(true);
                 }
@@ -403,7 +409,7 @@ public class FlightRecommendation {
     private static String getPackageDetails(String packageName) {
         switch (packageName) {
             case "国内随心飞":
-                return "套餐内容:\n- 国内航班10次\n- 有效期：无限时期！！\n- 特定航班折扣高达50%";
+                return "套餐内容:\n- 国内航班10次\n- 有效期：无限时期！！\n- 全场随机折扣，特定航班折扣高达50%";
             case "国外随心飞":
                 return "套餐内容:\n- 国际航班10次\n- 全场：1000元！！\n- 适用于热门国际航线";
             case "学生寒暑假":

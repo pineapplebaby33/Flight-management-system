@@ -239,7 +239,7 @@ public class Research {
 
 		// 创建一个 JLabel 作为链接
 		DbSelect sa = new DbSelect();
-		String packagestatus = sa.queryPackageStatus(33);
+		String packagestatus = sa.queryPackageStatus(Login.PassengerId);
 		JLabel lblLink = new JLabel("<html><a href=''>"+packagestatus+"</a></html>");
 		lblLink.setBounds(720, 15, 87, 42); // 设置位置和大小
 		lblLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // 鼠标悬停时显示手型光标

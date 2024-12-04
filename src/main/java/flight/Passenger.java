@@ -67,20 +67,21 @@ public class Passenger {
 					// 插入订单;
 					String seatNumber = generateSeatNumber(f.getSeatCapacity());
 					if (Order.IsHasOrder(pid, fid,isDomestic)) {
-					boolean re = insert.OrderInsert(p.getId(), seatNumber,
-							f.getId(), CreateDate, "PAID",isDomestic);
-					System.out.println("在Passenger.ReserveFlight里insert.OrderInsert");
-					// 更新航班和乘客信息
-					re = re //&& Flight.ReserveFlight(pid, fid,isDomestic)
-							&& p.UpdateOrderList(fid,isDomestic);
-					if (re) {
-						return 1;
-					}}
+						boolean re = insert.OrderInsert(p.getId(), seatNumber,
+								f.getId(), CreateDate, "PAID",isDomestic);
+						System.out.println("在Passenger.ReserveFlight里insert.OrderInsert");
+						// 更新航班和乘客信息
+						re = re //&& Flight.ReserveFlight(pid, fid,isDomestic)
+								&& p.UpdateOrderList(fid,isDomestic);
+						if (re) {
+							return 1;
+						}
+					}
 				} else {
 					System.err.println("该乘客已预订该航班，无法重复预订");
 				}
 			} else {
-				System.err.println("密码错误");
+				System.err.println("定航班密码错误");
 				return 2;
 			}
 		} else {
