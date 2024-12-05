@@ -1392,6 +1392,52 @@ public class DbSelect {
 		return packageStatusList;
 	}
 
+	// 根据 pid,packageStatus,OId 查询 package 表，返回特定套餐订单
+	public PackageOrder PackageOrderSelect(int PId, String packageStatus, int OId) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		// 用于存储查询结果
+		int id = 0;
+		int passengerId = 0;
+		String packageName = "";
+		float price = 0;
+		int orderId = 0;
+
+		try {
+			// 构建 SQL 查询语句
+			String sql = "SELECT * FROM package WHERE PId = ? AND Package = ? AND OId = ?";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, PId);
+			this.pst.setString(2, packageStatus);
+			this.pst.setInt(3, OId);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 解析查询结果
+			if (ret.next()) {
+				id = ret.getInt("id");
+				passengerId = ret.getInt("PId");
+				packageName = ret.getString("Package");
+				price = ret.getFloat("Price");
+				orderId = ret.getInt("OId");
+			}
+
+			// 关闭结果集和连接
+			this.ret.close();
+			this.cn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// 构造并返回 PackageOrder 对象
+		return new PackageOrder(id, passengerId, packageName, price, orderId);
+	}
+
+
 
 
 

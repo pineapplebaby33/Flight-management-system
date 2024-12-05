@@ -409,9 +409,9 @@ public class FlightRecommendation {
     private static String getPackageDetails(String packageName) {
         switch (packageName) {
             case "国内随心飞":
-                return "套餐内容:\n- 国内航班10次\n- 有效期：无限时期！！\n- 全场随机折扣，特定航班折扣高达50%";
+                return "套餐内容:\n- 国内航班10次\n- 有效期：无限时期！！\n- 全场75折扣，最高立500元";
             case "国外随心飞":
-                return "套餐内容:\n- 国际航班10次\n- 全场：1000元！！\n- 适用于热门国际航线";
+                return "套餐内容:\n- 国际航班10次\n- 有效期：无限时期！！\n- 全场：1000元！！\n- 适用于热门国际航线";
             case "学生寒暑假":
                 return "套餐内容:\n- 学生专属优惠只要400元！！！\n- 有效期：寒暑假期间！！\n- 限定次数：4次\n- 适用于所有国内航线";
             default:

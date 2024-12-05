@@ -21,6 +21,7 @@ public class Login {
     public static int FlightId = 0;
     static int AdminId = 0;
     public static int PassengerId = 0;
+    public static String packagestatus= "无";
     public static String Pwd = "";
     static int OrderId = 0;
     private JFrame frame;

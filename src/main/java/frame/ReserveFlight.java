@@ -12,6 +12,7 @@ import javax.swing.*;
 
 import flight.DbSelect;
 import flight.Flight;
+import flight.PackageOrder;
 
 public class ReserveFlight {
 	private JFrame frame;
@@ -71,6 +72,10 @@ public class ReserveFlight {
 		label_1.setBounds(439, 36, 55, 29);
 		frame.getContentPane().add(label_1);
 
+		JLabel label_4 = new JLabel("当前套餐");
+		label_4.setBounds(439, 65, 55, 29);
+		frame.getContentPane().add(label_4);
+
 		JLabel label_3 = new JLabel("降落时间");
 		label_3.setBounds(43, 264, 54, 15);
 		frame.getContentPane().add(label_3);
@@ -116,14 +121,20 @@ public class ReserveFlight {
 		Seat.setBounds(558, 43, 123, 15);
 		frame.getContentPane().add(Seat);
 
+		JLabel PackageStatus = new JLabel("New label");
+		PackageStatus.setBounds(558, 75, 123, 15);
+		frame.getContentPane().add(PackageStatus);
+
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
 		FlightName.setText(f.getFlightName());
 		StartCity.setText(f.getStartCity());
 		ArrCity.setText(f.getArrivalCity());
 		StartTime.setText(f.getStartTime().format(formatter));
 		ArrTime.setText(f.getArrivalTime().format(formatter));
-		Price.setText(f.getPrice() + "￥");
+		Price.setText(PackageOrder.discountPrice(f.getPrice()) + "￥");
 		Seat.setText(Integer.toString(f.getSeatCapacity()-f.getCurrentPassengers()));
+		PackageStatus.setText(Login.packagestatus);
+
 
 	}
 

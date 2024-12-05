@@ -31,7 +31,6 @@ public class Research {
 	private JScrollPane scrollPane;
 	static boolean isDomestic =true;
 	private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
-	private String packagestatus= "无";
 
 	public JFrame getFrame() {
 
@@ -241,9 +240,9 @@ public class Research {
 
 		// 创建一个 JLabel 作为链接
 		DbSelect sa = new DbSelect();
-		packagestatus = sa.queryPackageStatus(Login.PassengerId);
-		System.out.println("查询结果packagestatus"+packagestatus);
-		JLabel lblLink = new JLabel("<html><a href=''>"+packagestatus+"</a></html>");
+		Login.packagestatus = sa.queryPackageStatus(Login.PassengerId);
+		System.out.println("查询结果packagestatus"+Login.packagestatus);
+		JLabel lblLink = new JLabel("<html><a href=''>"+Login.packagestatus+"</a></html>");
 		lblLink.setBounds(720, 15, 87, 42); // 设置位置和大小
 		lblLink.setCursor(new Cursor(Cursor.HAND_CURSOR)); // 鼠标悬停时显示手型光标
 		lblLink.setToolTipText("了解更多");
@@ -331,16 +330,45 @@ public class Research {
 				frame.getContentPane().remove(scrollPane); // 清除旧的表格
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-			System.out.println("生成表格判断packagestatus"+packagestatus);
+			System.out.println("生成表格判断packagestatus"+Login.packagestatus);
 			String[] columnNames={};
 			String[][] flight_ob = new String[0][0];
-			if(Objects.equals(packagestatus, "无")){
-				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式", "航班状态"};
-				// 更新当前表格的航班数据源
-				currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
+			// 更新当前表格的航班数据源
+			currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
+			System.out.println(isDomestic?"国内":"国外");
 
-				// 按起飞时间排序，从早到晚
-				Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
+			// 按起飞时间排序，从早到晚
+			Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
+			if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+					(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+					(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic)){
+				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "原价", "特惠价", "是否预定", "模式", "航班状态"};
+				// 将航班信息填充到 flight_ob 二维数组中
+				flight_ob = new String[currentFlights.length][11];
+				for (int i = 0; i < currentFlights.length; i++) {
+					flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
+					flight_ob[i][1] = currentFlights[i].getFlightName();
+					flight_ob[i][2] = currentFlights[i].getStartCity();
+					flight_ob[i][3] = currentFlights[i].getArrivalCity();
+					flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
+					flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
+					flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
+					flight_ob[i][7] = String.format("%.1f", PackageOrder.discountPrice(currentFlights[i].getPrice()));
+					//System.out.println(flight_ob[i][7]);
+					// 检查当前登录的乘客是否已经预定该航班
+					if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
+						flight_ob[i][8] = "未预定";
+					} else {
+						flight_ob[i][8] = "已预定";
+					}
+					flight_ob[i][9] = "直飞";
+					flight_ob[i][10] = currentFlights[i].getFlightStatus();
+				}
+
+			}
+			else{
+				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式", "航班状态"};
+
 				// 将航班信息填充到 flight_ob 二维数组中
 				flight_ob = new String[currentFlights.length][10];
 				for (int i = 0; i < currentFlights.length; i++) {
@@ -361,36 +389,6 @@ public class Research {
 					flight_ob[i][9] = currentFlights[i].getFlightStatus();
 				}
 			}
-			else{
-				columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "原价", "特惠价", "是否预定", "模式", "航班状态"};
-
-				// 更新当前表格的航班数据源
-				currentFlights = new DbSelect().FlightSelectForPass(isDomestic); // 更新 currentFlights
-				// 按起飞时间排序，从早到晚
-				Arrays.sort(currentFlights, Comparator.comparing(Flight::getStartTime));
-				// 将航班信息填充到 flight_ob 二维数组中
-				flight_ob = new String[currentFlights.length][11];
-				for (int i = 0; i < currentFlights.length; i++) {
-					flight_ob[i][0] = Integer.toString(currentFlights[i].getId());
-					flight_ob[i][1] = currentFlights[i].getFlightName();
-					flight_ob[i][2] = currentFlights[i].getStartCity();
-					flight_ob[i][3] = currentFlights[i].getArrivalCity();
-					flight_ob[i][4] = currentFlights[i].getStartTime().format(formatter);
-					flight_ob[i][5] = currentFlights[i].getArrivalTime().format(formatter);
-					flight_ob[i][6] = String.valueOf(currentFlights[i].getPrice());
-					flight_ob[i][7] = String.format("%.1f", PackageOrder.discountPrice(currentFlights[i].getPrice(), packagestatus));
-					// 检查当前登录的乘客是否已经预定该航班
-					if (Order.IsHasOrder(Login.PassengerId, currentFlights[i].getId(), isDomestic)) {
-						flight_ob[i][8] = "未预定";
-					} else {
-						flight_ob[i][8] = "已预定";
-					}
-					flight_ob[i][9] = "直飞";
-					flight_ob[i][10] = currentFlights[i].getFlightStatus();
-				}
-
-			}
-
 
 			// 创建 JTable 表格，显示航班数据，并设置表格不可编辑。
 			Flight_Table = new JTable(flight_ob, columnNames) {
@@ -415,6 +413,9 @@ public class Research {
 			Flight_Table.setSelectionForeground(Color.yellow); // 选中后前景色
 			Flight_Table.setBounds(21, 143, 700, 363);
 			// 为第 6 列设置黑色文字 + 红色删除线的渲染器
+			if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+					(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+					(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic))
 			Research.setThickRedStrikeThroughRenderer(Flight_Table, 6);
 
 
@@ -671,6 +672,7 @@ public class Research {
 		arrivalCity.setSelectedIndex(0);
 	}
 
+	//套餐原价红色删除线
 	public static void setThickRedStrikeThroughRenderer(JTable table, int columnIndex) {
 		table.getColumnModel().getColumn(columnIndex).setCellRenderer(new DefaultTableCellRenderer() {
 			@Override

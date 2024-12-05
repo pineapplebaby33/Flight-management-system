@@ -4,15 +4,14 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 
-import flight.Flight;
-import flight.Order;
-import flight.Passenger;
+import flight.*;
 import listeners.PaymentCompleteListener;
 
 public class Pay {
@@ -80,7 +79,19 @@ public class Pay {
 						frame.setVisible(false);
 						Research window = new Research();
 						window.getFrame().setVisible(true);
+						//正常购票
 						boolean x2 =Flight.ReserveFlight(Login.PassengerId,Login.FlightId,isDmestic);
+						System.out.println("正常购票成功");
+						//存套餐订单
+						if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDmestic)||
+								(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDmestic)||
+								(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDmestic)){
+							DbSelect select = new DbSelect();
+							Order o = select.OrderSelect(Login.PassengerId,Login.FlightId,isDmestic);
+							Flight f = select.FlightSelect(Login.FlightId,isDmestic);
+							int pr =PackageOrder.ReservePackageOrder(Login.Pwd,Login.PassengerId,f.getPrice(),o.getId());
+							System.out.println("订购套餐内的航班成功");
+						}
 						AllDialog.Dialog(window.getFrame(), "购票成功");
 
 						// 调用支付完成监听器，通知支付成功

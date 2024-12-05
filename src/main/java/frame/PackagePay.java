@@ -92,15 +92,16 @@ public class PackagePay {
                 for (int i = 0; i < cpwd.length; i++) {
                     pwd += cpwd[i];
                 }
-                int x = PackageOrder.ReservePackageOrder(pwd,Login.PassengerId,getSelectedItem,0,0);//插入套餐订单
+
+                int x = PackageOrder.ReservePackageOrder(pwd,Login.PassengerId,0,0);//插入套餐订单
                 System.out.println("在PackagePay里PackageOrder.ReservePackageOrder成功");
                 if (x==1) {
                     frame.setVisible(false);
                     FlightRecommendation window = new FlightRecommendation();//返回个性推荐界面
                     window.getFrame().setVisible(true);
-                    AllDialog.Dialog(window.getFrame(), "购票成功");
+                    AllDialog.Dialog(window.getFrame(), "订购成功");
                 } else if(x==2){
-                    AllDialog.Dialog(frame, "支付失败，请检查密码");
+                    AllDialog.Dialog(frame, "订购失败，请检查密码");
                 }
 
             }

@@ -15,6 +15,7 @@ class FlightGenerator {
     private int defaultCount;
     private boolean isDomestic; // 新增参数
     private Random random = new Random();
+    private int price = 0;
 
     // 定义国内出发地和目的地选项
     private final String[] domesticLocations = {
@@ -80,6 +81,8 @@ class FlightGenerator {
             destination = domesticLocations[destinationIndex];
             originCode = domesticCodes[originIndex];
             destinationCode = domesticCodes[destinationIndex];
+            price = random.nextInt(450) + 500;
+
 
         } else {
             // 国际航班：在国内和国外城市之间随机选择
@@ -94,6 +97,7 @@ class FlightGenerator {
                 destination = internationalLocations[destinationIndex];
                 originCode = domesticCodes[originIndex];
                 destinationCode = internationalCodes[destinationIndex];
+                price = random.nextInt(450) + 2000;
 
             } else {
                 // 始发地为国际城市，目的地为国内城市
@@ -117,7 +121,7 @@ class FlightGenerator {
         arrivalTime.add(Calendar.MINUTE, duration);
 
         // 生成价格、折扣、座位数和状态
-        int price = random.nextInt(251) + 450;
+
         int seats = random.nextInt(51) + 100;
 
         // 90% 的几率为 AVAILABLE，10% 为 FULL
