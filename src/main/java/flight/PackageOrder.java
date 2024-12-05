@@ -3,6 +3,7 @@ package flight;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import frame.FlightRecommendation;
 import frame.Login;
 import frame.Research;
 import java.time.LocalDateTime;
@@ -32,7 +33,7 @@ public class PackageOrder {//对标package表
         Passenger p = dbSelect.PassengerSelect(PassengerId);
         if (Passenger.CheckPwd(p.getRealName(), pwd)) {//验证密码
             float discountPrice = discountPrice(Price);//生成折扣价格
-            boolean re = dbInsert.PackageInsert(PassengerId,Login.packagestatus,discountPrice,OId);//插入套餐订单
+            boolean re = dbInsert.PackageInsert(PassengerId, FlightRecommendation.selectstatue,discountPrice,OId);//插入套餐订单
             if(re){
                 System.out.println("在PackageOrder.ReservePackageOrder里dbInsert.PackageInsert成功");
                 return 1;//订购套餐成功

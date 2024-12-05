@@ -58,6 +58,7 @@ public class FlightRecommendation {
     static boolean isDomestic =true;
     private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
     private boolean HasOrderPackage = false;
+    public static String selectstatue = "选择的套餐名";
 
     public JFrame getFrame() {
 
@@ -360,6 +361,7 @@ public class FlightRecommendation {
 
                 }
                 System.out.println("packageComboBox.getSelectedItem(): " + packageComboBox.getSelectedItem());
+                selectstatue=(String)packageComboBox.getSelectedItem();
                 System.out.println("是否重复预定："+HasOrderPackage);
 
                 if(!Objects.equals(packagestatus, "无")){//在订购中

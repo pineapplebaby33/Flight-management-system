@@ -88,7 +88,7 @@ public class PassengerOrder {
 				fullPackages.add((String) packageInfo.get("Package"));
 			}
 
-// 输出所有已购套餐的状态
+			// 输出所有已购套餐的状态
 			System.out.println("所有套餐状态: " + fullPackages);
 
 
@@ -96,59 +96,6 @@ public class PassengerOrder {
 			String[] fullPackageArray = fullPackages.toArray(new String[0]);
 			System.out.println("Full Packages: " + Arrays.toString(fullPackageArray));
 
-			/*
-
-			if (order != null) {
-				for (int i = 0; i < order.length; i++) {
-					o_ob2[i][0] = Integer.toString(order[i].getId());
-					o_ob2[i][1] = order[i].getFlightId().getFlightName();
-					o_ob2[i][2] = order[i].getFlightId().getStartCity();
-					o_ob2[i][3] = order[i].getFlightId().getArrivalCity();
-					o_ob2[i][4] = order[i].getFlightId().getStartTime().format(formatter);
-					o_ob2[i][5] = order[i].getFlightId().getArrivalTime().format(formatter);
-
-					// 遍历已购套餐状态，尝试匹配套餐订单
-					PackageOrder matchedPackageOrder = null;
-					for (String currentPackageStatus : fullPackageArray) {
-						System.out.println("当前检查的套餐状态: " + currentPackageStatus);
-						PackageOrder po = s.PackageOrderSelect(Login.PassengerId, currentPackageStatus, order[i].getId());
-						if (po != null) {
-							matchedPackageOrder = po;
-							break; // 如果找到匹配的套餐订单，退出循环
-						}
-					}
-
-					// 判断是否为套餐订单
-				    if(matchedPackageOrder.getId()==0){
-						o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
-					 System.out.println(Login.PassengerId + "的订单" + order[i] + "不是套餐订单：");
-					}else if (matchedPackageOrder != null) {
-						o_ob2[i][6] = String.valueOf(matchedPackageOrder.getPrice());
-						System.out.println(Login.PassengerId + "的订单" + o_ob2[i][0] + "是套餐订单：" + matchedPackageOrder.getId());
-					}
-
-					o_ob2[i][7] = "已预定";
-					o_ob2[i][8] = order[i].getSeat();
-
-					food = new DbSelect().QueryFoodByOrderId(order[i].getId());
-					String selectfood;
-					if(food == 1){
-						selectfood = "已预定餐食-中餐";
-					}else if(food == 2){
-						selectfood = "已预定餐食-西餐";
-					}else{
-						selectfood = "未预定餐食";
-					}
-
-					o_ob2[i][9] = selectfood ;
-				}
-
-			}
-		}else{
-			o_ob2 = new String[1][9];
-			label.setText("当前无订单!");
-		}
-		 */
 			if (order != null) {
 				// 遍历所有套餐状态
 				for (String currentPackageStatus : fullPackageArray) {

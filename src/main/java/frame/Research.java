@@ -330,7 +330,7 @@ public class Research {
 				frame.getContentPane().remove(scrollPane); // 清除旧的表格
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-			System.out.println("生成表格判断packagestatus"+Login.packagestatus);
+			System.out.println("初始化生成表格判断packagestatus"+Login.packagestatus);
 			String[] columnNames={};
 			String[][] flight_ob = new String[0][0];
 			// 更新当前表格的航班数据源
@@ -452,53 +452,101 @@ public class Research {
 		if (scrollPane != null) {
 			frame.getContentPane().remove(scrollPane); // 清除旧的表格
 		}
-		String[] columnNames = { "ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定","模式","航班状态" };
-		String[][] flight_ob = new String[flights.length][10];
-		for (int i = 0; i < flights.length; i++) {
-			flight_ob[i][0] = Integer.toString(flights[i].getId());
-			flight_ob[i][1] = flights[i].getFlightName();
-			flight_ob[i][2] = flights[i].getStartCity();
-			flight_ob[i][3] = flights[i].getArrivalCity();
-			flight_ob[i][4] = (flights[i].getStartTime() != null) ?
-					flights[i].getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
-					"";
-			flight_ob[i][5] = (flights[i].getArrivalTime() != null) ?
-					flights[i].getArrivalTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
-					"";
-			flight_ob[i][6] = (flights[i].getPrice()==0.0f)?"":String.valueOf(flights[i].getPrice());
-			//是否预定栏
-			if(flights[i].getStartTime()==null){
-				flight_ob[i][7] = "";
-			}
-			else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId(),isDomestic)&&flights[i].getStartCity()!=null) {
-				flight_ob[i][7] = "未预定";
-			}else{
-				flight_ob[i][7] = "已预定";
-			}
-			//直飞中转栏
-			if(flights[i].getStartTime()==null){
-				flight_ob[i][8] = "";
-			}
-			else if(Objects.equals(flights[i].getStartCity(), startcity)&&Objects.equals(flights[i].getArrivalCity(), arrivalcity)){
-				flight_ob[i][8] = "直飞";
-			}
-			else
-				flight_ob[i][8] = "中转";
 
-			if(flights[i].getStartTime()==null){
-				flight_ob[i][9] = "";
-			}else {
-				flight_ob[i][9] = flights[i].getFlightStatus();
-			}
+		System.out.println("精准查询生成表格判断packagestatus"+Login.packagestatus);
+		String[] columnNames={};
+		String[][] flight_ob = new String[0][0];
+		// 更新当前表格的航班数据源
 
+		if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+				(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+				(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic)) {
+			columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "原价", "特惠价", "是否预定", "模式", "航班状态"};
+			flight_ob = new String[flights.length][11];
+			for (int i = 0; i < flights.length; i++) {
+				flight_ob[i][0] = Integer.toString(flights[i].getId());
+				flight_ob[i][1] = flights[i].getFlightName();
+				flight_ob[i][2] = flights[i].getStartCity();
+				flight_ob[i][3] = flights[i].getArrivalCity();
+				flight_ob[i][4] = (flights[i].getStartTime() != null) ?
+						flights[i].getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+						"";
+				flight_ob[i][5] = (flights[i].getArrivalTime() != null) ?
+						flights[i].getArrivalTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+						"";
+				flight_ob[i][6] = (flights[i].getPrice() == 0.0f) ? "" : String.valueOf(flights[i].getPrice());
+				flight_ob[i][7] = (flights[i].getPrice() == 0.0f) ? "" : String.format("%.1f", PackageOrder.discountPrice(flights[i].getPrice()));
+				//是否预定栏
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][8] = "";
+				} else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId(), isDomestic) && flights[i].getStartCity() != null) {
+					flight_ob[i][8] = "未预定";
+				} else {
+					flight_ob[i][8] = "已预定";
+				}
+				//直飞中转栏
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][9] = "";
+				} else if (Objects.equals(flights[i].getStartCity(), startcity) && Objects.equals(flights[i].getArrivalCity(), arrivalcity)) {
+					flight_ob[i][9] = "直飞";
+				} else
+					flight_ob[i][9] = "中转";
+
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][10] = "";
+				} else {
+					flight_ob[i][10] = flights[i].getFlightStatus();
+				}
+
+			}
 		}
+		else{
+			columnNames = new String[]{"ID", "航班号", "起飞城市", "到达城市", "起飞时间", "到达时间", "价格", "是否预定", "模式", "航班状态"};
+			flight_ob = new String[flights.length][10];
+			for (int i = 0; i < flights.length; i++) {
+				flight_ob[i][0] = Integer.toString(flights[i].getId());
+				flight_ob[i][1] = flights[i].getFlightName();
+				flight_ob[i][2] = flights[i].getStartCity();
+				flight_ob[i][3] = flights[i].getArrivalCity();
+				flight_ob[i][4] = (flights[i].getStartTime() != null) ?
+						flights[i].getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+						"";
+				flight_ob[i][5] = (flights[i].getArrivalTime() != null) ?
+						flights[i].getArrivalTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss")) :
+						"";
+				flight_ob[i][6] = (flights[i].getPrice() == 0.0f) ? "" : String.valueOf(flights[i].getPrice());
+				//是否预定栏
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][7] = "";
+				} else if (Order.IsHasOrder(Login.PassengerId, flights[i].getId(), isDomestic) && flights[i].getStartCity() != null) {
+					flight_ob[i][7] = "未预定";
+				} else {
+					flight_ob[i][7] = "已预定";
+				}
+				//直飞中转栏
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][8] = "";
+				} else if (Objects.equals(flights[i].getStartCity(), startcity) && Objects.equals(flights[i].getArrivalCity(), arrivalcity)) {
+					flight_ob[i][8] = "直飞";
+				} else
+					flight_ob[i][8] = "中转";
+
+				if (flights[i].getStartTime() == null) {
+					flight_ob[i][9] = "";
+				} else {
+					flight_ob[i][9] = flights[i].getFlightStatus();
+				}
+
+			}
+		}
+
 		Flight_Table = new JTable(flight_ob, columnNames) {
 			private static final long serialVersionUID = -5723427406160453043L;
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
-		TableColumn column = null;
+		TableColumn column ;
 		int colunms = Flight_Table.getColumnCount();
 		for (int i = 0; i < colunms; i++) {
 			column = Flight_Table.getColumnModel().getColumn(i);
@@ -509,6 +557,13 @@ public class Research {
 		Flight_Table.setSelectionBackground(Color.LIGHT_GRAY);
 		Flight_Table.setSelectionForeground(Color.yellow);
 		Flight_Table.setBounds(21, 143, 700, 363);
+
+		// 为第 6 列设置黑色文字 + 红色删除线的渲染器
+		if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+				(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+				(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic))
+			Research.setThickRedStrikeThroughRenderer(Flight_Table, 6);
+
 
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 143, 912, 363);
