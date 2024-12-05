@@ -68,6 +68,41 @@ public class DbDelete {
 
 	}
 
+	//取消航班时，删除记录（只支持当前的套餐）
+	public boolean deletePackageOrder(int PId, String packageStatus, int OId) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		boolean isDeleted = false;
+
+		try {
+			// 构建 SQL 删除语句
+			String sql = "DELETE FROM package WHERE PId = ? AND Package = ? AND OId = ?";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, PId);
+			this.pst.setString(2, packageStatus);
+			this.pst.setInt(3, OId);
+
+			// 执行删除操作
+			int affectedRows = pst.executeUpdate();
+
+			// 如果删除成功，受影响的行数大于0
+			isDeleted = affectedRows > 0;
+
+			// 关闭连接
+			this.cn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// 返回删除结果
+		return isDeleted;
+	}
+
+
+
 	public static void main(String[] args) {
 		/*
 		 * Admin/Passenger/Flight/Order��ɾ������Example DbDelete d=new DbDelete();

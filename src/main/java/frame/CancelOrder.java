@@ -99,11 +99,20 @@ public class CancelOrder {
                                                         o.getFlightId().getId(),
                                                         o.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
                         && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
+                DbDelete d = new DbDelete();
+                boolean x2 = d.deletePackageOrder(Login.PassengerId,Login.packagestatus,Login.OrderId);
                 if (x) {
+                    if(x2){
+                        System.out.println("已删除当前套餐下的订单,订单id： "+Login.OrderId);
+                    }
+                    else{
+                        System.out.println("取消订单不是当前套餐订单,订单id： "+Login.OrderId);
+                    }
                     frame.setVisible(false);
                     PassengerOrder wMyOrder = new PassengerOrder();
                     wMyOrder.getFrame().setVisible(true);
                     AllDialog.Dialog(wMyOrder.getFrame(), "操作成功");
+
                 } else {
                     AllDialog.Dialog(frame, "操作失败，请重试");
                 }
