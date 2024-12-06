@@ -93,7 +93,7 @@ public class PackagePay {
                     pwd += cpwd[i];
                 }
 
-                int x = PackageOrder.ReservePackageOrder(pwd,Login.PassengerId,0,0);//插入套餐订单
+                int x = PackageOrder.ReservePackageOrder(pwd,Login.PassengerId,0,0,true);//插入套餐订单
                 System.out.println("在PackagePay里PackageOrder.ReservePackageOrder成功");
                 if (x==1) {
                     frame.setVisible(false);

@@ -27,13 +27,18 @@ public class PackageOrder {//对标package表
         this.OId = OId;
     }
 
-    public static int ReservePackageOrder(String pwd,int PassengerId, float Price, int OId) {
+    public static int ReservePackageOrder(String pwd,int PassengerId, float Price, int OId,boolean first) {
         DbInsert dbInsert = new DbInsert();
         DbSelect dbSelect = new DbSelect();
         Passenger p = dbSelect.PassengerSelect(PassengerId);
         if (Passenger.CheckPwd(p.getRealName(), pwd)) {//验证密码
             float discountPrice = discountPrice(Price);//生成折扣价格
-            boolean re = dbInsert.PackageInsert(PassengerId, FlightRecommendation.selectstatue,discountPrice,OId);//插入套餐订单
+            boolean re=true;
+            if(first){
+                 re= dbInsert.PackageInsert(PassengerId, FlightRecommendation.selectstatue,discountPrice,OId);//初始选择套餐
+            }
+            else
+                re= dbInsert.PackageInsert(PassengerId, Login.packagestatus,discountPrice,OId);//插入套餐订单
             if(re){
                 System.out.println("在PackageOrder.ReservePackageOrder里dbInsert.PackageInsert成功");
                 return 1;//订购套餐成功

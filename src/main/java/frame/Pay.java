@@ -89,7 +89,7 @@ public class Pay {
 							DbSelect select = new DbSelect();
 							Order o = select.OrderSelect(Login.PassengerId,Login.FlightId,isDmestic);
 							Flight f = select.FlightSelect(Login.FlightId,isDmestic);
-							int pr =PackageOrder.ReservePackageOrder(Login.Pwd,Login.PassengerId,f.getPrice(),o.getId());
+							int pr =PackageOrder.ReservePackageOrder(Login.Pwd,Login.PassengerId,f.getPrice(),o.getId(),false);
 							System.out.println("订购套餐内的航班成功");
 						}
 						AllDialog.Dialog(window.getFrame(), "购票成功");

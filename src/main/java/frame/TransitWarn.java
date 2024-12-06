@@ -98,6 +98,7 @@ public class TransitWarn {
         button_1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                DbDelete d = new DbDelete();
                 char[] pass=passwordField.getPassword();
                 String pwd="";
                 for (int i = 0; i < pass.length; i++) {
@@ -114,6 +115,7 @@ public class TransitWarn {
                         o1.getFlightId().getId(),
                         o1.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
                         && Passenger.UnsubscribeFlight(o1.getPassengerId().getId(),o1.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
+                boolean x2 = d.deletePackageOrder(Login.PassengerId,Login.packagestatus,o1.getId());
 
 
                 //查询订单
@@ -122,7 +124,17 @@ public class TransitWarn {
                         o.getFlightId().getId(),
                         o.getCreateDate().format(formatter), "CANCEL",Research.isDomestic) //更新订单表，状态列为CANCEL
                         && Passenger.UnsubscribeFlight(o.getPassengerId().getId(),o.getFlightId().getId(),pwd,Research.isDomestic);//成功取消航班
+                boolean x2_1 = d.deletePackageOrder(Login.PassengerId,Login.packagestatus,o.getId());
                 if (x&&x1) {
+                    if(x2){
+                        System.out.println("已删除当前套餐下的中转订单1,订单id： "+Login.OrderId);
+                        if(x2_1){
+                            System.out.println("已删除当前套餐下的中转订单2,订单id： "+Login.OrderId);
+                        }
+                    }
+                    else{
+                        System.out.println("取消中转订单不是当前套餐订单,订单id： "+Login.OrderId);
+                    }
                     frame.setVisible(false);
                     PassengerOrder wMyOrder = new PassengerOrder();
                     wMyOrder.getFrame().setVisible(true);

@@ -579,7 +579,20 @@ public class Research {
 
 					//获取航班信息
 					String flightId = Flight_Table.getValueAt(row, 0).toString();
-					String transferFlag = Flight_Table.getValueAt(row, 8).toString();
+
+					String transferFlag ="";
+					if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+							(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+							(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic)){
+						transferFlag = Flight_Table.getValueAt(row, 9).toString();
+						System.out.println("中转，无套餐，取第9列");
+					}
+					else{
+						transferFlag = Flight_Table.getValueAt(row, 8).toString();
+						System.out.println("中转，无套餐，取第8列");
+					}
+					//String transferFlag = Flight_Table.getValueAt(row, 8).toString();
+
 					String startname = Flight_Table.getValueAt(row, 1).toString();
 					String startLocation = Flight_Table.getValueAt(row, 2).toString();
 					String endLocation = Flight_Table.getValueAt(row, 3).toString();
@@ -604,7 +617,17 @@ public class Research {
 						timer.addActionListener(actionEvent -> {
 							if (rowWrapper[0] < Flight_Table.getRowCount()) {//有剩余航班
 								//检查是否为中转
-								String nextTransferFlag = Flight_Table.getValueAt(rowWrapper[0], 8).toString();
+								String nextTransferFlag =" ";
+								if((Objects.equals(Login.packagestatus, "国内随心飞")&&isDomestic)||
+										(Objects.equals(Login.packagestatus, "学生寒暑假")&&isDomestic)||
+										(Objects.equals(Login.packagestatus, "国外随心飞")&&!isDomestic)){
+									nextTransferFlag = Flight_Table.getValueAt(rowWrapper[0], 9).toString();
+									System.out.println("中转，无套餐，取第9列");
+								}
+								else{
+									nextTransferFlag = Flight_Table.getValueAt(rowWrapper[0], 8).toString();
+									System.out.println("中转，无套餐，取第8列");
+								}
 								String nextEndLocation = Flight_Table.getValueAt(rowWrapper[0], 3).toString();
 
 								//不是中转
