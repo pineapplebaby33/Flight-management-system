@@ -35,10 +35,14 @@ public class PackageOrder {//对标package表
             float discountPrice = discountPrice(Price);//生成折扣价格
             boolean re=true;
             if(first){
-                 re= dbInsert.PackageInsert(PassengerId, FlightRecommendation.selectstatue,discountPrice,OId);//初始选择套餐
+                 re= dbInsert.PackageInsert(PassengerId, FlightRecommendation.selectstatue,0,0);//初始选择套餐
+                System.out.println("初次订购套餐成功");
             }
-            else
+            else{
                 re= dbInsert.PackageInsert(PassengerId, Login.packagestatus,discountPrice,OId);//插入套餐订单
+                System.out.println("订购套餐下订单成功");
+            }
+
             if(re){
                 System.out.println("在PackageOrder.ReservePackageOrder里dbInsert.PackageInsert成功");
                 return 1;//订购套餐成功

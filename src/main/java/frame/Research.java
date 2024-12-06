@@ -674,17 +674,7 @@ public class Research {
 						timer.start();
 
 					}
-					/*
-					int row = Flight_Table.getSelectedRow();
-					String preId1 = Flight_Table.getValueAt(row, 0).toString();
-					frame.setVisible(false);
-					Login.FlightId = Integer.parseInt(preId1);
-					System.out.println("Research跳转预定航班");
-					ReserveFlight window = new ReserveFlight(isDomestic);
-					System.out.println("预定航班跳转Research");
-					window.getFrame().setVisible(true);
 
-					 */
 				}
 
 				// 在停止计时器后输出 transferFlightsMap

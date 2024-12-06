@@ -1437,6 +1437,40 @@ public class DbSelect {
 		return new PackageOrder(id, passengerId, packageName, price, orderId);
 	}
 
+	// 根据 PId 和 Package 查询 package 表，固定 Price=0 和 OId=0，返回是否查询到数据
+	public boolean checkPackageExists(int PId, String packageStatus) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+
+		boolean exists = false;
+
+		try {
+			// 构建 SQL 查询语句
+			String sql = "SELECT 1 FROM package WHERE PId = ? AND Package = ? AND Price != 0 AND OId != 0";
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置查询参数
+			this.pst.setInt(1, PId);
+			this.pst.setString(2, packageStatus);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 检查是否有查询结果
+			if (ret.next()) {
+				exists = true; // 如果有结果，设置 exists 为 true
+			}
+
+			// 关闭结果集和连接
+			this.ret.close();
+			this.cn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// 返回查询结果
+		return exists;
+	}
 
 
 

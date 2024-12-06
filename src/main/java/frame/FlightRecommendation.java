@@ -58,6 +58,7 @@ public class FlightRecommendation {
     static boolean isDomestic =true;
     private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
     private boolean HasOrderPackage = false;
+    private boolean Hasuse = false;
     public static String selectstatue = "选择的套餐名";
 
     public JFrame getFrame() {
@@ -380,6 +381,44 @@ public class FlightRecommendation {
         });
         Create.setBounds(92, 500, 153, 37);
         frame.getContentPane().add(Create);
+
+        //退订界面
+        JButton cancel = new JButton("狠心退订");
+        cancel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Hasuse = sa.checkPackageExists(Login.PassengerId,packagestatus);
+                System.out.println("当前要取消的套餐"+packagestatus);
+                if(Hasuse){
+                    AllDialog.Dialog(frame, "您当前已经使用了"+packagestatus+"套餐，无法退订");
+                }else{
+                    DbDelete d = new DbDelete();
+                    boolean da =d.deletePackageOrder(Login.PassengerId,packagestatus,0);
+                    if(da){
+                        System.out.println("已经删除套餐"+packagestatus);
+                    }else{
+                        System.out.println("删除套餐"+packagestatus+"失败");
+                    }
+                    AllDialog.Dialog(frame, "已经删除套餐"+packagestatus);
+                    Login.packagestatus = sa.queryPackageStatus(Login.PassengerId);
+                    //packagestatus = sa.queryPackageStatus(Login.PassengerId);
+                    show1.setText("当前套餐:"+Login.packagestatus) ;
+                }
+
+
+
+            }
+        });
+        cancel.setBounds(92, 550, 153, 37);
+        frame.getContentPane().add(cancel);
+
+        // 添加推荐套餐的下拉框和文字框
+        JLabel cancelwarn = new JLabel("（只能推定当前套餐哦，一经使用套餐权力，无法退订，只有未使用权限才能退订）");
+        cancelwarn.setBounds(260, 560, 500, 30);
+        cancelwarn.setForeground(Color.red);
+        frame.getContentPane().add(cancelwarn);
+
+
 
         // 推荐航班标题
         JLabel label7 = new JLabel("<html><font color='rgb(173,193,212')>以下是我们根据您的个人偏好为您推荐的近日航班:</font></html>");
