@@ -59,7 +59,35 @@ public class FlightRecommendation {
     private Flight[] currentFlights; // 新增：用于保存当前表格中显示的航班数据
     private boolean HasOrderPackage = false;
     private boolean Hasuse = false;
+
+    // 声明需要动态更新的 JLabel
+    private JLabel label1; // 国内外偏好
+    private JLabel label8; // 最常落地城市
+    private JLabel label3; // 出发日期偏好
+    private JLabel label2; // 时间偏好
+    private JLabel label4; // 历史价格
+
+
     public static String selectstatue = "选择的套餐名";
+    //遍历收集信息
+    String mostFrequentDestination = null;
+    int maxDestinationCount = 0;
+    //目的城市
+    Map<String, Integer> destinationCount = new HashMap<>();
+    //出发日期
+    int summerVacationCount = 0;
+    int holidayCount = 0;
+    int workdayCount = 0;
+
+    //出发时间
+    int morningCount = 0; // 早晨 (00:00-11:59)
+    int afternoonCount = 0; // 下午 (12:00-17:59)
+    int eveningCount = 0; // 晚上 (18:00-23:59)
+
+    //价格区间
+    float minPrice = Float.MAX_VALUE;
+    float maxPrice = Float.MIN_VALUE;
+
 
     public JFrame getFrame() {
 
@@ -79,7 +107,7 @@ public class FlightRecommendation {
         });
 
         //查询用户的订单信息
-        Flight[] filghts = new DbSelect().FlightSelectByPassengerId(12,true);
+        Flight[] filghts = new DbSelect().FlightSelectByPassengerId(Login.PassengerId,true);
         if (filghts != null) {
             for (Flight flight : filghts) {
                 System.out.println("Flight ID: " + flight.getId());
@@ -100,108 +128,91 @@ public class FlightRecommendation {
     }
 
     private void initialize() {
-        Flight[] flights = new DbSelect().FlightSelectByPassengerId(12, true);
-        Flight[] flight1s = new DbSelect().FlightSelectByPassengerId(12, false);
+        Flight[] flights = new DbSelect().FlightSelectByPassengerId(Login.PassengerId, true);
+        Flight[] flight1s = new DbSelect().FlightSelectByPassengerId(Login.PassengerId, false);
 
-        //目的城市
-        Map<String, Integer> destinationCount = new HashMap<>();
-        //出发日期
-        int summerVacationCount = 0;
-        int holidayCount = 0;
-        int workdayCount = 0;
+        class bianli{
+            public void bianli(Flight[] flights){
+                if (flights != null && flights.length > 0) {
+                    // 遍历 flights
+                    for (Flight flight : flights) {
+                        // 1. 最常用的目的地
+                        String destination = flight.getArrivalCity();
+                        destinationCount.put(destination, destinationCount.getOrDefault(destination, 0) + 1);
 
-        //出发时间
-        int morningCount = 0; // 早晨 (00:00-11:59)
-        int afternoonCount = 0; // 下午 (12:00-17:59)
-        int eveningCount = 0; // 晚上 (18:00-23:59)
+                        // 2. 出发日期分类
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+                        String startTime = flight.getStartTime().format(formatter); // 假设格式为 YYYY-MM-DD-HH-mm-ss
+                        String[] timeParts = startTime.split("-"); // 按 '-' 分割时间
+                        String date = timeParts[0] + "-" + timeParts[1] + "-" + timeParts[2]; // 提取 YYYY-MM-DD
+                        int hour = Integer.parseInt(timeParts[3]); // 提取小时 (HH)
+                        if (isSummerVacation(date)) {
+                            summerVacationCount++;
+                        } else if (isHoliday(date)) {
+                            holidayCount++;
+                        } else {
+                            workdayCount++;
+                        }
 
-        //价格区间
-        float minPrice = Float.MAX_VALUE;
-        float maxPrice = Float.MIN_VALUE;
-        //遍历收集信息
-        String mostFrequentDestination = null;
-        int maxDestinationCount = 0;
+                        // 3. 起飞时间段统计
+                        if (hour < 12) {
+                            morningCount++;
+                        } else if (hour < 18) {
+                            afternoonCount++;
+                        } else {
+                            eveningCount++;
+                        }
 
-        if (flights != null && flights.length > 0) {
-            /*
-            // 初始化统计变量
-            //目的城市
-            Map<String, Integer> destinationCount = new HashMap<>();
 
-            //出发日期
-            int summerVacationCount = 0;
-            int holidayCount = 0;
-            int workdayCount = 0;
+                        // 4. 历史最低价格和最高价格
+                        if(flights.length==0){
+                            minPrice =0;
+                            maxPrice =0;
+                            System.out.println("flights.length==0" + minPrice+maxPrice);
+                        }else{
+                            float price = flight.getPrice();
+                            if (price < minPrice) minPrice = price;
+                            if (price > maxPrice) maxPrice = price;
+                            System.out.println("flights.length!=0" + minPrice+maxPrice);
+                        }
 
-            //出发时间
-            int morningCount = 0; // 早晨 (00:00-11:59)
-            int afternoonCount = 0; // 下午 (12:00-17:59)
-            int eveningCount = 0; // 晚上 (18:00-23:59)
+                    }
 
-            //价格区间
-            float minPrice = Float.MAX_VALUE;
-            float maxPrice = Float.MIN_VALUE;
+                    // 找出最常用的目的地
+                    //mostFrequentDestination = null;
+                    //int maxDestinationCount = 0;
+                    for (Map.Entry<String, Integer> entry : destinationCount.entrySet()) {
+                        if (entry.getValue() > maxDestinationCount) {
+                            mostFrequentDestination = entry.getKey();
+                            maxDestinationCount = entry.getValue();
+                        }
+                    }
 
-             */
-
-            // 遍历 flights
-            for (Flight flight : flights) {
-                // 1. 最常用的目的地
-                String destination = flight.getArrivalCity();
-                destinationCount.put(destination, destinationCount.getOrDefault(destination, 0) + 1);
-
-                // 2. 出发日期分类
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
-                String startTime = flight.getStartTime().format(formatter); // 假设格式为 YYYY-MM-DD-HH-mm-ss
-                String[] timeParts = startTime.split("-"); // 按 '-' 分割时间
-                String date = timeParts[0] + "-" + timeParts[1] + "-" + timeParts[2]; // 提取 YYYY-MM-DD
-                int hour = Integer.parseInt(timeParts[3]); // 提取小时 (HH)
-                if (isSummerVacation(date)) {
-                    summerVacationCount++;
-                } else if (isHoliday(date)) {
-                    holidayCount++;
+                    // 输出统计结果
+                    System.out.println("感谢与您的相遇！在为您服务期间：");
+                    System.out.println("您预定了国内/外航班：" + flights.length + "次");
+                    System.out.println("其中，您最常落地的城市是：" + mostFrequentDestination + "，有 " + maxDestinationCount + " 次");
+                    System.out.println("您的航班出发日期在寒暑假：" + summerVacationCount + " 次，节假日：" + holidayCount + " 次，在工作日：" + workdayCount + " 次");
+                    System.out.println("您的航班历史最低价格：" + minPrice + " 元，历史最高价格：" + maxPrice + " 元");
+                    System.out.println("您的航班起飞时间分布如下：");
+                    System.out.println("早晨 (00:00-11:59): " + morningCount + " 次");
+                    System.out.println("下午 (12:00-17:59): " + afternoonCount + " 次");
+                    System.out.println("晚上 (18:00-23:59): " + eveningCount + " 次");
                 } else {
-                    workdayCount++;
-                }
-
-                // 3. 起飞时间段统计
-                if (hour < 12) {
-                    morningCount++;
-                } else if (hour < 18) {
-                    afternoonCount++;
-                } else {
-                    eveningCount++;
-                }
-
-
-                // 4. 历史最低价格和最高价格
-                float price = flight.getPrice();
-                if (price < minPrice) minPrice = price;
-                if (price > maxPrice) maxPrice = price;
-            }
-
-            // 找出最常用的目的地
-            //mostFrequentDestination = null;
-            //int maxDestinationCount = 0;
-            for (Map.Entry<String, Integer> entry : destinationCount.entrySet()) {
-                if (entry.getValue() > maxDestinationCount) {
-                    mostFrequentDestination = entry.getKey();
-                    maxDestinationCount = entry.getValue();
+                    minPrice =0;
+                    maxPrice =0;
+                    System.out.println("No flights found.");
                 }
             }
 
-            // 输出统计结果
-            System.out.println("感谢与您的相遇！在为您服务期间：");
-            System.out.println("您预定了国内航班：" + flights.length + "次");
-            System.out.println("其中，您最常落地的城市是：" + mostFrequentDestination + "，有 " + maxDestinationCount + " 次");
-            System.out.println("您的航班出发日期在寒暑假：" + summerVacationCount + " 次，节假日：" + holidayCount + " 次，在工作日：" + workdayCount + " 次");
-            System.out.println("您的航班历史最低价格：" + minPrice + " 元，历史最高价格：" + maxPrice + " 元");
-            System.out.println("您的航班起飞时间分布如下：");
-            System.out.println("早晨 (00:00-11:59): " + morningCount + " 次");
-            System.out.println("下午 (12:00-17:59): " + afternoonCount + " 次");
-            System.out.println("晚上 (18:00-23:59): " + eveningCount + " 次");
-        } else {
-            System.out.println("No flights found.");
+        }
+
+
+        bianli bl =new bianli();
+        if((flights==null?0:flights.length)<(flight1s==null?0:flight1s.length)){
+            bl.bianli(flight1s);
+        }else{
+            bl.bianli(flights);
         }
 
 
@@ -221,6 +232,28 @@ public class FlightRecommendation {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        //按钮_国内航班
+        JButton button_00 = new JButton("国内航班");
+        button_00.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                isDomestic =true;
+                updateStatistics(flights);
+            }
+        });
+        button_00.setBounds(350, 70, 100, 32);
+        frame.getContentPane().add(button_00);
+
+        //按钮_国内航班
+        JButton button_01 = new JButton("国外航班");
+        button_01.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                isDomestic =true;
+                updateStatistics(flight1s);
+            }
+        });
+        button_01.setBounds(460, 70, 100, 32);
+        frame.getContentPane().add(button_01);
+
         // 问候语，天蓝色字体
         JLabel label0 = new JLabel("亲爱的 " + p.getRealName() + " 乘客您好！感谢与您的相遇！在为您服务期间：");
         label0.setBounds(50, 20, 850, 40); // 调整宽度和高度
@@ -229,15 +262,15 @@ public class FlightRecommendation {
         frame.getContentPane().add(label0);
 
         // 国内外偏好
-        JLabel label1 = new JLabel("<html>您预定了国内航班: <font color='rgb(173,193,212)'>" + flights.length
-                + "</font> 次，国际航班: <font color='rgb(173,193,212)'>" + flight1s.length + "</font> 次</html>");
+        label1 = new JLabel("<html>您预定了国内航班: <font color='rgb(173,193,212)'>" + (flights==null?0:flights.length)
+                + "</font> 次，国际航班: <font color='rgb(173,193,212)'>" + (flight1s==null?0:flight1s.length) + "</font> 次</html>");
         label1.setBounds(50, 70, 850, 30); // 适当下移
         label1.setFont(new Font("Microsoft YaHei", Font.PLAIN, 16));
         label1.setForeground(Color.BLACK);
         frame.getContentPane().add(label1);
 
         // 最常落地城市
-        JLabel label8 = new JLabel("<html>其中，您最常落地的城市是: <font color='rgb(173,193,212)'>"
+        label8 = new JLabel("<html>其中，您最常落地的城市是: <font color='rgb(173,193,212)'>"
                 + mostFrequentDestination + "</font>，有 <font color='rgb(173,193,212)'>" + maxDestinationCount + "</font> 次</html>");
         label8.setBounds(50, 110, 850, 30);
         label8.setFont(new Font("Microsoft YaHei", Font.PLAIN, 16));
@@ -245,7 +278,7 @@ public class FlightRecommendation {
         frame.getContentPane().add(label8);
 
         // 出发日期偏好
-        JLabel label3 = new JLabel("<html>您的航班出发日期在:<br>寒暑假: <font color='rgb(173,193,212')>"
+        label3 = new JLabel("<html>您的航班出发日期在:<br>寒暑假: <font color='rgb(173,193,212')>"
                 + summerVacationCount + "</font> 次，<br>节假日: <font color='rgb(173,193,212')>" + holidayCount
                 + "</font> 次，<br>工作日: <font color='rgb(173,193,212')>" + workdayCount + "</font> 次</html>");
         label3.setBounds(50, 150, 850, 83); // 增加垂直间距
@@ -254,7 +287,7 @@ public class FlightRecommendation {
         frame.getContentPane().add(label3);
 
         // 时间偏好
-        JLabel label2 = new JLabel("<html>您的航班起飞时间在:<br>早晨 (00:00-11:59): <font color='rgb(173,193,212')>"
+        label2 = new JLabel("<html>您的航班起飞时间在:<br>早晨 (00:00-11:59): <font color='rgb(173,193,212')>"
                 + morningCount + "</font> 次，<br>下午 (12:00-17:59): <font color='rgb(173,193,212')>" + afternoonCount
                 + "</font> 次，<br>晚上 (18:00-23:59): <font color='rgb(173,193,212')>" + eveningCount + "</font> 次</html>");
         label2.setBounds(50, 245, 850, 83); // 向下调整位置
@@ -263,7 +296,7 @@ public class FlightRecommendation {
         frame.getContentPane().add(label2);
 
         // 历史最低和最高价格
-        JLabel label4 = new JLabel("<html>您的航班历史最低价格: <font color='rgb(173,193,212')>"
+        label4 = new JLabel("<html>您的航班历史最低价格: <font color='rgb(173,193,212')>"
                 + minPrice + "</font> 元，<br>历史最高价格: <font color='rgb(173,193,212')>" + maxPrice + "</font> 元</html>");
         label4.setBounds(50, 330, 850, 50); // 间距进一步调整
         label4.setFont(new Font("Microsoft YaHei", Font.PLAIN, 16));
@@ -283,6 +316,7 @@ public class FlightRecommendation {
 
         // 下拉框选项
         String[] packages = {"国内随心飞", "国外随心飞", "学生寒暑假"};
+        //String[] packages = {};
         JComboBox<String> packageComboBox = new JComboBox<>(packages);
         packageComboBox.setBounds(150, 450, 150, 30);
         frame.getContentPane().add(packageComboBox);
@@ -297,8 +331,28 @@ public class FlightRecommendation {
         packageDetails.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         frame.getContentPane().add(packageDetails);
 
+        System.out.println((flights==null?0:flights.length)+"  "+(flight1s==null?0:flight1s.length));
         // 初始化套餐内容
-        packageDetails.setText(FlightRecommendation.getPackageDetails("国内随心飞"));
+        if((flights==null?0:flights.length)<(flight1s==null?0:flight1s.length)){//国外航班
+            packageDetails.setText(FlightRecommendation.getPackageDetails("国外随心飞"));
+            packages = new String[]{"国外随心飞", "国内随心飞", "学生寒暑假"};
+            System.out.println("国外随心飞");
+        } else if (summerVacationCount > holidayCount && summerVacationCount > workdayCount) {
+            packages = new String[]{"学生寒暑假", "国外随心飞", "国内随心飞"};
+            packageDetails.setText(FlightRecommendation.getPackageDetails("学生寒暑假"));
+        }else{
+            packages = new String[]{"国内随心飞", "国外随心飞", "学生寒暑假"};
+            packageDetails.setText(FlightRecommendation.getPackageDetails("国内随心飞"));
+        }
+
+        // 更新 JComboBox 的内容
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>(packages);
+        packageComboBox.setModel(comboBoxModel);
+
+        // 设置默认选中的第一个选项
+        packageComboBox.setSelectedIndex(0);
+
+
 
 
         // 添加下拉框监听器，动态更新文本框内容
@@ -413,7 +467,7 @@ public class FlightRecommendation {
         frame.getContentPane().add(cancel);
 
         // 添加推荐套餐的下拉框和文字框
-        JLabel cancelwarn = new JLabel("（只能推定当前套餐哦，一经使用套餐权力，无法退订，只有未使用权限才能退订）");
+        JLabel cancelwarn = new JLabel("（只能退订当前套餐哦，一经使用套餐权力，无法退订，只有未使用权限才能退订）");
         cancelwarn.setBounds(260, 560, 500, 30);
         cancelwarn.setForeground(Color.red);
         frame.getContentPane().add(cancelwarn);
@@ -422,7 +476,7 @@ public class FlightRecommendation {
 
         // 推荐航班标题
         JLabel label7 = new JLabel("<html><font color='rgb(173,193,212')>以下是我们根据您的个人偏好为您推荐的近日航班:</font></html>");
-        label7.setBounds(50, 640, 850, 30); // 向下移动
+        label7.setBounds(50, 600, 850, 30); // 向下移动
         label7.setFont(new Font("Microsoft YaHei", Font.BOLD, 16));
         frame.getContentPane().add(label7);
 
@@ -441,7 +495,7 @@ public class FlightRecommendation {
 
         // 调用 createRadarChart 函数生成雷达图
         createRadarChart(frame, morningCount, afternoonCount, eveningCount,
-                summerVacationCount, holidayCount, workdayCount,flights.length,flight1s.length);
+                summerVacationCount, holidayCount, workdayCount,(flights==null?0:flights.length),(flight1s==null?0:flight1s.length));
 
 
     }
@@ -482,6 +536,82 @@ public class FlightRecommendation {
         return false;
     }
 
+    private void updateStatistics(Flight[] flights) {
+        // 清空之前的统计数据
+        destinationCount.clear();
+        summerVacationCount = 0;
+        holidayCount = 0;
+        workdayCount = 0;
+        morningCount = 0;
+        afternoonCount = 0;
+        eveningCount = 0;
+        minPrice = Float.MAX_VALUE;
+        maxPrice = Float.MIN_VALUE;
+        mostFrequentDestination = null;
+        maxDestinationCount = 0;
+
+        // 重新统计数据
+        if (flights != null && flights.length > 0) {
+            for (Flight flight : flights) {
+                // 统计目的地
+                String destination = flight.getArrivalCity();
+                destinationCount.put(destination, destinationCount.getOrDefault(destination, 0) + 1);
+
+                // 出发日期分类
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+                String startTime = flight.getStartTime().format(formatter);
+                String[] timeParts = startTime.split("-");
+                String date = timeParts[0] + "-" + timeParts[1] + "-" + timeParts[2];
+                int hour = Integer.parseInt(timeParts[3]);
+
+                if (isSummerVacation(date)) summerVacationCount++;
+                else if (isHoliday(date)) holidayCount++;
+                else workdayCount++;
+
+                // 起飞时间段统计
+                if (hour < 12) morningCount++;
+                else if (hour < 18) afternoonCount++;
+                else eveningCount++;
+
+                // 价格区间统计
+                float price = flight.getPrice();
+                minPrice = Math.min(minPrice, price);
+                maxPrice = Math.max(maxPrice, price);
+            }
+
+            // 找到最常落地的城市
+            for (Map.Entry<String, Integer> entry : destinationCount.entrySet()) {
+                if (entry.getValue() > maxDestinationCount) {
+                    mostFrequentDestination = entry.getKey();
+                    maxDestinationCount = entry.getValue();
+                }
+            }
+        } else {
+            minPrice = 0;
+            maxPrice = 0;
+        }
+
+
+        label8.setText("<html>其中，您最常落地的城市是: <font color='rgb(173,193,212')>"
+                + mostFrequentDestination + "</font>，有 <font color='rgb(173,193,212')>"
+                + maxDestinationCount + "</font> 次</html>");
+
+        label3.setText("<html>您的航班出发日期在:<br>寒暑假: <font color='rgb(173,193,212')>"
+                + summerVacationCount + "</font> 次，<br>节假日: <font color='rgb(173,193,212')>"
+                + holidayCount + "</font> 次，<br>工作日: <font color='rgb(173,193,212')>"
+                + workdayCount + "</font> 次</html>");
+
+        label2.setText("<html>您的航班起飞时间在:<br>早晨 (00:00-11:59): <font color='rgb(173,193,212')>"
+                + morningCount + "</font> 次，<br>下午 (12:00-17:59): <font color='rgb(173,193,212')>"
+                + afternoonCount + "</font> 次，<br>晚上 (18:00-23:59): <font color='rgb(173,193,212')>"
+                + eveningCount + "</font> 次</html>");
+
+        label4.setText("<html>您的航班历史最低价格: <font color='rgb(173,193,212')>"
+                + minPrice + "</font> 元，<br>历史最高价格: <font color='rgb(173,193,212')>"
+                + maxPrice + "</font> 元</html>");
+    }
+
+
 
 
     public void createRadarChart(JFrame frame, int morningCount, int afternoonCount, int eveningCount,
@@ -504,7 +634,7 @@ public class FlightRecommendation {
 
         // 创建 ChartPanel 并设置大小和位置
         ChartPanel chartPanel = new ChartPanel(radarChart);
-        chartPanel.setBounds(500, 50, 350, 300); // 设置图表在右上角，宽高为300x300
+        chartPanel.setBounds(500, 50, 400, 300); // 设置图表在右上角，宽高为300x300
         frame.getContentPane().add(chartPanel);
     }
 
@@ -515,8 +645,8 @@ public class FlightRecommendation {
 
 class FlightRecommendationAlgorithm {
     private Map<String, Double> timePreference; // 时间偏好 {"Morning": 0.6, "Afternoon": 0.3, "Evening": 0.1}
-    private double minPrice; // 用户历史最低价格
-    private double maxPrice; // 用户历史最高价格
+    private double minPrice=0; // 用户历史最低价格
+    private double maxPrice=0; // 用户历史最高价格
     private List<String> frequentDestinations; // 用户常去目的地
     private boolean prefersDirectFlight; // 是否偏好直飞
 

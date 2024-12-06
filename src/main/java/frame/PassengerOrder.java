@@ -63,7 +63,6 @@ public class PassengerOrder {
 		String[][] o_ob2 =null;
 		currentPackageStatus = Login.packagestatus;
 		System.out.println("当前用户套餐状态" + Login.packagestatus);
-
 		if(order!=null) {
 			o_ob2 = new String[order.length][10];
 
@@ -72,15 +71,6 @@ public class PassengerOrder {
 			List<Map<String, Object>> packages1 = s.queryAllPackageStatus(Login.PassengerId);
 			System.out.println("Login.PassengerId: " + Login.PassengerId);
 
-			// 存储所有已购套餐的名称
-			/*List<String> fullPackages = new ArrayList<>();
-			for (Map<String, Object> packageInfo : packages1) {
-				if ((boolean) packageInfo.get("IsFull")) {
-					fullPackages.add((String) packageInfo.get("Package"));
-				}
-			}
-
-			 */
 			// 存储所有套餐的名称，不用判断 IsFull
 			List<String> fullPackages = new ArrayList<>();
 			for (Map<String, Object> packageInfo : packages1) {
@@ -96,7 +86,7 @@ public class PassengerOrder {
 			String[] fullPackageArray = fullPackages.toArray(new String[0]);
 			System.out.println("Full Packages: " + Arrays.toString(fullPackageArray));
 
-			if (order != null) {
+
 				// 遍历所有套餐状态
 				for (String currentPackageStatus : fullPackageArray) {
 					System.out.println("当前检查的套餐状态: " + currentPackageStatus);
@@ -143,10 +133,10 @@ public class PassengerOrder {
 					}
 					o_ob2[i][9] = selectfood;
 				}
-			} else {
-				o_ob2 = new String[1][9];
-				label.setText("当前无订单!");
-			}
+		} else if (order == null || order.length == 0) {
+			o_ob2 = new String[0][columnNames.length]; // 确保表格有空数据而非 null
+			label.setText("当前无订单!");
+
 
 		}
 
