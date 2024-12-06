@@ -2,10 +2,9 @@ package frame;
 import flight.DbSelect;
 import flight.Flight;
 
+import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -38,7 +37,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.SpiderWebPlot;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import java.awt.Window;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFrame;
@@ -48,6 +47,9 @@ import javax.swing.JButton;
 
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 
@@ -176,6 +178,8 @@ public class FlightRecommendation {
                             System.out.println("flights.length!=0" + minPrice+maxPrice);
                         }
 
+
+
                     }
 
                     // 找出最常用的目的地
@@ -216,7 +220,6 @@ public class FlightRecommendation {
         }
 
 
-
         //窗口信息
         frame = new JFrame();
         Passenger p = new DbSelect().PassengerSelect(Login.PassengerId);
@@ -238,6 +241,7 @@ public class FlightRecommendation {
             public void actionPerformed(ActionEvent e) {
                 isDomestic =true;
                 updateStatistics(flights);
+                recommendFlights(flights);
             }
         });
         button_00.setBounds(350, 70, 100, 32);
@@ -249,6 +253,7 @@ public class FlightRecommendation {
             public void actionPerformed(ActionEvent e) {
                 isDomestic =true;
                 updateStatistics(flight1s);
+                recommendFlights(flight1s);
             }
         });
         button_01.setBounds(460, 70, 100, 32);
@@ -493,6 +498,10 @@ public class FlightRecommendation {
         button_2.setBounds(376, 700, 100, 20);
         frame.getContentPane().add(button_2);
 
+        if((flights==null?0:flights.length)<(flight1s==null?0:flight1s.length)){
+        }
+
+
         // 调用 createRadarChart 函数生成雷达图
         createRadarChart(frame, morningCount, afternoonCount, eveningCount,
                 summerVacationCount, holidayCount, workdayCount,(flights==null?0:flights.length),(flight1s==null?0:flight1s.length));
@@ -611,6 +620,85 @@ public class FlightRecommendation {
                 + maxPrice + "</font> 元</html>");
     }
 
+    private void recommendFlights(Flight[] flights) {
+        // 清除之前的推荐内容
+        clearPreviousRecommendations();
+
+        if (flights == null || flights.length == 0) {
+            JOptionPane.showMessageDialog(frame, "未找到符合条件的航班！", "提示", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // 初始化用户偏好
+        Map<String, Double> timePreference = new HashMap<>();
+        int all =morningCount+afternoonCount+eveningCount;
+        timePreference.put("Morning", (double) (morningCount/all));
+        timePreference.put("Afternoon", (double) (afternoonCount/all));
+        timePreference.put("Evening", (double) (eveningCount/all));
+
+        FlightRecommendationAlgorithm algorithm = new FlightRecommendationAlgorithm(
+                timePreference,
+                minPrice,
+                maxPrice,
+                mostFrequentDestination
+        );
+
+        // 对每个航班计算分数
+        List<FlightScore> flightScores = new ArrayList<>();
+        for (Flight flight : flights) {
+            double score = algorithm.calculateFlightScore(flight);
+            flightScores.add(new FlightScore(flight, score));
+        }
+
+        // 按分数降序排序
+        flightScores.sort((a, b) -> Double.compare(b.score, a.score));
+
+        // 取前3个航班
+        StringBuilder recommendedFlights = new StringBuilder("<html><ul>");
+        for (int i = 0; i < Math.min(3, flightScores.size()); i++) {
+            Flight flight = flightScores.get(i).flight;
+            recommendedFlights.append("<li>")
+                    .append("航班号: ").append(flight.getFlightName())
+                    .append(", 出发: ").append(flight.getStartCity())
+                    .append(", 到达: ").append(flight.getArrivalCity())
+                    .append(", 起飞时间: ").append(flight.getStartTime())
+                    .append(", 价格: ").append(flight.getPrice())
+                    .append("</li>");
+        }
+        recommendedFlights.append("</ul></html>");
+
+        // 更新显示
+        JLabel recommendedLabel = new JLabel(recommendedFlights.toString());
+        recommendedLabel.setBounds(50, 620, 850, 80);
+        recommendedLabel.setFont(new Font("Microsoft YaHei", Font.PLAIN, 14));
+        recommendedLabel.setName("recommendationLabel"); // 设置标识，方便清除时定位
+        frame.getContentPane().add(recommendedLabel);
+        frame.repaint();
+    }
+
+    private void clearPreviousRecommendations() {
+        // 遍历 Frame 的内容面板，移除所有名为 "recommendationLabel" 的组件
+        Component[] components = frame.getContentPane().getComponents();
+        for (Component component : components) {
+            if (component instanceof JLabel && "recommendationLabel".equals(((JLabel) component).getName())) {
+                frame.getContentPane().remove(component);
+            }
+        }
+        frame.revalidate(); // 重新验证布局
+        frame.repaint(); // 刷新界面
+    }
+
+
+    // 辅助类用于存储航班和得分
+    private static class FlightScore {
+        Flight flight;
+        double score;
+
+        FlightScore(Flight flight, double score) {
+            this.flight = flight;
+            this.score = score;
+        }
+    }
 
 
 
@@ -639,70 +727,56 @@ public class FlightRecommendation {
     }
 
 
-
 }
+
+
 
 
 class FlightRecommendationAlgorithm {
     private Map<String, Double> timePreference; // 时间偏好 {"Morning": 0.6, "Afternoon": 0.3, "Evening": 0.1}
-    private double minPrice=0; // 用户历史最低价格
-    private double maxPrice=0; // 用户历史最高价格
-    private List<String> frequentDestinations; // 用户常去目的地
+    private double minPrice; // 用户历史最低价格
+    private double maxPrice; // 用户历史最高价格
+    private String frequentDestinations; // 用户常去目的地
     private boolean prefersDirectFlight; // 是否偏好直飞
 
-    public FlightRecommendationAlgorithm(String passengerId) {
+    public FlightRecommendationAlgorithm(Map<String, Double> timePreference,
+                                         double minPrice,double maxPrice,String frequentDestinations) {
         // 初始化用户偏好
-        this.timePreference = analyzeTimePreference(passengerId);
-        this.minPrice = analyzePriceRange(passengerId)[0];
-        this.maxPrice = analyzePriceRange(passengerId)[1];
-        this.frequentDestinations = analyzeFrequentDestinations(passengerId);
-        this.prefersDirectFlight = analyzeTransitPreference(passengerId);
+        this.timePreference = timePreference;
+        this.minPrice = minPrice;
+        this.maxPrice =  maxPrice;
+        this.frequentDestinations = frequentDestinations;
+        this.prefersDirectFlight = analyzeTransitPreference();
     }
 
-    // 计算推荐航班得分
-    public String recommendFlight(List<Map<String, Object>> flights) {
-        double bestScore = -1;
-        String bestFlightId = null;
-
-        for (Map<String, Object> flight : flights) {
-            double score = calculateFlightScore(flight);
-            if (score > bestScore) {
-                bestScore = score;
-                bestFlightId = flight.get("FlightId").toString();
-            }
-        }
-
-        return bestFlightId;
-    }
 
     // 计算单个航班的得分
-    private double calculateFlightScore(Map<String, Object> flight) {
+    double calculateFlightScore(Flight flight) {
         // 权重配置
         double w1 = 0.4, w2 = 0.3, w3 = 0.2, w4 = 0.1;
 
         // 时间偏好得分
-        String departureTime = flight.get("DepartureTime").toString();
-        double timeScore = timePreference.getOrDefault(getTimePeriod(departureTime), 0.0);
+        String timePeriod = getTimePeriod(flight.getStartTime());
+        double timeScore = timePreference.getOrDefault(timePeriod, 0.0);
 
         // 价格偏好得分
-        double price = Double.parseDouble(flight.get("Price").toString());
+        double price = flight.getPrice();
         double priceScore = calculatePriceScore(price);
 
         // 目的地偏好得分
-        String destination = flight.get("Destination").toString();
+        String destination = flight.getArrivalCity();
         double destinationScore = frequentDestinations.contains(destination) ? 1.0 : 0.0;
 
         // 中转偏好得分
-        boolean isDirect = (boolean) flight.get("IsDirect");
-        double transitScore = prefersDirectFlight == isDirect ? 1.0 : 0.0;
+        double transitScore = prefersDirectFlight ? 1.0 : 0.0;
 
         // 综合得分
         return w1 * timeScore + w2 * priceScore + w3 * destinationScore + w4 * transitScore;
     }
 
-    // 时间段转换
-    private String getTimePeriod(String departureTime) {
-        int hour = Integer.parseInt(departureTime.split(":")[0]);
+    // 时间段解析
+    private String getTimePeriod(LocalDateTime startTime) {
+        int hour = startTime.getHour(); // 从 LocalDateTime 获取小时
         if (hour >= 6 && hour < 12) return "Morning";
         if (hour >= 12 && hour < 18) return "Afternoon";
         return "Evening";
@@ -715,49 +789,47 @@ class FlightRecommendationAlgorithm {
         return 1 - (price - minPrice) / (maxPrice - minPrice); // 按比例降低分数
     }
 
-    // 分析时间偏好
-    private Map<String, Double> analyzeTimePreference(String passengerId) {
-        // 模拟分析，实际需要从数据库中查询用户航班数据
-        Map<String, Double> preference = new HashMap<>();
-        preference.put("Morning", 0.6);
-        preference.put("Afternoon", 0.3);
-        preference.put("Evening", 0.1);
-        return preference;
-    }
-
-    // 分析价格范围
-    private double[] analyzePriceRange(String passengerId) {
-        // 模拟分析，实际需要从数据库中查询用户航班数据
-        return new double[]{100.0, 500.0}; // 假设价格范围为100-500
-    }
-
-    // 分析用户常去目的地
-    private List<String> analyzeFrequentDestinations(String passengerId) {
-        // 模拟分析，实际需要从数据库中查询用户航班数据
-        return Arrays.asList("New York", "Tokyo", "London");
-    }
 
     // 分析中转偏好
-    private boolean analyzeTransitPreference(String passengerId) {
+    private boolean analyzeTransitPreference() {
         // 模拟分析，实际需要从 Transit 表中查询用户数据
-        return true; // 假设用户偏好直飞
+        DbSelect d = new DbSelect();
+        boolean ht = d.hasTransitData(Login.PassengerId);
+        return ht; // 假设用户偏好直飞
     }
+
+    // 测试主方法
     public static void main(String[] args) {
-        // 模拟航班数据
-        List<Map<String, Object>> flights = new ArrayList<>();
-        Map<String, Object> flight1 = Map.of("FlightId", "1001", "DepartureTime", "08:00", "Price", 200.0, "Destination", "New York", "IsDirect", true);
-        Map<String, Object> flight2 = Map.of("FlightId", "1002", "DepartureTime", "15:00", "Price", 150.0, "Destination", "Tokyo", "IsDirect", false);
-        flights.add(flight1);
-        flights.add(flight2);
+        // 示例航班数据
+        Flight flight1 = new Flight(
+                1,
+                "2024-12-06-08-00-00", // 起飞时间
+                "2024-12-06-10-30-00", // 降落时间
+                "Beijing", // 起始城市
+                "Shanghai", // 到达城市
+                "2024-12-06", // 出发日期
+                800.0f, // 价格
+                120, // 当前乘客数
+                150, // 座位容量
+                "Direct", // 航班状态
+                "12345", // 乘客ID
+                "AirChina 101" // 航班名称
+        );
+
+
+        Map<String, Double> T = new HashMap<>();
+        T.put("Morning", 0.6);
+        T.put("Afternoon", 0.3);
+        T.put("Evening", 0.1);
 
         // 初始化推荐系统
-        FlightRecommendationAlgorithm recommendation = new FlightRecommendationAlgorithm("12345");
+        FlightRecommendationAlgorithm recommendation = new FlightRecommendationAlgorithm(
+                T,200,2000,"北京");
 
+        double core = recommendation.calculateFlightScore(flight1);
+        System.out.println(core);
 
-
-        // 获取推荐航班
-        String bestFlightId = recommendation.recommendFlight(flights);
-        System.out.println("Recommended Flight ID: " + bestFlightId);
     }
-
 }
+
+

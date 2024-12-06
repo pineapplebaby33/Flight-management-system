@@ -1067,6 +1067,45 @@ public class DbSelect {
 		return result;
 	}
 
+	//查询该用户是否有中转数据
+	public boolean hasTransitData(int pid) {
+		System.out.println("查询 transit 表...");
+		boolean result = false; // 初始化返回值
+		this.db = new DbConnect(); // 数据库连接类实例化
+		this.cn = this.db.Get_Connection(); // 获取数据库连接
+
+		try {
+			// SQL 查询语句
+			String sql = "SELECT 1 FROM transit WHERE Pid = ? LIMIT 1"; // 仅检查是否存在匹配数据
+			this.pst = cn.prepareStatement(sql);
+
+			// 设置参数
+			this.pst.setInt(1, pid);
+
+			// 执行查询
+			this.ret = pst.executeQuery();
+
+			// 判断查询结果
+			if (ret.next()) {
+				result = true; // 如果有数据，则返回 true
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// 关闭资源
+			try {
+				if (ret != null) ret.close();
+				if (pst != null) pst.close();
+				if (cn != null) cn.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return result;
+	}
+
+
 	//查询OrderID
 	public Integer queryOrderId(int pid, int fid) {
 		System.out.println("查询订单表...");
