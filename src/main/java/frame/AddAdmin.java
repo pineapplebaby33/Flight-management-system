@@ -2,7 +2,7 @@ package frame;
 
 import flight.DbInsert;
 
-import java.awt.Window;
+import java.awt.*;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -37,6 +37,7 @@ public class AddAdmin {
         frame.setBounds(100, 100, 724, 531);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
+        frame.setTitle("添加管理员");
 
         JLabel label = new JLabel("管理员姓名");
         label.setBounds(113, 137, 136, 29);
@@ -79,6 +80,19 @@ public class AddAdmin {
         });
         Create.setBounds(275, 354, 153, 37);
         frame.getContentPane().add(Create);
+
+        JButton button_2 = new JButton("返回");
+        button_2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.setVisible(false);
+                AdminFunction ad = new AdminFunction();
+                ad.getFrame().setVisible(true);
+            }
+        });
+        //button_2.setFont(new Font("宋体", Font.PLAIN, 20));
+        button_2.setBounds(275, 400, 153, 37);
+        frame.getContentPane().add(button_2);
     }
 
     public Window getFrame() {

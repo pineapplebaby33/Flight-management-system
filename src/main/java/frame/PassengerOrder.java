@@ -51,7 +51,7 @@ public class PassengerOrder {
 
 
 		//取消订单提示
-		JLabel label = new JLabel("双击订单可以进入取消订单页面");
+		JLabel label = new JLabel("右键可以进行订单相关操作");
 		label.setForeground(Color.RED);
 		label.setBounds(26, 401, 301, 15);
 		frame.getContentPane().add(label);
@@ -86,29 +86,41 @@ public class PassengerOrder {
 			String[] fullPackageArray = fullPackages.toArray(new String[0]);
 			System.out.println("Full Packages: " + Arrays.toString(fullPackageArray));
 
+				if(fullPackageArray.length != 0){
+					System.out.println("订单里有属于套餐的订单");
+					// 遍历所有套餐状态
+					for (String currentPackageStatus : fullPackageArray) {
+						System.out.println("当前检查的套餐状态: " + currentPackageStatus);
 
-				// 遍历所有套餐状态
-				for (String currentPackageStatus : fullPackageArray) {
-					System.out.println("当前检查的套餐状态: " + currentPackageStatus);
+						// 遍历所有订单，筛选出匹配当前套餐状态的订单
+						for (int i = 0; i < order.length; i++) {
+							PackageOrder matchedPackageOrder = s.PackageOrderSelect(Login.PassengerId, currentPackageStatus, order[i].getId());
+							System.out.println("matchedPackageOrder"+matchedPackageOrder.getId());
 
-					// 遍历所有订单，筛选出匹配当前套餐状态的订单
-					for (int i = 0; i < order.length; i++) {
-						PackageOrder matchedPackageOrder = s.PackageOrderSelect(Login.PassengerId, currentPackageStatus, order[i].getId());
-
-						//判断是否为套餐订单
-						if(matchedPackageOrder.getId()==0){
-							// 如果未匹配当前套餐，则使用默认价格（仅在未被其他套餐处理过时）
-							if (o_ob2[i][6] == null) { // 防止被多次覆盖
-								o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
-								System.out.println(Login.PassengerId + "的订单" + order[i] + "未匹配到套餐 " + currentPackageStatus);
+							//判断是否为套餐订单
+							if(matchedPackageOrder.getId()==0){
+								// 如果未匹配当前套餐，则使用默认价格（仅在未被其他套餐处理过时）
+								if (o_ob2[i][6] == null) { // 防止被多次覆盖
+									o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
+									System.out.println(Login.PassengerId + "的订单" + order[i] + "未匹配到套餐 " + currentPackageStatus);
+								}
+							}else if (matchedPackageOrder != null) {
+								// 设置套餐匹配价格
+								o_ob2[i][6] = String.valueOf(matchedPackageOrder.getPrice());
+								System.out.println(Login.PassengerId + "的订单" + o_ob2[i][0] + "匹配到套餐 " + currentPackageStatus + "，订单ID：" + matchedPackageOrder.getId());
 							}
-						}else if (matchedPackageOrder != null) {
-							// 设置套餐匹配价格
-							o_ob2[i][6] = String.valueOf(matchedPackageOrder.getPrice());
-							System.out.println(Login.PassengerId + "的订单" + o_ob2[i][0] + "匹配到套餐 " + currentPackageStatus + "，订单ID：" + matchedPackageOrder.getId());
+						}
+					}
+				}else{
+					System.out.println("订单里没有属于套餐的订单");
+					for (int i = 0; i < order.length; i++) {
+						if (o_ob2[i][6] == null) { // 防止被多次覆盖
+							o_ob2[i][6] = String.valueOf(order[i].getFlightId().getPrice());
+							System.out.println(Login.PassengerId + "的订单" + order[i] + "未匹配到套餐 " + currentPackageStatus);
 						}
 					}
 				}
+
 
 				// 设置其他信息（餐食服务等）
 				for (int i = 0; i < order.length; i++) {

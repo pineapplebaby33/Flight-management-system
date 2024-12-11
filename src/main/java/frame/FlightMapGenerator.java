@@ -42,6 +42,7 @@ public class FlightMapGenerator {
         cityCoordinates.put("武汉", new double[]{30.5928, 114.3055});
         cityCoordinates.put("南京", new double[]{32.0603, 118.7969});
         cityCoordinates.put("成都", new double[]{30.5728, 104.0668});
+        cityCoordinates.put("四川", new double[]{30.5728, 104.0668});
         cityCoordinates.put("贵阳", new double[]{26.6470, 106.6302});
         cityCoordinates.put("昆明", new double[]{25.0406, 102.7123});
         cityCoordinates.put("南宁", new double[]{22.8170, 108.3669});
