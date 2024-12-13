@@ -911,6 +911,38 @@ public class DbSelect {
 		return cities;
 	}
 
+	//通过fid查询航班状态
+	public String FlightSelectStatus(int fid, boolean isDomestic) {
+		this.db = new DbConnect();
+		this.cn = this.db.Get_Connection();
+		try {
+			// 根据 isDomestic 参数选择查询的表
+			String tableName = isDomestic ? "`flight`" : "`flight1`";
+			String _sql = "select FlightStatus from " + tableName + " where Id = ?;";
+			this.pst = cn.prepareStatement(_sql);
+			this.pst.setInt(1, fid); // 设置参数
+
+			this.ret = pst.executeQuery();
+
+			if (ret.next()) { // 如果有结果
+				String flightStatus = ret.getString("FlightStatus");
+				this.ret.close();
+				this.cn.close();
+				return flightStatus;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ret != null) ret.close();
+				if (cn != null) cn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return null; // 如果未找到，返回 null
+	}
+
 
 
 	//A-查询预定信息√

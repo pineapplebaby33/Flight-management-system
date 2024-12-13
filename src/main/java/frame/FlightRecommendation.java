@@ -405,7 +405,7 @@ public class FlightRecommendation {
                 ? String.join(", ", fullPackageArray)
                 : "无已购套餐";
         JLabel show2 = new JLabel("历史已购套餐: " + history);
-        show2.setBounds(570, 400, 150, 30);
+        show2.setBounds(570, 400, 500, 30);
         frame.getContentPane().add(show2);
 
         //跳转支付界面

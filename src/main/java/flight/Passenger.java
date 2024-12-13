@@ -26,18 +26,7 @@ public class Passenger {
 	}
 
 
-	/*
-	public Order[] SelectOrders(String pwd) {
-		if (Passenger.CheckPwd(this.getRealName(), pwd)) {
-			return new DbSelect().PassengerOrders(this.getId());
-		} else {
-			System.err.println("�˿��������");
-			return null;
-		}
-	}
 
-
-	 */
 	//检查密码√
 	public static boolean CheckPwd(String RealName, String pwd) {
 		DbSelect _s = new DbSelect();
@@ -107,46 +96,6 @@ public class Passenger {
 		return  Integer.toString(seatNumber) + seatLetter ;
 	}
 
-	/*
-	public static Order ReserveFlight(int pid, int fid, String pwd, int mode) {
-
-		DbSelect select = new DbSelect();
-		Flight f = select.FlightSelect(fid);
-
-		if (f.getFlightStatus().equals("AVAILABLE")) {
-			Passenger p = select.PassengerSelect(pid);
-
-			if (Passenger.CheckPwd(p.getRealName(), pwd)) {
-				if (select.OrderSelect(pid, fid) == null) {
-
-					DbInsert insert = new DbInsert();
-					// �������ڸ�ʽ
-					SimpleDateFormat df = new SimpleDateFormat(
-							"yyyy-MM-dd-HH-mm-ss");
-					String CreateDate = df.format(new Date());
-
-					boolean re = insert.OrderInsert(p.getId(), p.getId(),
-							f.getId(), CreateDate, "PAID");
-					// ����Flight��Passenger�б��CurrentPassengers������Passenger��OrderList
-					re = re && Flight.ReserveFlight(pid, fid)
-							&& p.UpdateOrderList(fid);
-					if (re) {
-						return select.OrderSelect(pid, fid);
-					}
-				} else {
-					System.err.println("�����Ѵ��ڣ��޷��ظ���Ʊ");
-				}
-			} else {
-				System.err.println("�˿��������");
-				return null;
-			}
-		} else {
-			System.err.println("����״̬�쳣������Ԥ��");
-			return null;
-		}
-		return null;
-	}
-*/
 
 	//订单表_添加P.OrderList
 	public boolean UpdateOrderList(int fid,boolean isDomestic) {

@@ -13,6 +13,9 @@ import javax.swing.*;
 import flight.DbSelect;
 import flight.Flight;
 import flight.PackageOrder;
+import flight.Passenger;
+
+import static java.awt.SystemColor.window;
 
 public class ReserveFlight {
 	private JFrame frame;

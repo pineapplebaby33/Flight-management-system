@@ -436,8 +436,16 @@ public class Research {
 							Flight selectedFlight = currentFlights[row];
 							frame.setVisible(false);
 							Login.FlightId = selectedFlight.getId();
-							ReserveFlight window = new ReserveFlight(isDomestic);
-							window.getFrame().setVisible(true);
+							DbSelect ds = new DbSelect();
+							String isfull= ds.FlightSelectStatus(Login.FlightId,isDomestic);
+							if(isfull.equals("FULL")){
+								AllDialog.Dialog(frame, "航班已满");
+								frame.setVisible(true);
+							}else{
+								ReserveFlight window = new ReserveFlight(isDomestic);
+								window.getFrame().setVisible(true);
+							}
+
 						}
 					}
 				}

@@ -115,54 +115,7 @@ class FlightSearch {
     }
 }
 
-/*
-class FlightProcessor {
-    public Flight[] processFlights(Flight[] flights, String startCity, String destinationCity, LocalDateTime startDate) {
-        // 创建航班图
-        FlightGraph flightGraph = new FlightGraph();
 
-        // 添加符合日期条件的航班信息到图中
-        for (Flight flight : flights) {
-            // 只判断 startTime 的日期部分是否等于 startDate 的日期部分
-            if (flight.getStartTime().toLocalDate().isEqual(startDate.toLocalDate())) {
-                flightGraph.addFlight(flight);
-            }
-        }
-
-        // 创建航班搜索对象
-        FlightSearch flightSearch = new FlightSearch(flightGraph);
-
-        // 查找最快和最便宜路径
-        FlightPathResult result = flightSearch.findPaths(startCity, destinationCity);
-
-        // 获取所有可能的路径
-        List<List<Flight>> allPaths = flightGraph.findAllPaths(startCity, destinationCity);
-
-        // 构建 FlightInfo[] flights 数组
-        List<Flight> flightsList = new ArrayList<>();
-
-        // 添加"最快路径"标签
-        flightsList.add(new Flight(-1, null, null, "", "", "", 0.0f, 0, 0, "","0", "最快路径："));
-        flightsList.addAll(result.getFastestPath());
-
-        // 添加"最便宜路径"标签
-        flightsList.add(new Flight(-2, null, null, "", "", "", 0.0f, 0, 0, "", "0", "最便宜路径："));
-        flightsList.addAll(result.getCheapestPath());
-
-        // 添加剩余路径（排除最快和最便宜的路径）
-        flightsList.add(new Flight(-3, null, null, "", "", "", 0.0f, 0, 0, "", "0", "剩下的路径："));
-        for (List<Flight> path : allPaths) {
-            if (!path.equals(result.getFastestPath()) && !path.equals(result.getCheapestPath())) {
-                flightsList.addAll(path);
-            }
-        }
-
-        // 返回构建好的 FlightInfo[] 数组
-        return flightsList.toArray(new Flight[0]);
-    }
-
-}
- */
 class FlightProcessor {
     public Flight[] processFlights(Flight[] flights, String startCity, String destinationCity, LocalDateTime startDate) {
         // 创建航班图

@@ -331,54 +331,6 @@ public class DbInsert {
 
 
 	public static void main(String[] args) {
-		/*
-		 * Example �Д�Flight���딵���Ƿ�Ҏ���K�x�����
-		DbInsert d = new DbInsert();
-		DbSelect s = new DbSelect();
-		Flight xFlight = s.FlightSelect(1);
-		boolean rex = false;
-		System.out.println(DateTime.GetDateTimeStr(xFlight.getStartTime()));
-		System.out.println(DateTime.GetDateTimeStr(xFlight.getArrivalTime()));
-		DateTime _t1 = DateTime.GetDateTimeOb(DateTime.GetDateTimeStr(xFlight
-				.getStartTime()));
-		DateTime _t2 = DateTime.GetDateTimeOb(DateTime.GetDateTimeStr(xFlight
-				.getArrivalTime()));
-		System.out.println("���ʱ���Ƿ���ڵ���ʱ�䣺" + DateTime.CompareDate(_t1, _t2));
-		System.out.println("��ʱ�����Ƿ����2Сʱ��" + DateTime.GetSub(_t1, _t2));
-		rex = d.FlightInsert(DateTime.GetDateTimeStr(xFlight.getStartTime()),
-				DateTime.GetDateTimeStr(xFlight.getArrivalTime()),
-				xFlight.getStartCity(), "����", xFlight.getDepartureDate(),
-				xFlight.getPrice(), xFlight.getCurrentPassengers(),
-				xFlight.getSeatCapacity(), xFlight.getFlightStatus(),
-				xFlight.GetPassengerString(xFlight.getPassengerId()), "XZ98521");
-		if (rex) {
-			System.out.println("��ӳɹ�");
-		} else {
-			System.out.println("���ʧ��");
-		}*/
-		/*
-		 * Passenger/Admin/Flight/Order Insert Example DbInsert d = new
-		 * DbInsert(); DbSelect s=new DbSelect(); Flight
-		 * xFlight=s.FlightSelect(1); Passenger passenger=s.PassengerSelect(2);
-		 * Order o=s.OrderSelect(1); boolean rex=false;
-		 * rex=d.OrderInsert(o.getPassengerId().getId(), o.getSeat(),
-		 * o.getFlightId().getId(), DateTime.GetDateTimeStr(o.getCreateDate()),
-		 * o.getStatus());
-		 * if(rex){System.out.println("��ӳɹ�");}else{System.out.println("���ʧ��");}
-		 * rex
-		 * =d.FlightInsert(DateTime.GetDateTimeStr(xFlight.getStartTime()),DateTime
-		 * .GetDateTimeStr(xFlight.getArrivalTime()),xFlight.getStartCity(),
-		 * "����", xFlight.getDepartureDate(),xFlight.getPrice(),
-		 * xFlight.getCurrentPassengers(),xFlight.getSeatCapacity(),
-		 * xFlight.getFlightStatus
-		 * (),xFlight.GetPassengerString(xFlight.getPassengerId()),"XZ98521");
-		 * if(rex){System.out.println("��ӳɹ�");}else{System.out.println("���ʧ��");}
-		 * rex=d.AdminInsert("Admin888","admin888");
-		 * if(rex){System.out.println("��ӳɹ�");}else{System.out.println("���ʧ��");}
-		 * rex
-		 * =d.PassengerInsert(passenger.getRealName(),passenger.getIdentityId(),
-		 * "balabala", "");
-		 * if(rex){System.out.println("��ӳɹ�");}else{System.out.println("���ʧ��");}
-		 */
+
 	}
 }

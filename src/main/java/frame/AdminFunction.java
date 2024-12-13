@@ -276,21 +276,6 @@ public class AdminFunction {
         newFlight.setBounds(183, 541, 190, 50);
         AdminFrame.getContentPane().add(newFlight);
 
-        /*
-        //按钮_查询订单
-        JButton SelectOrder = new JButton("查询订单");
-        SelectOrder.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                AdminFrame.setVisible(false);
-                OrderShow w = new OrderShow();
-                w.getFrame().setVisible(true);
-            }
-        });
-        SelectOrder.setBounds(424, 541, 153, 50);
-        AdminFrame.getContentPane().add(SelectOrder);
-
-         */
 
         //按钮_查询预定信息
         JButton Booking = new JButton("查询预订信息");
