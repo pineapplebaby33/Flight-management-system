@@ -944,7 +944,6 @@ public class DbSelect {
 	}
 
 
-
 	//A-查询预定信息√
 	public BookingInfo[] BookingInfoSelect(Boolean isDomestic) {
 		this.db = new DbConnect();
